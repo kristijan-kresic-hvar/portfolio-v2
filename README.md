@@ -41,3 +41,5 @@ yarn dev          # localhost:4321
 - [`CLAUDE.md`](./CLAUDE.md) — engineering conventions for AI coding agents (Claude Code, Codex, Cursor)
 
 <!-- ci smoke test -->
+
+<!-- review smoke -->
