@@ -39,3 +39,5 @@ yarn dev          # localhost:4321
 
 - [`ARCHITECTURE.md`](./ARCHITECTURE.md) — system overview, route map, Brief pipeline diagram, design system, key decisions
 - [`CLAUDE.md`](./CLAUDE.md) — engineering conventions for AI coding agents (Claude Code, Codex, Cursor)
+
+<!-- ci smoke test -->
