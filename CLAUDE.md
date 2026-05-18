@@ -145,6 +145,22 @@ Branch naming: `<type>/<scope>-<short-slug>` (e.g. `feat/hero-with-headshot`, `c
 - Component-scoped `<style>` only when Tailwind can't (rare)
 - Extract logic >10 lines into `src/lib/utils/`
 
+## API endpoints — `prerender = false` required
+
+`astro.config.mjs` uses `output: 'static'` (Astro 5+ default; the legacy `output: 'hybrid'` was removed). Static mode prerenders everything at build time, which breaks server-runtime endpoints.
+
+Every file under `src/pages/api/**` (and any other route that must run on Vercel at request time — e.g. dynamic OG generator `src/pages/og/[slug].png.ts`) **must export `prerender = false`** at the top, before any other code:
+
+```ts
+// src/pages/api/contact.ts
+export const prerender = false;
+
+import type { APIRoute } from 'astro';
+// …
+```
+
+Forgetting this means Astro tries to evaluate the endpoint at build time, which either fails (no env vars) or produces a useless static response. The Vercel adapter relies on this flag to know which routes ship as serverless functions.
+
 ## Comments
 
 Default: no comments. Only when WHY is non-obvious.
