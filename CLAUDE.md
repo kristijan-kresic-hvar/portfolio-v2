@@ -117,7 +117,7 @@ Enforced by `commitlint` (commit-msg hook via lefthook).
 
 Trunk-based with self-PR + squash-merge.
 
-- `master` = always deployable
+- `main` = always deployable
 - Feature branches per phase or logical chunk
 - PR titles match Conventional Commits format
 - Squash-merge by default (clean linear history)
