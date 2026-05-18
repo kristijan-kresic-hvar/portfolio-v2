@@ -1,0 +1,41 @@
+name: code-review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  claude-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude code review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          mode: review
+          direct_prompt: |
+            Review this pull request against the repo conventions in CLAUDE.md.
+
+            Focus on:
+            - Conventional Commits format on commits (type + scope whitelist)
+            - TypeScript strictness: no `any`, no `@ts-ignore`, respect `noUncheckedIndexedAccess`
+            - Astro/React island boundaries: `client:` directives explicit and minimal
+            - Path aliases used (no `../../../`)
+            - Tailwind v4 tokens via `@theme` — no hardcoded colors
+            - Accessibility (jsx-a11y rules, semantic HTML, focus rings)
+            - Performance (image optimization, RSC defaults, no unnecessary JS)
+            - Naming conventions (kebab files, PascalCase components, etc.)
+
+            For each issue: file:line, problem, suggested fix. Skip nitpicks the linter/prettier already catches.
+
+            End with a single-line verdict: APPROVE / REQUEST_CHANGES / COMMENT.

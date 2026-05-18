@@ -1,0 +1,9 @@
+dist
+.astro
+.yarn
+.vercel
+node_modules
+*.lock
+yarn.lock
+package-lock.json
+public

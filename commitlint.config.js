@@ -1,0 +1,40 @@
+/** @type {import('@commitlint/types').UserConfig} */
+export default {
+  extends: ['@commitlint/config-conventional'],
+  rules: {
+    'type-enum': [
+      2,
+      'always',
+      ['feat', 'fix', 'refactor', 'style', 'chore', 'docs', 'perf', 'test', 'build', 'ci'],
+    ],
+    'scope-enum': [
+      2,
+      'always',
+      [
+        'setup',
+        'tokens',
+        'primitives',
+        'layout',
+        'hero',
+        'trust-strip',
+        'featured-work',
+        'capabilities',
+        'workflow',
+        'stack-chips',
+        'cta-band',
+        'work',
+        'blog',
+        'brief-cron',
+        'contact',
+        'about',
+        'seo',
+        'motion',
+        'a11y',
+        'deps',
+      ],
+    ],
+    'subject-case': [2, 'always', ['lower-case', 'sentence-case', 'start-case']],
+    'subject-max-length': [2, 'always', 72],
+    'body-max-line-length': [2, 'always', 100],
+  },
+};

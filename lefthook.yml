@@ -1,0 +1,16 @@
+pre-commit:
+  parallel: true
+  jobs:
+    - name: prettier
+      glob: '*.{ts,tsx,js,mjs,cjs,astro,md,mdx,json,yml,yaml,css}'
+      run: yarn prettier --write {staged_files}
+      stage_fixed: true
+    - name: eslint
+      glob: '*.{ts,tsx,astro}'
+      run: yarn eslint --fix {staged_files}
+      stage_fixed: true
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: yarn commitlint --edit {1}

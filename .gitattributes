@@ -1,0 +1,5 @@
+* text=auto eol=lf
+
+yarn.lock linguist-generated
+.yarn/releases/** binary linguist-vendored
+.yarn/plugins/** binary linguist-vendored
