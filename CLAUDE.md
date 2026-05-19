@@ -4,6 +4,12 @@ Engineering conventions for AI coding agents working in this repo. Mirror of the
 
 Private repo. Every change is deliberate.
 
+## Session pre-flight (Phase 2+ — UI file edits)
+
+Before any `Edit`/`Write` on `.astro` / `.css` / `.scss` / `.svelte` / `.tsx` files: delegate `accessibility-agents:accessibility-lead` with the planned components or section. Required — the PreToolUse hook at `~/.claude/hooks/a11y-enforce-edit.sh` blocks UI-file edits until the per-session marker `/tmp/a11y-reviewed-${SESSION_ID}` exists (dropped automatically by the PostToolUse Agent hook after a successful delegation). One delegation per session unlocks the rest of the session AND produces real a11y review aligned with the Phase 10 Lighthouse `a11y = 100` target.
+
+Canonical spec: `~/Obsidian/brain/01 - Projects/portfolio-v2/portfolio-v2.md` → Phase 2 pre-flight note.
+
 ## Stack
 
 - Astro 6 (App Router-style file-based routing) — `output: 'static'` w/ Vercel adapter
