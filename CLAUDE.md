@@ -192,12 +192,40 @@ Never:
 - Vercel env vars set via dashboard, never in code
 - Local dev uses `.env.local`
 
+## Design workflow (impeccable)
+
+All non-trivial UI work runs through the `impeccable` skill. The skill loads two project files at the repo root automatically — they're the contract:
+
+- **`PRODUCT.md`** — positioning, users, tone, anti-references, strategic principles. `register: brand` (portfolio is a marketing surface; design IS the product).
+- **`DESIGN.md`** — colors, typography, spacing, motion, components. Mirror of `src/styles/global.css` `@theme {}` block; if they diverge, fix the CSS first and reflect it here.
+
+Before touching components, layouts, sections, motion, or a11y: invoke `/impeccable <sub-command> <target>`. The sub-command tells the skill what flow to load.
+
+### Phase → sub-command mapping
+
+| Phase | Task                                                                      | Sub-command                                                                                              |
+| ----- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| 2     | Design tokens + primitives (Button, Card, Chip, Link, Section, Container) | `/impeccable document` once to verify DESIGN.md, then `/impeccable craft` per primitive                  |
+| 3     | Layouts (Nav, Footer, PageShell)                                          | `/impeccable shape` brief, then `/impeccable craft`                                                      |
+| 4     | Landing sections (Hero, TrustStrip, FeaturedWork, etc.)                   | `/impeccable craft` per section, `/impeccable polish` over the full page                                 |
+| 5     | Case study template + 3 real studies                                      | `/impeccable craft` template, `/impeccable polish` per filled case study                                 |
+| 6     | Blog templates (Brief + Deep-dive)                                        | `/impeccable craft` for templates, `/impeccable typeset` for prose tuning                                |
+| 7     | About + Contact pages                                                     | `/impeccable craft` per page, `/impeccable harden` on the contact form (error states + focus management) |
+| 8     | Motion polish                                                             | `/impeccable animate` page-by-page, `/impeccable polish` for hover micro-interactions                    |
+| 10    | A11y pass                                                                 | `/impeccable audit` site-wide, `/impeccable harden` for fixes                                            |
+
+Phases 9 (SEO/meta) and 11 (deploy) are mechanical — no impeccable.
+
+**Don't compress impeccable's gates.** Several sub-commands (especially `craft`) have multi-step user-confirmation gates between shape → mock direction → palette → build. Respect them; they're how the skill avoids generic output.
+
+`/impeccable live` warms context via `live.mjs` and serves a local browser session for real-time iteration. Use it during Phase 4 polish.
+
 ## Skill invocation rules
 
 When working in this repo, invoke these skills proactively:
 
 - **`claude-api`** — BEFORE writing or modifying any code that imports `@anthropic-ai/sdk`. Applies to `src/pages/api/cron/brief.ts`, `src/lib/brief/generate.ts`, and any future Anthropic SDK integration. Skill bundles current best practices (prompt caching, model migration, tool use, batch, citations) easy to miss otherwise.
-- **`impeccable`** — primary design driver for Phase 4 (landing), Phase 5 (case study polish), Phase 8 (motion), Phase 10 (a11y). Has 23 sub-commands. Preferred over `frontend-design` here.
+- **`impeccable`** — primary design driver for all UI work. See "Design workflow (impeccable)" above for the gate + sub-command mapping. Preferred over `frontend-design` for this project — broader scope + auto-loads PRODUCT.md / DESIGN.md.
 - **`astro`** — invoke for non-trivial `.astro` work, content collections, SSR adapter config.
 - **`firecrawl-*`** — for content research (Brief enrichment, reference site scraping).
 - **`deploy-to-vercel`** — launch step + preview deploys.
