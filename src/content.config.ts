@@ -11,6 +11,8 @@ const work = defineCollection({
     stack: z.array(z.string()),
     year: z.number(),
     outcome: z.string().optional(),
+    constraint: z.string().optional(),
+    retrospective: z.string().optional(),
     cover: z.string().optional(),
     draft: z.boolean().default(false),
     featured: z.boolean().default(false),
