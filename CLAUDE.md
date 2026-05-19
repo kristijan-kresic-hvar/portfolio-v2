@@ -201,20 +201,22 @@ All non-trivial UI work runs through the `impeccable` skill. The skill loads two
 
 Before touching components, layouts, sections, motion, or a11y: invoke `/impeccable <sub-command> <target>`. The sub-command tells the skill what flow to load.
 
-### Phase → sub-command mapping
+### Phase → skill mapping
 
-| Phase | Task                                                                      | Sub-command                                                                                              |
-| ----- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| 2     | Design tokens + primitives (Button, Card, Chip, Link, Section, Container) | `/impeccable document` once to verify DESIGN.md, then `/impeccable craft` per primitive                  |
-| 3     | Layouts (Nav, Footer, PageShell)                                          | `/impeccable shape` brief, then `/impeccable craft`                                                      |
-| 4     | Landing sections (Hero, TrustStrip, FeaturedWork, etc.)                   | `/impeccable craft` per section, `/impeccable polish` over the full page                                 |
-| 5     | Case study template + 3 real studies                                      | `/impeccable craft` template, `/impeccable polish` per filled case study                                 |
-| 6     | Blog templates (Brief + Deep-dive)                                        | `/impeccable craft` for templates, `/impeccable typeset` for prose tuning                                |
-| 7     | About + Contact pages                                                     | `/impeccable craft` per page, `/impeccable harden` on the contact form (error states + focus management) |
-| 8     | Motion polish                                                             | `/impeccable animate` page-by-page, `/impeccable polish` for hover micro-interactions                    |
-| 10    | A11y pass                                                                 | `/impeccable audit` site-wide, `/impeccable harden` for fixes                                            |
+| Phase | Task                                                                      | Primary skill(s)                                                                                                                  |
+| ----- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| 2     | Design tokens + primitives (Button, Card, Chip, Link, Section, Container) | `/impeccable document` once to verify DESIGN.md, then `/impeccable craft` per primitive                                           |
+| 3     | Layouts (Nav, Footer, PageShell)                                          | `/impeccable shape` brief, then `/impeccable craft`                                                                               |
+| 4     | Landing sections (Hero, TrustStrip, FeaturedWork, etc.)                   | `/impeccable craft` per section, `/impeccable polish` over the full page                                                          |
+| 5     | Case study template + 3 real studies                                      | `/impeccable craft` template, `/impeccable polish` per filled study, `image` for screenshot optimization                          |
+| 6     | Blog templates (Brief + Deep-dive)                                        | `/impeccable craft` for templates, `/impeccable typeset` for prose tuning                                                         |
+| 7     | About + Contact pages                                                     | `/impeccable craft` per page, `/impeccable harden` on the contact form, `playwright-cli` for browser QA                           |
+| 8     | Motion polish                                                             | `/impeccable animate` page-by-page, `/impeccable polish` for hover micro-interactions                                             |
+| 9     | SEO / structured data / meta                                              | `schema` (JSON-LD authoring), `seo-audit` (technical sweep), `ai-seo` (AEO + citations)                                           |
+| 10    | A11y + perf pass                                                          | `/impeccable audit` site-wide, `/impeccable harden` for fixes, `webapp-testing` (cross-device), `web-quality-skills` (Lighthouse) |
+| 11    | Deploy + launch                                                           | `deploy-to-vercel`, `launch` (launch sequencing), `directory-submissions` (dev-directory backlinks)                               |
 
-Phases 9 (SEO/meta) and 11 (deploy) are mechanical — no impeccable.
+Phases 1 (setup) is mechanical — no impeccable.
 
 **Don't compress impeccable's gates.** Several sub-commands (especially `craft`) have multi-step user-confirmation gates between shape → mock direction → palette → build. Respect them; they're how the skill avoids generic output.
 
@@ -222,15 +224,49 @@ Phases 9 (SEO/meta) and 11 (deploy) are mechanical — no impeccable.
 
 ## Skill invocation rules
 
-When working in this repo, invoke these skills proactively:
+When working in this repo, invoke these skills proactively. Default to **CLI + skill over MCP** wherever a CLI covers the capability (preference locked 2026-05-19).
 
-- **`claude-api`** — BEFORE writing or modifying any code that imports `@anthropic-ai/sdk`. Applies to `src/pages/api/cron/brief.ts`, `src/lib/brief/generate.ts`, and any future Anthropic SDK integration. Skill bundles current best practices (prompt caching, model migration, tool use, batch, citations) easy to miss otherwise.
+### Primary (always-on for matching phases)
+
 - **`impeccable`** — primary design driver for all UI work. See "Design workflow (impeccable)" above for the gate + sub-command mapping. Preferred over `frontend-design` for this project — broader scope + auto-loads PRODUCT.md / DESIGN.md.
+- **`claude-api`** — BEFORE writing or modifying any code that imports `@anthropic-ai/sdk`. Applies to `src/pages/api/cron/brief.ts`, `src/lib/brief/generate.ts`, and any future Anthropic SDK integration. Skill bundles current best practices (prompt caching, model migration, tool use, batch, citations).
 - **`astro`** — invoke for non-trivial `.astro` work, content collections, SSR adapter config.
-- **`firecrawl-*`** — for content research (Brief enrichment, reference site scraping).
-- **`deploy-to-vercel`** — launch step + preview deploys.
+
+### Phase-bound
+
+- **`schema`** — Phase 9. JSON-LD authoring for `Person` (`/about`, `/`), `CreativeWork` (case studies), `BlogPosting` (Briefs + deep-dives).
+- **`seo-audit`** — Phase 9. Technical SEO sweep before launch (canonical, sitemap, meta, OG, robots).
+- **`ai-seo`** — Phase 9. AEO + citation-readiness for the Brief blog (AI search optimization).
+- **`webapp-testing`** — Phase 10. Cross-device QA (Safari iOS, Chrome Android, desktop).
+- **`playwright-cli`** — Phase 7. Contact form QA + Phase 10 browser checks.
+- **`image`** — Phase 5. Case study screenshot optimization (WebP, sizing, lazy-load).
+- **`launch`** — Phase 11. Launch sequencing, Product Hunt prep, launch-day checklist.
+- **`directory-submissions`** — Phase 11+. Dev-portfolio directories for backlinks + discovery.
+- **`deploy-to-vercel`** — Phase 11. Launch step + preview deploys via `vercel` CLI.
+
+### Auxiliary (auto-triggered or per-need)
+
 - **`brainstorming`** — auto-triggers on creative/build work; respect the design-doc gate.
 - **`content-research-writer`** — polishing Brief drafts or case-study copy.
+- **`firecrawl-*`** — for content research (Brief enrichment, reference site scraping).
+- **`find-docs`** — universal. Use to verify Astro 6 / Tailwind v4 / Resend / Anthropic SDK / Octokit API references before writing integration code.
+- **`simplify`** — pre-PR code review for reuse + quality.
+
+### Community skills (installed at `~/.claude/skills/`)
+
+- **`web-quality-skills`** (Addy Osmani / Chrome team) — Phase 10/11. Lighthouse + Core Web Vitals audits. Run before each preview deploy.
+- **`accessibility-agents`** (Community-Access) — Phase 10. Eleven WCAG 2.2 AA specialists. Pair with `/impeccable audit` for full a11y coverage. _(Install blocked by classifier — manual clone required, see `~/.claude/projects/.../memory/cli-over-mcp.md`)_
+- **`schema-markup-generator`** (extracted from AgriciDaniel/claude-seo) — Phase 9. JSON-LD authoring complement to in-session `schema` skill. _(Install blocked by classifier — manual clone required)_
+
+### Project-local skills (committed to repo at `.claude/skills/`)
+
+- **`astro-prerender-check`** — enforces `prerender = false` on any file under `src/pages/api/**` or `src/pages/og/**`. Auto-triggers on edits to those paths.
+- **`commit-scope-validator`** — pre-validates commit messages against the scope whitelist in `commitlint.config.js` before lefthook runs.
+
+### CLI-over-MCP integrations
+
+- **Vercel** — use `vercel` CLI + `deploy-to-vercel` skill. No Vercel MCP.
+- **GitHub** — use `gh` CLI + Octokit (programmatic, in `src/lib/brief/github.ts`). No GitHub MCP.
 
 **NOT applicable:** `next-best-practices` · `shadcn` · `biocirv-*` (this is Astro, not Next; no shadcn registry; not BioCirV).
 
