@@ -40,6 +40,7 @@ All three read in English. CET timezone is surfaced on the Contact page (respons
 - **Confident, not boastful.** Outcomes over adjectives. "200% inquiry boost" beats "I built an amazing site". "Built for the web since 2016" beats "passionate about web development".
 - **Craft-aware.** Specific names + versions. "React 19", "Astro 6", "Tailwind v4" — not "modern stack" or "the latest frameworks".
 - **AI-assisted, not AI-product.** Workflow is honest about AI tooling (Claude, Cursor, Codex) but the product is a _human-finished web product_. Transparency footer on every blog post: "Researched with Claude. Edited and published by me."
+- **Name the AI boundary explicitly.** Per 2026 freelance positioning research: "AI-augmented" alone is now generic noise. Differentiator = naming _where_ AI helps and _where it doesn't_. Locked boundary line for About + How-I-work + FAQ band: **"AI for codegen scaffolds and research drafts. Not for architecture decisions, security review, or anything that ships under my name."** Calms the "did you actually do this?" objection funded buyers now carry.
 - **No hedging.** Cut "in my opinion", "I think", "perhaps", "might".
 - **No em-dashes overuse.** The model loves them; the brand doesn't.
 - **No closing-paragraph filler.** Skip "in conclusion", "I hope this helps", any "I'm excited to..."
