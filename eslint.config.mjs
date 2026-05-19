@@ -27,4 +27,11 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // Astro 6 generates types at .astro/types.d.ts referenced via triple-slash.
+    files: ['**/*.d.ts'],
+    rules: {
+      '@typescript-eslint/triple-slash-reference': ['error', { path: 'always' }],
+    },
+  },
 );
