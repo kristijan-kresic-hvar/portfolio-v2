@@ -1,0 +1,37 @@
+{
+  // Tailwind v4 — IntelliSense can't parse @theme {} blocks; point it at the CSS entry
+  "tailwindCSS.experimental.configFile": "src/styles/global.css",
+  "tailwindCSS.classFunctions": ["cn", "clsx", "cva", "tw"],
+  "tailwindCSS.includeLanguages": {
+    "astro": "html",
+    "mdx": "html"
+  },
+
+  // Astro formatter — explicit for new contributors / fresh clones
+  "[astro]": {
+    "editor.defaultFormatter": "astro-build.astro-vscode"
+  },
+
+  // axe a11y linter — block deploys on errors (Lighthouse a11y 100 target)
+  "axe-linter.severityLevel": "error",
+
+  // ESLint — global setting already covers fixAll on save; nothing extra needed (flat config auto-detected)
+
+  // Markdown / MDX — soft wrap long copy in case studies + blog briefs
+  "[markdown]": {
+    "editor.wordWrap": "on"
+  },
+  "[mdx]": {
+    "editor.wordWrap": "on"
+  },
+
+  // Spell-checker scopes
+  "cSpell.enabledFileTypes": {
+    "astro": true,
+    "mdx": true,
+    "markdown": true,
+    "typescript": true,
+    "typescriptreact": true
+  },
+  "cSpell.words": ["astro", "lenis", "tailwindcss", "vercel"]
+}
