@@ -1,19 +1,16 @@
 ## What
 
-<one-line summary>
+<one-line summary of the change>
 
 ## Why
 
-<problem / motivation>
+<problem / motivation> · Linear: KKD-\_\_\_
 
-## Notes
+## Verification
 
-<screenshots if UI, decisions made, callouts for reviewers>
+<how you confirmed it works — UI screenshots, behaviour checked, edge cases.
+CI already runs typecheck / lint / build, so don't restate those.>
 
-## Checklist
+## Notes for reviewer
 
-- [ ] Conventional Commit format (`type(scope): subject`)
-- [ ] `yarn typecheck` passes
-- [ ] `yarn lint` passes
-- [ ] `yarn build` succeeds
-- [ ] Manual smoke test on local dev server
+<decisions, trade-offs, anything to look at closely — or "none">
