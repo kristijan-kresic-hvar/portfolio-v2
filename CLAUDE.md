@@ -4,11 +4,9 @@ Engineering conventions for AI coding agents working in this repo. Mirror of the
 
 Private repo. Every change is deliberate.
 
-## Session pre-flight (Phase 2+ — UI file edits)
+## Accessibility (Phase 2+ — UI file edits)
 
-Before any `Edit`/`Write` on `.astro` / `.css` / `.scss` / `.svelte` / `.tsx` files: delegate `accessibility-agents:accessibility-lead` with the planned components or section. Required — the PreToolUse hook at `~/.claude/hooks/a11y-enforce-edit.sh` blocks UI-file edits until the per-session marker `/tmp/a11y-reviewed-${SESSION_ID}` exists (dropped automatically by the PostToolUse Agent hook after a successful delegation). One delegation per session unlocks the rest of the session AND produces real a11y review aligned with the Phase 10 Lighthouse `a11y = 100` target.
-
-Canonical spec: `~/Obsidian/brain/01 - Projects/portfolio-v2/portfolio-v2.md` → Phase 2 pre-flight note.
+a11y review is **manual** via `/impeccable audit` — there is no enforcement hook. The old `accessibility-agents:accessibility-lead` delegation + the `a11y-enforce-edit.sh` PreToolUse hook were **removed in the `.claude` rebuild**; do not wait on a `/tmp/a11y-reviewed-*` marker or delegate to a plugin that no longer exists. Target stays `a11y = 100` (Phase 10 Lighthouse) — run `/impeccable audit` during UI work and again at Phase 10.
 
 ## Stack
 
@@ -261,7 +259,7 @@ When working in this repo, invoke these skills proactively. Default to **CLI + s
 ### Community skills (installed at `~/.claude/skills/`)
 
 - **`web-quality-skills`** (Addy Osmani / Chrome team) — Phase 10/11. Lighthouse + Core Web Vitals audits. Run before each preview deploy.
-- **`accessibility-agents`** (Community-Access) — Phase 10. Eleven WCAG 2.2 AA specialists. Pair with `/impeccable audit` for full a11y coverage. _(Install blocked by classifier — manual clone required, see `~/.claude/projects/.../memory/cli-over-mcp.md`)_
+- **`accessibility-agents`** (Community-Access) — **removed in the `.claude` rebuild; not installed.** a11y is now manual via `/impeccable audit` (Phase 10). Listed only so it isn't re-added by mistake.
 - **`schema-markup-generator`** (extracted from AgriciDaniel/claude-seo) — Phase 9. JSON-LD authoring complement to in-session `schema` skill. _(Install blocked by classifier — manual clone required)_
 
 ### Project-local skills (committed to repo at `.claude/skills/`)
@@ -286,7 +284,7 @@ To bypass (rare): `git commit --no-verify`. Don't.
 ## CI
 
 - `.github/workflows/ci.yml` — typecheck + lint + build on PR
-- `.github/workflows/code-review.yml` — Claude Code Action on PR open/sync; requires `ANTHROPIC_API_KEY` repo secret
+- `.github/workflows/code-review.yml` — Claude Code Action on PR open/sync; auth via `CLAUDE_CODE_OAUTH_TOKEN` repo secret (Claude subscription OAuth, not API credits)
 
 ## What we are NOT doing (v1)
 
