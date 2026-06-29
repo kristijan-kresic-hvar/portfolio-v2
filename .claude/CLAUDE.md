@@ -15,7 +15,7 @@ Merges with global `~/.claude/CLAUDE.md`. Project design/product/architecture do
 - Typecheck: `yarn typecheck` (astro check)
 - Lint: `yarn lint` (eslint . && astro check)
 - Format check: `yarn format:check`
-- Tests: none configured — manual QA via `playwright-cli` + browser; a11y/contrast per Phase 10.
+- Tests: `yarn test` (Vitest — unit/schema, via `getViteConfig`). E2E not set up — manual QA via `playwright-cli` + browser; a11y/contrast per Phase 10.
 
 ## Stack
 

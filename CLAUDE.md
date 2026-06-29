@@ -283,12 +283,12 @@ To bypass (rare): `git commit --no-verify`. Don't.
 
 ## CI
 
-- `.github/workflows/ci.yml` — typecheck + lint + build on PR
+- `.github/workflows/ci.yml` — typecheck + lint + test + build on PR
 - `.github/workflows/code-review.yml` — Claude Code Action on PR open/sync; auth via `CLAUDE_CODE_OAUTH_TOKEN` repo secret (Claude subscription OAuth, not API credits)
 
 ## What we are NOT doing (v1)
 
-- Tests (no Vitest / Playwright yet — add when first regression bites)
+- E2E / Playwright tests (Vitest unit tests are wired — `yarn test`, run in CI; add e2e when a real flow needs it)
 - Storybook (component count too low)
 - Design tokens build step (Tailwind v4 `@theme` handles it natively)
 - i18n (EN only)
