@@ -11,6 +11,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "typecheck": "astro check",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint . && astro check",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -55,6 +57,7 @@
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.4"
+    "typescript-eslint": "^8.59.4",
+    "vitest": "^4.1.9"
   }
 }
