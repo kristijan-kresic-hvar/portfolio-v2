@@ -42,8 +42,8 @@ src/
 │   └── motion/          # React islands w/ Framer Motion
 ├── content/
 │   ├── blog/            # MDX briefs + deep-dives
-│   ├── work/            # MDX case studies
-│   └── config.ts        # Zod schemas for collections
+│   └── work/            # MDX case studies
+├── content.config.ts    # Zod schemas for collections (Astro 6: src root, NOT content/config.ts)
 ├── layouts/             # RootLayout, BlogLayout, WorkLayout
 ├── lib/
 │   ├── brief/           # AI Brief workflow (Anthropic SDK + Octokit)
@@ -77,7 +77,7 @@ Always import via aliases. No deep relative paths (`../../../`).
 ```ts
 import Button from '@/components/primitives/Button.astro';
 import { generateBrief } from '@/lib/brief/generate';
-import type { BlogPost } from '@/content/config';
+import { collections } from '@/content.config';
 ```
 
 ## Naming

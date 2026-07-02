@@ -4,6 +4,8 @@ Token spec consumed by the `impeccable` skill. Mirrored in `src/styles/global.cs
 
 Dark only. Single amber accent. Geist + Geist Mono.
 
+> **Status (pre-Phase 2):** this is the _target_ token spec. `src/styles/global.css` currently holds only Phase-1 placeholder tokens (`--color-bg`, `--color-text-muted`, …); the full scale below (`--space-*`, `--text-*`, elevation, motion, radius) gets encoded in Phase 2. Until then, don't assume a token named here resolves in CSS.
+
 ## Colors
 
 ### Backgrounds (4 elevation steps)
