@@ -2,6 +2,8 @@
 
 High-level overview of how the portfolio is wired together. Read this if you want to understand the project beyond a tour of the repo. Engineering conventions live in [`CLAUDE.md`](./CLAUDE.md); design tokens in [`src/styles/global.css`](./src/styles/global.css).
 
+> **Status — documents the intended end-state, not `main` today.** Most of `src/` is currently scaffolded (`.gitkeep` placeholders); only `RootLayout.astro`, `index.astro`, `global.css`, `content.config.ts`, and `env.d.ts` exist. Routes, `lib/`, API/cron endpoints, layouts beyond `RootLayout`, and content land in Phases 2+. Treat the paths below as the target structure.
+
 ## Route map
 
 ```
@@ -44,7 +46,7 @@ All sections are static Astro components except `<Hero />`, `<CTABand />` (motio
 
 ## Content collections
 
-Defined in [`src/content/config.ts`](./src/content/config.ts) using Zod schemas.
+Defined in [`src/content.config.ts`](./src/content.config.ts) using Zod schemas (Astro 6 puts the collection config at the `src/` root, not inside `content/`).
 
 ```
 src/content/
@@ -57,7 +59,7 @@ src/content/
     └── ...
 ```
 
-Frontmatter schemas live in `src/content/config.ts`. Type-safe queries via `getCollection('work')` / `getCollection('blog')`.
+Frontmatter schemas live in `src/content.config.ts`. Type-safe queries via `getCollection('work')` / `getCollection('blog')`.
 
 ## Brief pipeline (monthly cron)
 
