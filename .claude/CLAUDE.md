@@ -42,3 +42,4 @@ Merges with global `~/.claude/CLAUDE.md`. Project design/product/architecture do
 
 - Trunk-based: feature branch → self-PR → squash-merge to `main`. CI + Claude code-review in `.github/workflows`.
 - Per global: worktree + PR, never commit to `main`, never merge without explicit approval.
+- **Merge gate (manual):** branch protection is unavailable (private repo on Free → GitHub 403), so CI does not hard-block merges. Squash-merge only after CI is green **and** the code-review verdict is in — never merge a red or pending PR.
