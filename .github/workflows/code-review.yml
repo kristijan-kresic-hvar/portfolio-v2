@@ -27,9 +27,13 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          use_sticky_comment: true
+          track_progress: true
           prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
             Review this pull request against the repo conventions in CLAUDE.md.
+            The PR branch is already checked out in the current working directory.
 
             Focus on:
             - Conventional Commits format on commits (type + scope whitelist)
@@ -41,6 +45,12 @@ jobs:
             - Performance (image optimization, RSC defaults, no unnecessary JS)
             - Naming conventions (kebab files, PascalCase components, etc.)
 
-            For each issue: file:line, problem, suggested fix. Skip nitpicks the linter/prettier already catches.
-
-            End with a single-line verdict: APPROVE / REQUEST_CHANGES / COMMENT.
+            Post the review as GitHub comments — do NOT submit review text as chat messages:
+            - Use `mcp__github_inline_comment__create_inline_comment` (with `confirmed: true`) for each
+              specific file:line issue, giving the problem + a suggested fix.
+            - Use `gh pr comment` for one short top-level summary, ending with a single-line verdict:
+              APPROVE / REQUEST_CHANGES / COMMENT.
+            - Skip nitpicks the linter/prettier already catches. If nothing needs changing, still post a
+              brief approving summary so the review is never silent.
+          claude_args: |
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
