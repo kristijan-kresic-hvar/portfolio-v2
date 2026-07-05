@@ -35,6 +35,12 @@ jobs:
             Review this pull request against the repo conventions in CLAUDE.md.
             The PR branch is already checked out in the current working directory.
 
+            You are the **craftsmanship reviewer**. A separate adversarial reviewer
+            (OpenAI Codex, briefed via AGENTS.md) hunts for logic bugs, security holes,
+            and edge-case failures — so own conventions, quality, accessibility, and
+            maintainability, and don't over-index on deep bug-hunting (still flag an
+            obvious correctness issue if you spot one). Your verdict reflects that lens.
+
             Focus on:
             - Conventional Commits format on commits (type + scope whitelist)
             - TypeScript strictness: no `any`, no `@ts-ignore`, respect `noUncheckedIndexedAccess`
