@@ -226,7 +226,10 @@ Shadows use the `--shadow-*` namespace (`--shadow-card` → `shadow-card`). Drop
   0 8px 32px rgba(0, 0, 0, 0.4);
 --shadow-glow: 0 0 40px var(--color-accent-glow);
 --shadow-glow-strong: 0 0 60px rgba(245, 158, 11, 0.4);
---shadow-focus-ring: 0 0 0 2px var(--color-bg-base), 0 0 0 4px var(--color-accent);
+/* Focus ring is surface-aware — outline + offset, NOT a box-shadow halo. A halo
+   with a fixed gap color (var(--color-bg-base)) mismatches on elevated surfaces
+   (--color-bg-elev-1/2/3); an outline lets the real background show through:
+     :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px } */
 ```
 
 ## Motion
@@ -359,7 +362,7 @@ Component tokens reference the `--color-*`, `--radius-*`, and `--shadow-*` token
 
 ### Focus ring
 
-- 2px solid `--color-accent`, 2px offset from element bg
+- **Surface-aware:** `outline: 2px solid var(--color-accent)` + `outline-offset: 2px` — the browser shows the real background under the gap, so it works on any elevation (never a fixed-bg box-shadow halo)
 - Visible only on `:focus-visible` (keyboard nav)
 - Mandatory on every interactive element
 
