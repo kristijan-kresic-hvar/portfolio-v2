@@ -1,3 +1,9 @@
+# SAFETY: assumes a PRIVATE, single-maintainer repo. Before going public or adding collaborators:
+#   - add `if: github.event.pull_request.head.repo.full_name == github.repository` to the job (skip fork PRs), and
+#   - treat the PR branch's CLAUDE.md as attacker-controlled — review against the base branch's conventions.
+# GOTCHA: a PR that edits THIS file is skipped by the action's workflow-validation guard (runs green,
+# no review). Verify workflow changes on the NEXT PR after merge. Diagnose silent runs via
+# `gh run view <id> --log` (permission_denials_count vs "Skipping action due to workflow validation").
 name: code-review
 
 on:
@@ -65,3 +71,19 @@ jobs:
             - Skip nitpicks the linter/prettier already catches. Always post a verdict — never silent.
           claude_args: |
             --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr review:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
+
+      # The action exits 0 whether or not a review was posted (quota errors, tool failures, and
+      # permission denials all end "green"). Fail unless a review exists on the current head SHA —
+      # the only mechanical observability available without branch protection (GitHub Free, private).
+      - name: Verify a review was posted on the head SHA
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          COUNT=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews" \
+            --jq "[.[] | select(.commit_id == \"$HEAD_SHA\")] | length")
+          if [ "$COUNT" -eq 0 ]; then
+            echo "::error::Claude ran but posted no review on head $HEAD_SHA — treat this PR as UNREVIEWED."
+            exit 1
+          fi
+          echo "OK: $COUNT review(s) on $HEAD_SHA"
