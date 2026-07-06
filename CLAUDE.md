@@ -234,7 +234,7 @@ When working in this repo, invoke these skills proactively. Default to **CLI + s
 
 - **`impeccable`** — primary design driver for all UI work. See "Design workflow (impeccable)" above for the gate + sub-command mapping. Preferred over `frontend-design` for this project — broader scope + auto-loads PRODUCT.md / DESIGN.md.
 - **`claude-api`** — BEFORE writing or modifying any code that imports `@anthropic-ai/sdk`. Applies to `src/pages/api/cron/brief.ts`, `src/lib/brief/generate.ts`, and any future Anthropic SDK integration. Skill bundles current best practices (prompt caching, model migration, tool use, batch, citations).
-- **`verify-library-api` + `find-docs`** — for non-trivial `.astro` work, content collections, adapter config: check the installed Astro/Tailwind version first, then version-pinned docs. (The old `astro` skill is gone — these two cover it.)
+- **`verify-library-api`** (paired with `find-docs` — see Auxiliary, which owns its description) — for non-trivial `.astro` work, content collections, adapter config: check the installed Astro/Tailwind version first, then version-pinned docs. (The old `astro` skill is gone — these two cover it.)
 
 ### Phase-bound
 
