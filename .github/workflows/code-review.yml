@@ -86,8 +86,8 @@ jobs:
             exit 0
           fi
           HEAD_SHA="${{ github.event.pull_request.head.sha }}"
-          COUNT=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews" \
-            --jq "[.[] | select(.commit_id == \"$HEAD_SHA\")] | length")
+          COUNT=$(gh api --paginate "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews" \
+            --jq "[.[] | select(.commit_id == \"$HEAD_SHA\")] | length" | paste -sd+ - | bc)
           if [ "$COUNT" -eq 0 ]; then
             echo "::error::Claude ran but posted no review on head $HEAD_SHA — treat this PR as UNREVIEWED."
             exit 1
