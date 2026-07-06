@@ -1,0 +1,98 @@
+# merge-gate — stamps a commit status (context: "merge-gate") on the PR head that is
+# green ONLY when every configured AI reviewer has approved the CURRENT head:
+#   - Claude leg (required iff .github/workflows/code-review.yml exists): a review by
+#     claude[bot] with state APPROVED on the head SHA. Waived with a note when the PR
+#     edits code-review.yml itself (the review action skips such PRs by design).
+#   - Codex leg (required iff AGENTS.md exists): zero unresolved Codex threads AND a
+#     clean-pass signal on the head (a "didn't find any major issues" comment naming the
+#     head SHA, or a 👍 reaction newer than the head commit).
+# Re-evaluates on pushes, submitted reviews, and new comments (Codex's clean pass is a
+# comment). NOTE: on GitHub Free private repos this status is VISUAL — branch protection
+# (which would hard-block the button) needs a paid plan or a public repo. The local
+# ~/.claude merge-gate hook is the hard gate for agent-driven merges.
+name: merge-gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  pull_request_review:
+    types: [submitted, dismissed]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: read
+  statuses: write
+
+concurrency:
+  group: merge-gate-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    # issue_comment also fires on plain issues — only run for comments on PRs
+    if: github.event_name != 'issue_comment' || github.event.issue.pull_request
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Evaluate reviewers and stamp commit status
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUM: ${{ github.event.pull_request.number || github.event.issue.number }}
+        run: |
+          set -euo pipefail
+          HEAD_SHA=$(gh api "repos/$REPO/pulls/$PR_NUM" --jq .head.sha)
+
+          # Fail-closed: any error below stamps a red status before the job dies.
+          stamp() { D="$2"; gh api "repos/$REPO/statuses/$HEAD_SHA" -f state="$1" -f context=merge-gate -f description="${D:0:135}" --silent; }
+          trap 'stamp failure "gate errored — treat as NOT approved"' ERR
+
+          CLAUDE_CFG=$(gh api "repos/$REPO/contents/.github/workflows/code-review.yml" --jq .path 2>/dev/null || true)
+          CODEX_CFG=$(gh api "repos/$REPO/contents/AGENTS.md" --jq .path 2>/dev/null || true)
+
+          PROBLEMS=""
+          NOTE=""
+
+          if [ -n "$CLAUDE_CFG" ]; then
+            SELF_EDIT=$(gh api --paginate "repos/$REPO/pulls/$PR_NUM/files" \
+              --jq '[.[] | select(.filename == ".github/workflows/code-review.yml")] | length' \
+              | awk '{s+=$1} END {print s+0}')
+            if [ "$SELF_EDIT" -gt 0 ]; then
+              NOTE="Claude waived (PR edits code-review.yml). "
+            else
+              APPROVED=$(gh api --paginate "repos/$REPO/pulls/$PR_NUM/reviews" \
+                --jq "[.[] | select(.commit_id == \"$HEAD_SHA\" and .user.login == \"claude[bot]\" and .state == \"APPROVED\")] | length" \
+                | awk '{s+=$1} END {print s+0}')
+              [ "$APPROVED" -eq 0 ] && PROBLEMS="${PROBLEMS}Claude not approved on head. "
+            fi
+          fi
+
+          if [ -n "$CODEX_CFG" ]; then
+            OWNER="${REPO%%/*}"; NAME="${REPO##*/}"
+            UNRESOLVED=$(gh api graphql \
+              -f query='query($o:String!,$r:String!,$n:Int!){repository(owner:$o,name:$r){pullRequest(number:$n){reviewThreads(first:100){nodes{isResolved comments(first:1){nodes{author{login}}}}}}}}' \
+              -F o="$OWNER" -F r="$NAME" -F n="$PR_NUM" \
+              --jq '[.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false) | select(.comments.nodes[0].author.login | test("codex"))] | length')
+            [ "$UNRESOLVED" -gt 0 ] && PROBLEMS="${PROBLEMS}${UNRESOLVED} unresolved Codex thread(s). "
+
+            SHORT_SHA="${HEAD_SHA:0:10}"
+            CLEAN=$(gh api --paginate "repos/$REPO/issues/$PR_NUM/comments" \
+              --jq "[.[] | select(.user.login | test(\"codex\")) | select(.body | test(\"any major issues\"; \"i\")) | select(.body | contains(\"$SHORT_SHA\"))] | length" \
+              | awk '{s+=$1} END {print s+0}')
+            if [ "$CLEAN" -eq 0 ]; then
+              COMMIT_DATE=$(gh api "repos/$REPO/commits/$HEAD_SHA" --jq .commit.committer.date)
+              CLEAN=$(gh api "repos/$REPO/issues/$PR_NUM/reactions" \
+                --jq "[.[] | select(.user.login | test(\"codex\")) | select(.content == \"+1\") | select(.created_at > \"$COMMIT_DATE\")] | length")
+            fi
+            [ "$CLEAN" -eq 0 ] && PROBLEMS="${PROBLEMS}Codex has no clean signal on head (comment '@codex review'). "
+          fi
+
+          if [ -z "$CLAUDE_CFG" ] && [ -z "$CODEX_CFG" ]; then
+            stamp success "no AI reviewers configured — gate not applicable"
+          elif [ -n "$PROBLEMS" ]; then
+            stamp failure "${NOTE}${PROBLEMS}" && echo "::error::merge-gate: ${NOTE}${PROBLEMS}" && exit 1
+          else
+            stamp success "${NOTE}all configured reviewers clean on head"
+          fi
