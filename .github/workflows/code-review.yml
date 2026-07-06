@@ -78,19 +78,28 @@ jobs:
       - name: Verify a review was posted on the head SHA
         env:
           GH_TOKEN: ${{ github.token }}
+          # Refs/values pass through env so branch names are data, never shell syntax.
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
         run: |
+          # pipefail: a failed gh api call must fail the step, not yield an empty count that
+          # reads as "OK" — this step exists precisely to catch silent verification gaps.
+          set -o pipefail
           # A PR editing this workflow is skipped by the action's validation guard — a missing
           # review there is EXPECTED, not a failure. Warn instead of failing in that one case.
-          if ! git diff --quiet origin/${{ github.event.pull_request.base.ref }} HEAD -- .github/workflows/code-review.yml; then
+          if ! git diff --quiet "origin/$BASE_REF" HEAD -- .github/workflows/code-review.yml; then
             echo "::warning::This PR modifies code-review.yml — the review action skips itself here. UNREVIEWED by design; verify on the next PR after merge."
             exit 0
           fi
-          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
           # Filter by author too — another bot's review (e.g. Codex) on the same head must not
           # mask a silently-failed Claude run. "claude[bot]" is the GitHub App login the action
           # posts under; if the app is ever renamed, update this filter or the check false-fails.
-          COUNT=$(gh api --paginate "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews" \
-            --jq "[.[] | select(.commit_id == \"$HEAD_SHA\" and .user.login == \"claude[bot]\")] | length" | paste -sd+ - | bc)
+          # awk sums the per-page counts (no bc — not guaranteed on runners) and prints 0 on empty.
+          COUNT=$(gh api --paginate "repos/$REPO/pulls/$PR_NUM/reviews" \
+            --jq "[.[] | select(.commit_id == \"$HEAD_SHA\" and .user.login == \"claude[bot]\")] | length" \
+            | awk '{s+=$1} END {print s+0}')
           if [ "$COUNT" -eq 0 ]; then
             echo "::error::Claude posted no review on head $HEAD_SHA — treat this PR as UNREVIEWED by Claude."
             exit 1
