@@ -1,15 +1,17 @@
-# merge-gate — stamps a commit status (context: "merge-gate") on the PR head that is
-# green ONLY when every configured AI reviewer has approved the CURRENT head:
-#   - Claude leg (required iff .github/workflows/code-review.yml exists): a review by
-#     claude[bot] with state APPROVED on the head SHA. Waived with a note when the PR
-#     edits code-review.yml itself (the review action skips such PRs by design).
-#   - Codex leg (required iff AGENTS.md exists): zero unresolved Codex threads AND a
-#     clean-pass signal on the head (a "didn't find any major issues" comment naming the
-#     head SHA, or a 👍 reaction newer than the head commit).
-# Re-evaluates on pushes, submitted reviews, and new comments (Codex's clean pass is a
-# comment). NOTE: on GitHub Free private repos this status is VISUAL — branch protection
-# (which would hard-block the button) needs a paid plan or a public repo. The local
-# ~/.claude merge-gate hook is the hard gate for agent-driven merges.
+# merge-gate — stamps a commit status (context: "merge-gate") on the PR head, green ONLY
+# when every APPLICABLE AI reviewer is clean on the CURRENT head. A leg applies when its
+# reviewer is configured OR has activity on the PR (see the local hook + address-pr-review
+# for the normative signal map):
+#   - Claude: a review by claude[bot], state APPROVED, on the head SHA. Waived (with a
+#     note) only when the PR's ONLY changes are workflow files — the review action skips
+#     PRs editing code-review.yml, but a code+workflow bundle must still be reviewed.
+#   - Codex: zero unresolved Codex threads AND a clean-pass comment ("didn't find any
+#     major issues") whose embedded 10+ hex-char commit SHA prefixes the head. (A 👍 reaction is a
+#     weak hint only — no GitHub event fires for reactions, so it can never flip the
+#     status by itself; the comment is authoritative.)
+# NOTE: on GitHub Free private repos this status is VISUAL — branch protection (which
+# hard-blocks the merge button) needs a paid plan or a public repo. The local
+# ~/.claude/hooks/merge-gate.mjs hook is the hard gate for agent-driven merges.
 name: merge-gate
 
 on:
@@ -17,8 +19,11 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
   pull_request_review:
     types: [submitted, dismissed]
+  pull_request_review_thread:
+    types: [resolved, unresolved]
   issue_comment:
     types: [created]
+  workflow_dispatch: {}
 
 permissions:
   contents: read
@@ -27,7 +32,7 @@ permissions:
   statuses: write
 
 concurrency:
-  group: merge-gate-${{ github.event.pull_request.number || github.event.issue.number }}
+  group: merge-gate-${{ github.event.pull_request.number || github.event.issue.number || github.run_id }}
   cancel-in-progress: true
 
 jobs:
@@ -42,36 +47,58 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           PR_NUM: ${{ github.event.pull_request.number || github.event.issue.number }}
+          OWNER: ${{ github.repository_owner }}
+          # Payload SHA (present on PR events) is the fallback head if the API fetch fails,
+          # so a network blip still stamps red on the right commit instead of vanishing.
+          PAYLOAD_SHA: ${{ github.event.pull_request.head.sha }}
+          CODEX_REST: chatgpt-codex-connector[bot]
+          CODEX_GQL: chatgpt-codex-connector
         run: |
           set -euo pipefail
-          HEAD_SHA=$(gh api "repos/$REPO/pulls/$PR_NUM" --jq .head.sha)
+          NAME="${REPO##*/}"
 
-          # Fail-closed: any error below stamps a red status before the job dies.
+          HEAD_SHA=$(gh api "repos/$REPO/pulls/$PR_NUM" --jq .head.sha 2>/dev/null || echo "$PAYLOAD_SHA")
+          [ -z "$HEAD_SHA" ] && { echo "::error::merge-gate: cannot determine head SHA"; exit 1; }
+
+          # Fail-closed: any unhandled error stamps red on the head before the job dies.
           stamp() { D="$2"; gh api "repos/$REPO/statuses/$HEAD_SHA" -f state="$1" -f context=merge-gate -f description="${D:0:135}" --silent; }
           trap 'stamp failure "gate errored — treat as NOT approved"' ERR
 
-          CLAUDE_CFG=$(gh api "repos/$REPO/contents/.github/workflows/code-review.yml" --jq .path 2>/dev/null || true)
-          CODEX_CFG=$(gh api "repos/$REPO/contents/AGENTS.md" --jq .path 2>/dev/null || true)
+          # cfg PATH -> "yes" if the file exists, "" if a genuine 404, FAIL (exit) on any
+          # other error so a transient API hiccup can't be read as "reviewer not configured".
+          cfg() {
+            local body; body=$(gh api "repos/$REPO/contents/$1" -i 2>/dev/null || true)
+            case "$body" in
+              *"HTTP/2.0 200"*|*"HTTP/1.1 200"*|*" 200 "*) echo yes ;;
+              *"HTTP/2.0 404"*|*"HTTP/1.1 404"*|*" 404 "*) echo "" ;;
+              *) echo "probe failed for $1" >&2; return 1 ;;
+            esac
+          }
+          CLAUDE_CFG=$(cfg ".github/workflows/code-review.yml")
+          CODEX_CFG=$(cfg "AGENTS.md")
 
-          # A leg applies when CONFIGURED (file present) OR the bot has ACTIVITY on this
-          # PR — config alone can be stale (bot uninstalled → actionable failure message),
-          # activity alone can exist without config. Either signal makes the leg required.
+          # A leg applies when CONFIGURED or the bot has ACTIVITY on this PR.
           CLAUDE_ACTIVE=$(gh api --paginate "repos/$REPO/pulls/$PR_NUM/reviews" \
-            --jq '[.[] | select(.user.login == "claude[bot]")] | length' | awk '{s+=$1} END {print s+0}')
+            --jq "[.[] | select(.user.login == \"claude[bot]\")] | length" | awk '{s+=$1} END {print s+0}')
           CODEX_ACTIVE=$(( \
-            $(gh api --paginate "repos/$REPO/pulls/$PR_NUM/reviews" --jq '[.[] | select(.user.login | test("codex"))] | length' | awk '{s+=$1} END {print s+0}') + \
-            $(gh api --paginate "repos/$REPO/issues/$PR_NUM/comments" --jq '[.[] | select(.user.login | test("codex"))] | length' | awk '{s+=$1} END {print s+0}') + \
-            $(gh api "repos/$REPO/issues/$PR_NUM/reactions" --jq '[.[] | select(.user.login | test("codex"))] | length') ))
+            $(gh api --paginate "repos/$REPO/pulls/$PR_NUM/reviews" --jq "[.[] | select(.user.login == \"$CODEX_REST\")] | length" | awk '{s+=$1} END {print s+0}') + \
+            $(gh api --paginate "repos/$REPO/issues/$PR_NUM/comments" --jq "[.[] | select(.user.login == \"$CODEX_REST\")] | length" | awk '{s+=$1} END {print s+0}') + \
+            $(gh api --paginate "repos/$REPO/issues/$PR_NUM/reactions" --jq "[.[] | select(.user.login == \"$CODEX_REST\")] | length" | awk '{s+=$1} END {print s+0}') ))
 
-          PROBLEMS=""
-          NOTE=""
+          PROBLEMS=""; NOTE=""
 
           if [ -n "$CLAUDE_CFG" ] || [ "$CLAUDE_ACTIVE" -gt 0 ]; then
-            SELF_EDIT=$(gh api --paginate "repos/$REPO/pulls/$PR_NUM/files" \
-              --jq '[.[] | select(.filename == ".github/workflows/code-review.yml")] | length' \
-              | awk '{s+=$1} END {print s+0}')
-            if [ "$SELF_EDIT" -gt 0 ]; then
-              NOTE="Claude waived (PR edits code-review.yml). "
+            # Waive Claude ONLY when EVERY changed file is a workflow file — a code+workflow
+            # bundle must not skip review of the code (author-controlled bypass otherwise).
+            read -r TOTAL_FILES WF_FILES < <(gh api --paginate "repos/$REPO/pulls/$PR_NUM/files" \
+              --jq '{t: length, w: ([.[] | select(.filename | startswith(".github/workflows/"))] | length)}' \
+              | awk -F'[:,}]' '{for(i=1;i<=NF;i++){if($i ~ /"t"/)t=$(i+1); if($i ~ /"w"/)w=$(i+1)}} END{print t" "w}')
+            TOUCHES_WF=$(gh api --paginate "repos/$REPO/pulls/$PR_NUM/files" \
+              --jq '[.[] | select(.filename == ".github/workflows/code-review.yml")] | length' | awk '{s+=$1} END {print s+0}')
+            if [ "$TOUCHES_WF" -gt 0 ] && [ "$TOTAL_FILES" = "$WF_FILES" ]; then
+              NOTE="Claude waived (workflow-only self-edit). "
+            elif [ "$TOUCHES_WF" -gt 0 ]; then
+              PROBLEMS="${PROBLEMS}PR bundles code with a code-review.yml edit — Claude cannot review it; split the PR. "
             elif [ "$CLAUDE_ACTIVE" -eq 0 ]; then
               PROBLEMS="${PROBLEMS}Claude configured but never reviewed this PR (check workflow/token). "
             else
@@ -86,29 +113,27 @@ jobs:
             PROBLEMS="${PROBLEMS}Codex configured (AGENTS.md) but never touched this PR — comment '@codex review'. "
           fi
           if [ "$CODEX_ACTIVE" -gt 0 ]; then
-            OWNER="${REPO%%/*}"; NAME="${REPO##*/}"
-            UNRESOLVED=$(gh api graphql \
-              -f query='query($o:String!,$r:String!,$n:Int!){repository(owner:$o,name:$r){pullRequest(number:$n){reviewThreads(first:100){nodes{isResolved comments(first:1){nodes{author{login}}}}}}}}' \
+            THREADS=$(gh api graphql \
+              -f query='query($o:String!,$r:String!,$n:Int!){repository(owner:$o,name:$r){pullRequest(number:$n){reviewThreads(first:100){totalCount nodes{isResolved comments(first:1){nodes{author{login}}}}}}}}' \
               -F o="$OWNER" -F r="$NAME" -F n="$PR_NUM" \
-              --jq '[.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false) | select(.comments.nodes[0].author.login | test("codex"))] | length')
+              --jq "{total: .data.repository.pullRequest.reviewThreads.totalCount, unresolved: ([.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false) | select(((.comments.nodes[0].author.login) // \"\") == \"$CODEX_GQL\")] | length)}")
+            TOTAL_THREADS=$(echo "$THREADS" | jq .total)
+            UNRESOLVED=$(echo "$THREADS" | jq .unresolved)
+            [ "$TOTAL_THREADS" -gt 100 ] && PROBLEMS="${PROBLEMS}${TOTAL_THREADS} review threads — too many to verify (cap 100). "
             [ "$UNRESOLVED" -gt 0 ] && PROBLEMS="${PROBLEMS}${UNRESOLVED} unresolved Codex thread(s). "
 
-            SHORT_SHA="${HEAD_SHA:0:10}"
+            # Clean = a Codex comment with the exact clean phrase whose embedded 7-40 hex
+            # SHA prefixes the head. Reaction is NOT trusted here (no event re-fires it).
             CLEAN=$(gh api --paginate "repos/$REPO/issues/$PR_NUM/comments" \
-              --jq "[.[] | select(.user.login | test(\"codex\")) | select(.body | test(\"any major issues\"; \"i\")) | select(.body | contains(\"$SHORT_SHA\"))] | length" \
+              --jq "[.[] | select(.user.login == \"$CODEX_REST\") | select(.body | test(\"didn'?t find any major issues\"; \"i\")) | select([.body | scan(\"[0-9a-f]{10,40}\") | . as $s | select(\"$HEAD_SHA\" | startswith($s))] | length > 0)] | length" \
               | awk '{s+=$1} END {print s+0}')
-            if [ "$CLEAN" -eq 0 ]; then
-              COMMIT_DATE=$(gh api "repos/$REPO/commits/$HEAD_SHA" --jq .commit.committer.date)
-              CLEAN=$(gh api "repos/$REPO/issues/$PR_NUM/reactions" \
-                --jq "[.[] | select(.user.login | test(\"codex\")) | select(.content == \"+1\") | select(.created_at > \"$COMMIT_DATE\")] | length")
-            fi
             [ "$CLEAN" -eq 0 ] && PROBLEMS="${PROBLEMS}Codex has no clean signal on head (comment '@codex review'). "
           fi
 
           if [ -z "$CLAUDE_CFG" ] && [ -z "$CODEX_CFG" ] && [ "$CLAUDE_ACTIVE" -eq 0 ] && [ "$CODEX_ACTIVE" -eq 0 ]; then
             stamp success "no AI reviewers configured or active — gate not applicable"
           elif [ -n "$PROBLEMS" ]; then
-            stamp failure "${NOTE}${PROBLEMS}" && echo "::error::merge-gate: ${NOTE}${PROBLEMS}" && exit 1
+            stamp failure "${NOTE}${PROBLEMS}"; echo "::error::merge-gate: ${NOTE}${PROBLEMS}"; exit 1
           else
             stamp success "${NOTE}all applicable reviewers clean on head"
           fi
