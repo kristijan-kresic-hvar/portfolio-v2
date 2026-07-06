@@ -88,13 +88,12 @@ jobs:
           PROBLEMS=""; NOTE=""
 
           if [ -n "$CLAUDE_CFG" ] || [ "$CLAUDE_ACTIVE" -gt 0 ]; then
-            # Waive Claude ONLY when EVERY changed file is a workflow file — a code+workflow
-            # bundle must not skip review of the code (author-controlled bypass otherwise).
-            read -r TOTAL_FILES WF_FILES < <(gh api --paginate "repos/$REPO/pulls/$PR_NUM/files" \
-              --jq '{t: length, w: ([.[] | select(.filename | startswith(".github/workflows/"))] | length)}' \
-              | awk -F'[:,}]' '{for(i=1;i<=NF;i++){if($i ~ /"t"/)t=$(i+1); if($i ~ /"w"/)w=$(i+1)}} END{print t" "w}')
-            TOUCHES_WF=$(gh api --paginate "repos/$REPO/pulls/$PR_NUM/files" \
-              --jq '[.[] | select(.filename == ".github/workflows/code-review.yml")] | length' | awk '{s+=$1} END {print s+0}')
+            # One files call → total, count under .github/workflows/, and whether
+            # code-review.yml is touched. Waive Claude ONLY when EVERY changed file is a
+            # workflow file — a code+workflow bundle must not skip review of the code.
+            FSTATS=$(gh api --paginate --slurp "repos/$REPO/pulls/$PR_NUM/files" \
+              | jq 'add | {t: length, w: ([.[] | select(.filename | startswith(".github/workflows/"))] | length), cr: ([.[] | select(.filename == ".github/workflows/code-review.yml")] | length)}')
+            TOTAL_FILES=$(echo "$FSTATS" | jq .t); WF_FILES=$(echo "$FSTATS" | jq .w); TOUCHES_WF=$(echo "$FSTATS" | jq .cr)
             if [ "$TOUCHES_WF" -gt 0 ] && [ "$TOTAL_FILES" = "$WF_FILES" ]; then
               NOTE="Claude waived (workflow-only self-edit). "
             elif [ "$TOUCHES_WF" -gt 0 ]; then
@@ -102,10 +101,11 @@ jobs:
             elif [ "$CLAUDE_ACTIVE" -eq 0 ]; then
               PROBLEMS="${PROBLEMS}Claude configured but never reviewed this PR (check workflow/token). "
             else
-              APPROVED=$(gh api --paginate "repos/$REPO/pulls/$PR_NUM/reviews" \
-                --jq "[.[] | select(.commit_id == \"$HEAD_SHA\" and .user.login == \"claude[bot]\" and .state == \"APPROVED\")] | length" \
-                | awk '{s+=$1} END {print s+0}')
-              [ "$APPROVED" -eq 0 ] && PROBLEMS="${PROBLEMS}Claude not approved on head. "
+              # LATEST claude[bot] verdict on the head (reviews are chronological → last),
+              # so a later CHANGES_REQUESTED on the same SHA overrides an earlier APPROVED.
+              LATEST=$(gh api --paginate --slurp "repos/$REPO/pulls/$PR_NUM/reviews" \
+                | jq -r "[add[] | select(.commit_id == \"$HEAD_SHA\" and .user.login == \"claude[bot]\")] | last | .state // \"NONE\"")
+              [ "$LATEST" != "APPROVED" ] && PROBLEMS="${PROBLEMS}Claude's latest verdict on head is ${LATEST}, not APPROVED. "
             fi
           fi
 
