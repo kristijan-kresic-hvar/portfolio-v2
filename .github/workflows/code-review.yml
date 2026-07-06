@@ -86,10 +86,13 @@ jobs:
             exit 0
           fi
           HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          # Filter by author too — another bot's review (e.g. Codex) on the same head must not
+          # mask a silently-failed Claude run. "claude[bot]" is the GitHub App login the action
+          # posts under; if the app is ever renamed, update this filter or the check false-fails.
           COUNT=$(gh api --paginate "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews" \
-            --jq "[.[] | select(.commit_id == \"$HEAD_SHA\")] | length" | paste -sd+ - | bc)
+            --jq "[.[] | select(.commit_id == \"$HEAD_SHA\" and .user.login == \"claude[bot]\")] | length" | paste -sd+ - | bc)
           if [ "$COUNT" -eq 0 ]; then
-            echo "::error::Claude ran but posted no review on head $HEAD_SHA — treat this PR as UNREVIEWED."
+            echo "::error::Claude posted no review on head $HEAD_SHA — treat this PR as UNREVIEWED by Claude."
             exit 1
           fi
-          echo "OK: $COUNT review(s) on $HEAD_SHA"
+          echo "OK: $COUNT Claude review(s) on $HEAD_SHA"
