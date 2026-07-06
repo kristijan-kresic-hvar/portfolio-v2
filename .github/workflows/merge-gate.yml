@@ -53,15 +53,27 @@ jobs:
           CLAUDE_CFG=$(gh api "repos/$REPO/contents/.github/workflows/code-review.yml" --jq .path 2>/dev/null || true)
           CODEX_CFG=$(gh api "repos/$REPO/contents/AGENTS.md" --jq .path 2>/dev/null || true)
 
+          # A leg applies when CONFIGURED (file present) OR the bot has ACTIVITY on this
+          # PR — config alone can be stale (bot uninstalled → actionable failure message),
+          # activity alone can exist without config. Either signal makes the leg required.
+          CLAUDE_ACTIVE=$(gh api --paginate "repos/$REPO/pulls/$PR_NUM/reviews" \
+            --jq '[.[] | select(.user.login == "claude[bot]")] | length' | awk '{s+=$1} END {print s+0}')
+          CODEX_ACTIVE=$(( \
+            $(gh api --paginate "repos/$REPO/pulls/$PR_NUM/reviews" --jq '[.[] | select(.user.login | test("codex"))] | length' | awk '{s+=$1} END {print s+0}') + \
+            $(gh api --paginate "repos/$REPO/issues/$PR_NUM/comments" --jq '[.[] | select(.user.login | test("codex"))] | length' | awk '{s+=$1} END {print s+0}') + \
+            $(gh api "repos/$REPO/issues/$PR_NUM/reactions" --jq '[.[] | select(.user.login | test("codex"))] | length') ))
+
           PROBLEMS=""
           NOTE=""
 
-          if [ -n "$CLAUDE_CFG" ]; then
+          if [ -n "$CLAUDE_CFG" ] || [ "$CLAUDE_ACTIVE" -gt 0 ]; then
             SELF_EDIT=$(gh api --paginate "repos/$REPO/pulls/$PR_NUM/files" \
               --jq '[.[] | select(.filename == ".github/workflows/code-review.yml")] | length' \
               | awk '{s+=$1} END {print s+0}')
             if [ "$SELF_EDIT" -gt 0 ]; then
               NOTE="Claude waived (PR edits code-review.yml). "
+            elif [ "$CLAUDE_ACTIVE" -eq 0 ]; then
+              PROBLEMS="${PROBLEMS}Claude configured but never reviewed this PR (check workflow/token). "
             else
               APPROVED=$(gh api --paginate "repos/$REPO/pulls/$PR_NUM/reviews" \
                 --jq "[.[] | select(.commit_id == \"$HEAD_SHA\" and .user.login == \"claude[bot]\" and .state == \"APPROVED\")] | length" \
@@ -70,7 +82,10 @@ jobs:
             fi
           fi
 
-          if [ -n "$CODEX_CFG" ]; then
+          if [ -n "$CODEX_CFG" ] && [ "$CODEX_ACTIVE" -eq 0 ]; then
+            PROBLEMS="${PROBLEMS}Codex configured (AGENTS.md) but never touched this PR — comment '@codex review'. "
+          fi
+          if [ "$CODEX_ACTIVE" -gt 0 ]; then
             OWNER="${REPO%%/*}"; NAME="${REPO##*/}"
             UNRESOLVED=$(gh api graphql \
               -f query='query($o:String!,$r:String!,$n:Int!){repository(owner:$o,name:$r){pullRequest(number:$n){reviewThreads(first:100){nodes{isResolved comments(first:1){nodes{author{login}}}}}}}}' \
@@ -90,10 +105,10 @@ jobs:
             [ "$CLEAN" -eq 0 ] && PROBLEMS="${PROBLEMS}Codex has no clean signal on head (comment '@codex review'). "
           fi
 
-          if [ -z "$CLAUDE_CFG" ] && [ -z "$CODEX_CFG" ]; then
-            stamp success "no AI reviewers configured — gate not applicable"
+          if [ -z "$CLAUDE_CFG" ] && [ -z "$CODEX_CFG" ] && [ "$CLAUDE_ACTIVE" -eq 0 ] && [ "$CODEX_ACTIVE" -eq 0 ]; then
+            stamp success "no AI reviewers configured or active — gate not applicable"
           elif [ -n "$PROBLEMS" ]; then
             stamp failure "${NOTE}${PROBLEMS}" && echo "::error::merge-gate: ${NOTE}${PROBLEMS}" && exit 1
           else
-            stamp success "${NOTE}all configured reviewers clean on head"
+            stamp success "${NOTE}all applicable reviewers clean on head"
           fi
