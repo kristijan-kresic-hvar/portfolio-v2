@@ -164,7 +164,10 @@ jobs:
           if [ -z "$CLAUDE_CFG" ] && [ -z "$CODEX_CFG" ] && [ "$CLAUDE_ACTIVE" -eq 0 ] && [ "$CODEX_ACTIVE" -eq 0 ]; then
             stamp success "no AI reviewers configured or active — gate not applicable"
           elif [ -n "$PROBLEMS" ]; then
-            stamp failure "${NOTE}${PROBLEMS}"; echo "::error::merge-gate: ${NOTE}${PROBLEMS}"; exit 1
+            # Verdict lives in the STATUS alone — the job stays green. A red verdict used
+            # to also exit 1, double-reporting as a red check-run row; humans read that as
+            # a second failure. Red job now = infrastructure failure (ERR trap), only.
+            stamp failure "${NOTE}${PROBLEMS}"; echo "::error::merge-gate: ${NOTE}${PROBLEMS}"
           else
             stamp success "${NOTE}all applicable reviewers clean on head"
           fi
