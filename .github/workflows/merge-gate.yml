@@ -47,10 +47,12 @@ permissions:
 # "Cancelled" check-run rows pinned to the head read as failed CI even with the verdict
 # status green. Nothing gates on run conclusions (the hook and skills read statuses and
 # reviews directly), runs are ~30s, and stamps are per-SHA — parallel runs are cheap and
-# near-idempotent. Residual race: two same-SHA runs straddling a signal change can stamp
-# out of order for a few seconds; the next event, a workflow_dispatch, or the 30-min
-# babysitter sweep self-heals it. (The old group's run_id fallback also meant dispatches
-# were never actually deduped — dropping this loses nothing.)
+# near-idempotent. The one dangerous ordering — an older run finishing last and stamping
+# success over a newer run's failure (stale GREEN a human could merge on) — is closed by
+# stampOk below: success never overwrites a failure stamped by a later-starting run.
+# Stale red over newer green is left alone: fail-closed, and the next event re-greens it.
+# (The old group's run_id fallback also meant dispatches were never actually deduped —
+# dropping this loses nothing.)
 
 jobs:
   gate:
@@ -105,6 +107,8 @@ jobs:
         run: |
           set -euo pipefail
           NAME="${REPO##*/}"
+          # Captured BEFORE any data fetch: the freshness reference for stampOk below.
+          RUN_T0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
           HEAD_SHA=$(gh api "repos/$REPO/pulls/$PR_NUM" --jq .head.sha 2>/dev/null || echo "$PAYLOAD_SHA")
           [ -z "$HEAD_SHA" ] && { echo "::error::merge-gate: cannot determine head SHA"; exit 1; }
@@ -112,6 +116,20 @@ jobs:
           # Fail-closed: any unhandled error stamps red on the head before the job dies.
           stamp() { D="$2"; gh api "repos/$REPO/statuses/$HEAD_SHA" -f state="$1" -f context=merge-gate -f description="${D:0:135}" --silent; }
           trap 'stamp failure "gate errored — treat as NOT approved"' ERR
+          # Success may never overwrite a FAILURE stamped by a run that started after us —
+          # without a concurrency group an older run can finish last, and its data predates
+          # whatever the newer run saw (P1 from PR #20 review). ISO-8601 UTC compares
+          # lexicographically. Red stamps stay unguarded: stale red is fail-closed and the
+          # next event re-greens it; guarding it would let a stale green survive instead.
+          stampOk() {
+            NEWEST_FAIL=$(gh api "repos/$REPO/statuses/$HEAD_SHA" \
+              --jq "[.[] | select(.context==\"merge-gate\")][0] | select(.state==\"failure\") | .created_at" 2>/dev/null || true)
+            if [ -n "$NEWEST_FAIL" ] && [ "$NEWEST_FAIL" \> "$RUN_T0" ]; then
+              echo "::notice::merge-gate: not stamping success — a newer run stamped failure ($NEWEST_FAIL > run start $RUN_T0)"
+            else
+              stamp success "$1"
+            fi
+          }
 
           # cfg PATH -> "yes" if the file exists, "" if a genuine 404, FAIL (exit) on any
           # other error so a transient API hiccup can't be read as "reviewer not configured".
@@ -209,12 +227,12 @@ jobs:
           fi
 
           if [ -z "$CLAUDE_CFG" ] && [ -z "$CODEX_CFG" ] && [ "$CLAUDE_ACTIVE" -eq 0 ] && [ "$CODEX_ACTIVE" -eq 0 ]; then
-            stamp success "no AI reviewers configured or active — gate not applicable"
+            stampOk "no AI reviewers configured or active — gate not applicable"
           elif [ -n "$PROBLEMS" ]; then
             # Verdict lives in the STATUS alone — the job stays green. A red verdict used
             # to also exit 1, double-reporting as a red check-run row; humans read that as
             # a second failure. Red job now = infrastructure failure (ERR trap), only.
             stamp failure "${NOTE}${PROBLEMS}"; echo "::error::merge-gate: ${NOTE}${PROBLEMS}"
           else
-            stamp success "${NOTE}all applicable reviewers clean on head"
+            stampOk "${NOTE}all applicable reviewers clean on head"
           fi
