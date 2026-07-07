@@ -22,7 +22,9 @@ on:
   pull_request_review_thread:
     types: [resolved, unresolved]
   issue_comment:
-    types: [created]
+    # edited/deleted too: the clean-pass comment is the authoritative positive signal —
+    # an edit that breaks the SHA match or a deletion must re-evaluate a stale green.
+    types: [created, edited, deleted]
   workflow_dispatch: {}
 
 permissions:
