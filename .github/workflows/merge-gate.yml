@@ -38,12 +38,12 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
+  pull-requests: write  # write: dismiss stale approvals on new commits (else read would do)
   issues: read
   statuses: write
 
 concurrency:
-  group: merge-gate-${{ github.event.pull_request.number || github.event.issue.number || github.run_id }}
+  group: merge-gate-${{ github.event.pull_request.number || github.event.issue.number || github.event.inputs.pr_number || github.run_id }}
   cancel-in-progress: true
 
 jobs:
@@ -53,6 +53,35 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      # Free-plan reimplementation of branch protection's "dismiss stale reviews":
+      # GitHub's sidebar shows a reviewer's latest review PR-wide, so an APPROVED from a
+      # superseded commit keeps advertising approval while fixes are under re-review.
+      # On every push, dismiss Claude's approval if it names a commit that is no longer
+      # the head — its automatic re-review restores a fresh one that actually means it.
+      - name: Dismiss stale Claude approval on new commits
+        if: github.event_name == 'pull_request' && github.event.action == 'synchronize'
+        # Best-effort UX step: a failure here (rate limit, already-dismissed race) must
+        # never prevent the evaluate step below from stamping the verdict status.
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          # NOTE: gh rejects --slurp combined with --jq (cli/cli#10459) — pipe to jq
+          # like the rest of this file, or the query silently never yields an id.
+          RID=$(gh api --paginate --slurp "repos/$REPO/pulls/$PR_NUM/reviews" 2>/dev/null \
+            | jq -r "[add[] | select(.user.login == \"claude[bot]\")] | last | select(.state == \"APPROVED\") | select(.commit_id != \"$HEAD_SHA\") | .id" || true)
+          if [ -n "$RID" ]; then
+            gh api -X PUT "repos/$REPO/pulls/$PR_NUM/reviews/$RID/dismissals" \
+              -f message="Stale: approval was for a superseded commit — new head $HEAD_SHA awaits Claude re-review." --silent
+            echo "dismissed stale approval (review $RID)"
+          else
+            echo "no stale approval to dismiss"
+          fi
+
       - name: Evaluate reviewers and stamp commit status
         env:
           GH_TOKEN: ${{ github.token }}
@@ -99,7 +128,7 @@ jobs:
             $(gh api --paginate "repos/$REPO/issues/$PR_NUM/comments" --jq "[.[] | select(.user.login == \"$CODEX_REST\")] | length" | awk '{s+=$1} END {print s+0}') + \
             $(gh api --paginate "repos/$REPO/issues/$PR_NUM/reactions" --jq "[.[] | select(.user.login == \"$CODEX_REST\")] | length" | awk '{s+=$1} END {print s+0}') ))
 
-          PROBLEMS=""; NOTE=""
+          PROBLEMS=""; NOTE=""; UNRESOLVED=0; CLEAN=0; TOTAL_THREADS=0
 
           if [ -n "$CLAUDE_CFG" ] || [ "$CLAUDE_ACTIVE" -gt 0 ]; then
             # One files call → total, count under .github/workflows/, and whether
@@ -144,10 +173,34 @@ jobs:
             [ "$CLEAN" -eq 0 ] && PROBLEMS="${PROBLEMS}Codex has no clean signal on head (comment '@codex review'). "
           fi
 
+          # Companion visibility status: the Codex app posts comments only — it never
+          # creates a check run, so it's INVISIBLE in the checks UI while reviewing.
+          # Stamp its per-head state as a second context: yellow in flight, green clean,
+          # red on unresolved findings. UX sugar only — merge-gate stays the authority.
+          # (Known gap: a 👍-only clean on PR open fires no event; stays pending until
+          # the next event refreshes it.)
+          stampCodex() { D="$2"; gh api "repos/$REPO/statuses/$HEAD_SHA" -f state="$1" -f context=codex-review -f description="${D:0:135}" --silent; }
+          if [ -z "$CODEX_CFG" ] && [ "$CODEX_ACTIVE" -eq 0 ]; then
+            : # Codex leg not applicable — no status
+          elif [ "$TOTAL_THREADS" -gt 100 ]; then
+            # Fail-closed like the main gate: beyond the 100-thread scan cap, unresolved
+            # findings past the first page are unknown — a clean comment can't buy green.
+            stampCodex failure "$TOTAL_THREADS review threads — beyond scan cap, unresolved findings unknown"
+          elif [ "$CLEAN" -gt 0 ] && [ "$UNRESOLVED" -eq 0 ]; then
+            stampCodex success "clean on current head"
+          elif [ "$UNRESOLVED" -gt 0 ]; then
+            stampCodex failure "$UNRESOLVED unresolved Codex thread(s)"
+          else
+            stampCodex pending "review in flight or awaiting '@codex review' on current head"
+          fi
+
           if [ -z "$CLAUDE_CFG" ] && [ -z "$CODEX_CFG" ] && [ "$CLAUDE_ACTIVE" -eq 0 ] && [ "$CODEX_ACTIVE" -eq 0 ]; then
             stamp success "no AI reviewers configured or active — gate not applicable"
           elif [ -n "$PROBLEMS" ]; then
-            stamp failure "${NOTE}${PROBLEMS}"; echo "::error::merge-gate: ${NOTE}${PROBLEMS}"; exit 1
+            # Verdict lives in the STATUS alone — the job stays green. A red verdict used
+            # to also exit 1, double-reporting as a red check-run row; humans read that as
+            # a second failure. Red job now = infrastructure failure (ERR trap), only.
+            stamp failure "${NOTE}${PROBLEMS}"; echo "::error::merge-gate: ${NOTE}${PROBLEMS}"
           else
             stamp success "${NOTE}all applicable reviewers clean on head"
           fi
