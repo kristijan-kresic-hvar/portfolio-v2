@@ -51,6 +51,8 @@ jobs:
           # Payload SHA (present on PR events) is the fallback head if the API fetch fails,
           # so a network blip still stamps red on the right commit instead of vanishing.
           PAYLOAD_SHA: ${{ github.event.pull_request.head.sha }}
+          # Two identities on purpose: REST user.login carries the [bot] suffix, GraphQL
+          # author.login does NOT (verified live against this repo's own review threads).
           CODEX_REST: chatgpt-codex-connector[bot]
           CODEX_GQL: chatgpt-codex-connector
         run: |
@@ -125,7 +127,7 @@ jobs:
             # Clean = a Codex comment with the exact clean phrase whose embedded 7-40 hex
             # SHA prefixes the head. Reaction is NOT trusted here (no event re-fires it).
             CLEAN=$(gh api --paginate "repos/$REPO/issues/$PR_NUM/comments" \
-              --jq "[.[] | select(.user.login == \"$CODEX_REST\") | select(.body | test(\"didn'?t find any major issues\"; \"i\")) | select([.body | scan(\"[0-9a-f]{10,40}\") | . as $s | select(\"$HEAD_SHA\" | startswith($s))] | length > 0)] | length" \
+              --jq "[.[] | select(.user.login == \"$CODEX_REST\") | select(.body | test(\"didn'?t find any major issues\"; \"i\")) | select([.body | scan(\"[0-9a-f]{10,40}\") | . as \$s | select(\"$HEAD_SHA\" | startswith(\$s))] | length > 0)] | length" \
               | awk '{s+=$1} END {print s+0}')
             [ "$CLEAN" -eq 0 ] && PROBLEMS="${PROBLEMS}Codex has no clean signal on head (comment '@codex review'). "
           fi
