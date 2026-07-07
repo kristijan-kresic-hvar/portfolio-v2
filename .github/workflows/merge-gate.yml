@@ -27,6 +27,9 @@ on:
     # edited/deleted too: the clean-pass comment is the authoritative positive signal —
     # an edit that breaks the SHA match or a deletion must re-evaluate a stale green.
     types: [created, edited, deleted]
+  # A late inline finding posted as a review comment must re-evaluate a green head.
+  pull_request_review_comment:
+    types: [created]
   workflow_dispatch:
     inputs:
       pr_number:
