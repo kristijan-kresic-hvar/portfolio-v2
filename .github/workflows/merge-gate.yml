@@ -19,8 +19,10 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
   pull_request_review:
     types: [submitted, dismissed]
-  pull_request_review_thread:
-    types: [resolved, unresolved]
+  # NOTE: pull_request_review_thread is a WEBHOOK event only — it is NOT a valid
+  # workflow trigger; listing it makes GitHub reject the entire file ("workflow file
+  # issue", zero jobs, every event). Thread resolves re-evaluate via the next comment
+  # (issue_comment) or manual workflow_dispatch instead.
   issue_comment:
     # edited/deleted too: the clean-pass comment is the authoritative positive signal —
     # an edit that breaks the SHA match or a deletion must re-evaluate a stale green.
