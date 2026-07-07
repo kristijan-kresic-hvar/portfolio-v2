@@ -38,7 +38,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
+  pull-requests: write  # write: dismiss stale approvals on new commits (else read would do)
   issues: read
   statuses: write
 
@@ -53,6 +53,30 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      # Free-plan reimplementation of branch protection's "dismiss stale reviews":
+      # GitHub's sidebar shows a reviewer's latest review PR-wide, so an APPROVED from a
+      # superseded commit keeps advertising approval while fixes are under re-review.
+      # On every push, dismiss Claude's approval if it names a commit that is no longer
+      # the head — its automatic re-review restores a fresh one that actually means it.
+      - name: Dismiss stale Claude approval on new commits
+        if: github.event_name == 'pull_request' && github.event.action == 'synchronize'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          RID=$(gh api --paginate --slurp "repos/$REPO/pulls/$PR_NUM/reviews" \
+            --jq "[add[] | select(.user.login == \"claude[bot]\")] | last | select(.state == \"APPROVED\") | select(.commit_id != \"$HEAD_SHA\") | .id" || true)
+          if [ -n "$RID" ]; then
+            gh api -X PUT "repos/$REPO/pulls/$PR_NUM/reviews/$RID/dismissals" \
+              -f message="Stale: approval was for a superseded commit — new head $HEAD_SHA awaits Claude re-review." --silent
+            echo "dismissed stale approval (review $RID)"
+          else
+            echo "no stale approval to dismiss"
+          fi
+
       - name: Evaluate reviewers and stamp commit status
         env:
           GH_TOKEN: ${{ github.token }}
