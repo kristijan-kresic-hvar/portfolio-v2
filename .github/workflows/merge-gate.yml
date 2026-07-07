@@ -67,8 +67,10 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
-          RID=$(gh api --paginate --slurp "repos/$REPO/pulls/$PR_NUM/reviews" \
-            --jq "[add[] | select(.user.login == \"claude[bot]\")] | last | select(.state == \"APPROVED\") | select(.commit_id != \"$HEAD_SHA\") | .id" || true)
+          # NOTE: gh rejects --slurp combined with --jq (cli/cli#10459) — pipe to jq
+          # like the rest of this file, or the query silently never yields an id.
+          RID=$(gh api --paginate --slurp "repos/$REPO/pulls/$PR_NUM/reviews" 2>/dev/null \
+            | jq -r "[add[] | select(.user.login == \"claude[bot]\")] | last | select(.state == \"APPROVED\") | select(.commit_id != \"$HEAD_SHA\") | .id" || true)
           if [ -n "$RID" ]; then
             gh api -X PUT "repos/$REPO/pulls/$PR_NUM/reviews/$RID/dismissals" \
               -f message="Stale: approval was for a superseded commit — new head $HEAD_SHA awaits Claude re-review." --silent
