@@ -75,26 +75,22 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           PR_NUM: ${{ github.event.pull_request.number }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
-          # Stale-event guard (P1, PR #20 round 2): with no concurrency group, a delayed
-          # run for an old push can reach here after a newer push — its payload SHA is no
-          # longer the PR head, and dismissing against it would kill Claude's VALID
-          # approval on the current head. Only the run whose event still matches the live
-          # head may dismiss. (continue-on-error above keeps a failed fetch harmless.)
+          # Staleness is judged against the LIVE head, not the event's payload SHA (P1s,
+          # PR #20 rounds 2-3): with no concurrency group a delayed run for an old push
+          # can execute after newer pushes — comparing against its stale payload SHA would
+          # dismiss Claude's VALID approval on the current head. Against the live head the
+          # dismissal is correct by construction, however delayed this run is: it can only
+          # select an approval whose commit is not the PR's head at query time.
           CUR=$(gh api "repos/$REPO/pulls/$PR_NUM" --jq .head.sha)
-          if [ "$CUR" != "$HEAD_SHA" ]; then
-            echo "stale event (head moved ${HEAD_SHA:0:8} -> ${CUR:0:8}) — skipping dismiss"
-            exit 0
-          fi
           # NOTE: gh rejects --slurp combined with --jq (cli/cli#10459) — pipe to jq
           # like the rest of this file, or the query silently never yields an id.
           RID=$(gh api --paginate --slurp "repos/$REPO/pulls/$PR_NUM/reviews" 2>/dev/null \
-            | jq -r "[add[] | select(.user.login == \"claude[bot]\")] | last | select(.state == \"APPROVED\") | select(.commit_id != \"$HEAD_SHA\") | .id" || true)
+            | jq -r "[add[] | select(.user.login == \"claude[bot]\")] | last | select(.state == \"APPROVED\") | select(.commit_id != \"$CUR\") | .id" || true)
           if [ -n "$RID" ]; then
             gh api -X PUT "repos/$REPO/pulls/$PR_NUM/reviews/$RID/dismissals" \
-              -f message="Stale: approval was for a superseded commit — new head $HEAD_SHA awaits Claude re-review." --silent
+              -f message="Stale: approval was for a superseded commit — current head $CUR awaits Claude re-review." --silent
             echo "dismissed stale approval (review $RID)"
           else
             echo "no stale approval to dismiss"
@@ -140,8 +136,20 @@ jobs:
               --jq "[.[] | select(.context==\"merge-gate\")][0] | select(.state==\"failure\") | .created_at")
             if [ -n "$NEWEST_FAIL" ] && ! [ "$NEWEST_FAIL" \< "$RUN_T0" ]; then
               echo "::notice::merge-gate: not stamping success — newer-or-concurrent failure ($NEWEST_FAIL >= run start $RUN_T0)"
-            else
-              stamp success "$1"
+              return 0
+            fi
+            stamp success "$1"
+            # Post-write verify (P1, round 3): a failure written between the read above and
+            # the success write above would be buried (GitHub shows the latest status per
+            # context). Re-read after writing: any such failure happened before this read,
+            # so it's visible here — restore it on top. A failure written after our success
+            # supersedes it naturally. Together that closes the stale-green window, not
+            # just shrinks it; a failed re-read lands in the ERR trap (red, fail-closed).
+            POST_FAIL=$(gh api "repos/$REPO/statuses/$HEAD_SHA" \
+              --jq "[.[] | select(.context==\"merge-gate\") | select(.state==\"failure\")][0].created_at // empty")
+            if [ -n "$POST_FAIL" ] && ! [ "$POST_FAIL" \< "$RUN_T0" ]; then
+              stamp failure "restored: a concurrent run stamped failure ($POST_FAIL) — that verdict stands, not this run's stale success"
+              echo "::notice::merge-gate: success superseded — restored concurrent failure from $POST_FAIL"
             fi
           }
 
