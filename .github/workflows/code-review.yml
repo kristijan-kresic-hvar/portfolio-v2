@@ -64,11 +64,14 @@ jobs:
               specific file:line issue, giving the problem + a suggested fix.
             - Submit the top-level verdict as an ACTUAL pr review (not a plain comment) so it is a
               machine-readable state, not just prose — pick exactly one:
-              `gh pr review ${{ github.event.pull_request.number }} --approve` (clean) /
-              `--request-changes` (real problems) / `--comment` (notes only), with a short summary as the
-              body. A plain `gh pr comment` leaves reviewDecision empty, so a green check then falsely
-              reads as "reviewed."
-            - Skip nitpicks the linter/prettier already catches. Always post a verdict — never silent.
+              `gh pr review ${{ github.event.pull_request.number }} --request-changes` if there is any
+              blocking problem, otherwise `--approve`. Put non-blocking notes/nits in the review body or
+              as inline comments — do NOT downgrade the verdict to `--comment` just because you left
+              notes. The merge gate treats only `--approve` as clean, so a clean-but-`--comment` review
+              deadlocks the PR; APPROVE-with-notes is the correct clean verdict. A plain `gh pr comment`
+              leaves reviewDecision empty, so a green check then falsely reads as "reviewed."
+            - Skip nitpicks the linter/prettier already catches. Always post an approve/request-changes
+              verdict — never silent, never notes-only.
           claude_args: |
             --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr review:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
 
