@@ -60,6 +60,9 @@ jobs:
       # the head — its automatic re-review restores a fresh one that actually means it.
       - name: Dismiss stale Claude approval on new commits
         if: github.event_name == 'pull_request' && github.event.action == 'synchronize'
+        # Best-effort UX step: a failure here (rate limit, already-dismissed race) must
+        # never prevent the evaluate step below from stamping the verdict status.
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
