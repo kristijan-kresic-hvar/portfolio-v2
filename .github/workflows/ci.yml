@@ -10,6 +10,11 @@ concurrency:
   group: ci-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
+# yarn install executes third-party lifecycle scripts; don't hand them a writable token.
+# (Repo default is already read-only, but that's a mutable setting — pin it here.)
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
