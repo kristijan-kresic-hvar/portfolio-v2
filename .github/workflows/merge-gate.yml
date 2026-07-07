@@ -78,6 +78,16 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
+          # Stale-event guard (P1, PR #20 round 2): with no concurrency group, a delayed
+          # run for an old push can reach here after a newer push — its payload SHA is no
+          # longer the PR head, and dismissing against it would kill Claude's VALID
+          # approval on the current head. Only the run whose event still matches the live
+          # head may dismiss. (continue-on-error above keeps a failed fetch harmless.)
+          CUR=$(gh api "repos/$REPO/pulls/$PR_NUM" --jq .head.sha)
+          if [ "$CUR" != "$HEAD_SHA" ]; then
+            echo "stale event (head moved ${HEAD_SHA:0:8} -> ${CUR:0:8}) — skipping dismiss"
+            exit 0
+          fi
           # NOTE: gh rejects --slurp combined with --jq (cli/cli#10459) — pipe to jq
           # like the rest of this file, or the query silently never yields an id.
           RID=$(gh api --paginate --slurp "repos/$REPO/pulls/$PR_NUM/reviews" 2>/dev/null \
@@ -118,14 +128,18 @@ jobs:
           trap 'stamp failure "gate errored — treat as NOT approved"' ERR
           # Success may never overwrite a FAILURE stamped by a run that started after us —
           # without a concurrency group an older run can finish last, and its data predates
-          # whatever the newer run saw (P1 from PR #20 review). ISO-8601 UTC compares
-          # lexicographically. Red stamps stay unguarded: stale red is fail-closed and the
-          # next event re-greens it; guarding it would let a stale green survive instead.
+          # whatever the newer run saw (P1s from PR #20 review, rounds 1-2). Timestamps are
+          # second-granularity ISO-8601 UTC (lexicographic compare), so an EQUAL timestamp
+          # is treated as unsafe too (>= via "not <") — a same-second tie costs at most a
+          # skipped green the next event repairs. The freshness lookup is deliberately NOT
+          # error-suppressed: a failed read falls into the ERR trap and stamps red, because
+          # "couldn't check" must never become "assume clean". Red stamps stay unguarded:
+          # stale red is fail-closed and the next event re-greens it.
           stampOk() {
             NEWEST_FAIL=$(gh api "repos/$REPO/statuses/$HEAD_SHA" \
-              --jq "[.[] | select(.context==\"merge-gate\")][0] | select(.state==\"failure\") | .created_at" 2>/dev/null || true)
-            if [ -n "$NEWEST_FAIL" ] && [ "$NEWEST_FAIL" \> "$RUN_T0" ]; then
-              echo "::notice::merge-gate: not stamping success — a newer run stamped failure ($NEWEST_FAIL > run start $RUN_T0)"
+              --jq "[.[] | select(.context==\"merge-gate\")][0] | select(.state==\"failure\") | .created_at")
+            if [ -n "$NEWEST_FAIL" ] && ! [ "$NEWEST_FAIL" \< "$RUN_T0" ]; then
+              echo "::notice::merge-gate: not stamping success — newer-or-concurrent failure ($NEWEST_FAIL >= run start $RUN_T0)"
             else
               stamp success "$1"
             fi
