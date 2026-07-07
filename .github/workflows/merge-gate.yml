@@ -165,7 +165,7 @@ jobs:
             [ "$TOTAL_THREADS" -gt 100 ] && PROBLEMS="${PROBLEMS}${TOTAL_THREADS} review threads — too many to verify (cap 100). "
             [ "$UNRESOLVED" -gt 0 ] && PROBLEMS="${PROBLEMS}${UNRESOLVED} unresolved Codex thread(s). "
 
-            # Clean = a Codex comment with the exact clean phrase whose embedded 7-40 hex
+            # Clean = a Codex comment with the exact clean phrase whose embedded 10+ hex-char
             # SHA prefixes the head. Reaction is NOT trusted here (no event re-fires it).
             CLEAN=$(gh api --paginate "repos/$REPO/issues/$PR_NUM/comments" \
               --jq "[.[] | select(.user.login == \"$CODEX_REST\") | select(.body | test(\"didn'?t find any major issues\"; \"i\")) | select([.body | scan(\"[0-9a-f]{10,40}\") | . as \$s | select(\"$HEAD_SHA\" | startswith(\$s))] | length > 0)] | length" \
@@ -192,6 +192,14 @@ jobs:
             stampCodex failure "$UNRESOLVED unresolved Codex thread(s)"
           else
             stampCodex pending "review in flight or awaiting '@codex review' on current head"
+          fi
+
+          # A waiver must never reduce the applicable reviewer count to zero (mirror the
+          # local hook merge-gate.mjs). A workflow-only self-edit in a repo with no Codex
+          # leg would otherwise fall through to green with no review at all — the Claude
+          # action self-skips code-review.yml PRs, so nothing looked at the change.
+          if [ -n "$NOTE" ] && [ -z "$CODEX_CFG" ] && [ "$CODEX_ACTIVE" -eq 0 ]; then
+            PROBLEMS="${PROBLEMS}self-edit waiver leaves ZERO reviewers — merge via the web UI after personal review. "
           fi
 
           if [ -z "$CLAUDE_CFG" ] && [ -z "$CODEX_CFG" ] && [ "$CLAUDE_ACTIVE" -eq 0 ] && [ "$CODEX_ACTIVE" -eq 0 ]; then
