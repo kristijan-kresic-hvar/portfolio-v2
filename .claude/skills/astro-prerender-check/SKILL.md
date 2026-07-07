@@ -63,4 +63,4 @@ After insertion, the file should pass `yarn typecheck` and `yarn build` cleanly.
 
 - `CLAUDE.md` § "API endpoints — `prerender = false` required" — repo convention
 - `dev-conventions.md` § 4 Tooling — explanation of why Astro 6 removed `hybrid`
-- `astro` skill — for broader Astro questions; this skill is the per-file invariant guard
+- `verify-library-api` + `find-docs` skills — for broader Astro questions (the old `astro` skill is gone); this skill is the per-file invariant guard
