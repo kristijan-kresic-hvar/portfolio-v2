@@ -128,7 +128,7 @@ jobs:
             $(gh api --paginate "repos/$REPO/issues/$PR_NUM/comments" --jq "[.[] | select(.user.login == \"$CODEX_REST\")] | length" | awk '{s+=$1} END {print s+0}') + \
             $(gh api --paginate "repos/$REPO/issues/$PR_NUM/reactions" --jq "[.[] | select(.user.login == \"$CODEX_REST\")] | length" | awk '{s+=$1} END {print s+0}') ))
 
-          PROBLEMS=""; NOTE=""; UNRESOLVED=0; CLEAN=0
+          PROBLEMS=""; NOTE=""; UNRESOLVED=0; CLEAN=0; TOTAL_THREADS=0
 
           if [ -n "$CLAUDE_CFG" ] || [ "$CLAUDE_ACTIVE" -gt 0 ]; then
             # One files call → total, count under .github/workflows/, and whether
@@ -182,6 +182,10 @@ jobs:
           stamp2() { D="$2"; gh api "repos/$REPO/statuses/$HEAD_SHA" -f state="$1" -f context=codex-review -f description="${D:0:135}" --silent; }
           if [ -z "$CODEX_CFG" ] && [ "$CODEX_ACTIVE" -eq 0 ]; then
             : # Codex leg not applicable — no status
+          elif [ "$TOTAL_THREADS" -gt 100 ]; then
+            # Fail-closed like the main gate: beyond the 100-thread scan cap, unresolved
+            # findings past the first page are unknown — a clean comment can't buy green.
+            stamp2 failure "$TOTAL_THREADS review threads — beyond scan cap, unresolved findings unknown"
           elif [ "$CLEAN" -gt 0 ] && [ "$UNRESOLVED" -eq 0 ]; then
             stamp2 success "clean on current head"
           elif [ "$UNRESOLVED" -gt 0 ]; then
