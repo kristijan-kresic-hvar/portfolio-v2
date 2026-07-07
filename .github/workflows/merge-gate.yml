@@ -42,9 +42,15 @@ permissions:
   issues: read
   statuses: write
 
-concurrency:
-  group: merge-gate-${{ github.event.pull_request.number || github.event.issue.number || github.event.inputs.pr_number || github.run_id }}
-  cancel-in-progress: true
+# NO concurrency group, on purpose. Event bursts (PR open + review + comment land within
+# seconds, all on the SAME head SHA) made cancel-in-progress cancel sibling runs, and the
+# "Cancelled" check-run rows pinned to the head read as failed CI even with the verdict
+# status green. Nothing gates on run conclusions (the hook and skills read statuses and
+# reviews directly), runs are ~30s, and stamps are per-SHA — parallel runs are cheap and
+# near-idempotent. Residual race: two same-SHA runs straddling a signal change can stamp
+# out of order for a few seconds; the next event, a workflow_dispatch, or the 30-min
+# babysitter sweep self-heals it. (The old group's run_id fallback also meant dispatches
+# were never actually deduped — dropping this loses nothing.)
 
 jobs:
   gate:
