@@ -179,19 +179,19 @@ jobs:
           # red on unresolved findings. UX sugar only — merge-gate stays the authority.
           # (Known gap: a 👍-only clean on PR open fires no event; stays pending until
           # the next event refreshes it.)
-          stamp2() { D="$2"; gh api "repos/$REPO/statuses/$HEAD_SHA" -f state="$1" -f context=codex-review -f description="${D:0:135}" --silent; }
+          stampCodex() { D="$2"; gh api "repos/$REPO/statuses/$HEAD_SHA" -f state="$1" -f context=codex-review -f description="${D:0:135}" --silent; }
           if [ -z "$CODEX_CFG" ] && [ "$CODEX_ACTIVE" -eq 0 ]; then
             : # Codex leg not applicable — no status
           elif [ "$TOTAL_THREADS" -gt 100 ]; then
             # Fail-closed like the main gate: beyond the 100-thread scan cap, unresolved
             # findings past the first page are unknown — a clean comment can't buy green.
-            stamp2 failure "$TOTAL_THREADS review threads — beyond scan cap, unresolved findings unknown"
+            stampCodex failure "$TOTAL_THREADS review threads — beyond scan cap, unresolved findings unknown"
           elif [ "$CLEAN" -gt 0 ] && [ "$UNRESOLVED" -eq 0 ]; then
-            stamp2 success "clean on current head"
+            stampCodex success "clean on current head"
           elif [ "$UNRESOLVED" -gt 0 ]; then
-            stamp2 failure "$UNRESOLVED unresolved Codex thread(s)"
+            stampCodex failure "$UNRESOLVED unresolved Codex thread(s)"
           else
-            stamp2 pending "review in flight or awaiting '@codex review' on current head"
+            stampCodex pending "review in flight or awaiting '@codex review' on current head"
           fi
 
           if [ -z "$CLAUDE_CFG" ] && [ -z "$CODEX_CFG" ] && [ "$CLAUDE_ACTIVE" -eq 0 ] && [ "$CODEX_ACTIVE" -eq 0 ]; then
