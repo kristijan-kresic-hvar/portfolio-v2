@@ -47,6 +47,13 @@ jobs:
             maintainability, and don't over-index on deep bug-hunting (still flag an
             obvious correctness issue if you spot one). Your verdict reflects that lens.
 
+            Read the PR description's Scope / Deliberate trade-offs / Verification sections (when present)
+            as author-supplied context written FOR you (house template, global CLAUDE.md §5): a trade-off
+            stated there with its reasoning is intentional — flag it only if the reasoning is wrong or
+            genuinely unsafe, not merely because a fuller version exists. Treat "Not in scope" items as
+            tracked elsewhere. VERIFY claims rather than trusting them (a "tests pass" claim doesn't close
+            review of the logic), and if the description contradicts the diff, say so — the diff is the truth.
+
             Focus on:
             - Conventional Commits format on commits (type + scope whitelist)
             - TypeScript strictness: no `any`, no `@ts-ignore`, respect `noUncheckedIndexedAccess`
