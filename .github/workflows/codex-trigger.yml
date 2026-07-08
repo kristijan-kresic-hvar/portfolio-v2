@@ -1,0 +1,71 @@
+# codex-trigger — fires the Codex review at PR-open, whoever opened the PR.
+# Codex is trigger-only by design (the account's Auto review toggle stays OFF: it
+# double-reviews PRs whose loop also posts a trigger, and its clean pass is a 👍-only
+# shape the merge gate can't verify). This workflow makes the trigger origin-independent:
+# the bot posts the mention, so a PR opened from the web UI or a bare terminal gets its
+# adversarial review immediately instead of waiting for the next babysitter sweep.
+# The comment body must be EXACTLY "@codex review" — any extra text makes Codex start a
+# generic cloud task instead of a code review (developers.openai.com/codex).
+# CAVEAT (verify per account): some Codex account configurations reject bot-authored
+# triggers ("trigger did not come from a connected human Codex account"). If the 👀 ack
+# never appears on this workflow's comment, the loop/babysitter trigger path still
+# covers every PR — this workflow just stops adding value; remove it.
+name: codex-trigger
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  trigger:
+    # Same-repo, non-draft PRs only: fork PRs get a read-only token (comment would
+    # fail), drafts aren't ready for review spend.
+    if: github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Mention Codex when the repo is Codex-configured
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          # Same detection contract as merge-gate's codexCfg: AGENTS.md must CONTAIN the
+          # official '## Code Review Rules' section, probed on the default branch AND the
+          # PR head (so the PR that adds the section gets its review too). 404 = not
+          # configured (skip quietly); any other probe error fails the job loudly rather
+          # than silently skipping the adversarial review.
+          codexCfg() {
+            local ref resp enc b64 text
+            for ref in "" "?ref=$HEAD_SHA"; do
+              if resp=$(gh api "repos/$REPO/contents/AGENTS.md$ref" --jq '"\(.encoding) \(.content)"' 2>&1); then
+                enc=${resp%%[[:space:]]*}
+                b64=${resp#*[[:space:]]}
+                if [ "$enc" != "base64" ]; then
+                  echo "AGENTS.md probe: unexpected encoding '$enc' (ref '$ref')" >&2; return 1
+                fi
+                text=$(printf %s "$b64" | base64 -d)
+                if grep -Eq '^##[[:space:]]+Code Review Rules' <<<"$text"; then
+                  echo yes; return 0
+                fi
+              else
+                case "$resp" in
+                  *"HTTP 404"*) : ;;
+                  *) echo "AGENTS.md probe failed: $resp" >&2; return 1 ;;
+                esac
+              fi
+            done
+          }
+          if [ -z "$(codexCfg)" ]; then
+            echo "Codex not configured (no AGENTS.md § Code Review Rules) — skipping"
+            exit 0
+          fi
+          gh pr comment "$PR_NUM" --repo "$REPO" --body "@codex review"
+          echo "posted @codex review on PR #$PR_NUM"
