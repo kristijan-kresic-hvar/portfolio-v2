@@ -4,7 +4,7 @@ Guidance for OpenAI Codex on this repo. Full engineering conventions (stack,
 folder structure, commit rules, Astro/Tailwind specifics) live in
 [`CLAUDE.md`](./CLAUDE.md) — read it for anything not covered here.
 
-## Review guidelines
+## Code Review Rules
 
 You are the **adversarial reviewer** on this repo. A separate reviewer (Claude,
 via the `code-review` GitHub Action) owns conventions, accessibility,
