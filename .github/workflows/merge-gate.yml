@@ -164,7 +164,23 @@ jobs:
             esac
           }
           CLAUDE_CFG=$(cfg ".github/workflows/code-review.yml")
-          CODEX_CFG=$(cfg "AGENTS.md")
+          # Codex leg is keyed on AGENTS.md CONTAINING the official '## Code Review Rules'
+          # section (openai/codex#25738) — NOT bare file presence. Teams use AGENTS.md as
+          # a generic agent briefing without the Codex review app installed; file-presence
+          # detection would hard-red the gate forever on such repos ("configured but never
+          # touched"). 404 = not configured; any other probe error fails closed (ERR trap).
+          codexCfg() {
+            local body
+            if body=$(gh api "repos/$REPO/contents/AGENTS.md" --jq .content 2>&1); then
+              printf %s "$body" | base64 -d | grep -Eq '^##[[:space:]]+Code Review Rules' && echo yes || true
+            else
+              case "$body" in
+                *"HTTP 404"*) : ;;
+                *) echo "AGENTS.md probe failed: $body" >&2; return 1 ;;
+              esac
+            fi
+          }
+          CODEX_CFG=$(codexCfg)
 
           # A leg applies when CONFIGURED or the bot has ACTIVITY on this PR.
           CLAUDE_ACTIVE=$(gh api --paginate "repos/$REPO/pulls/$PR_NUM/reviews" \
@@ -199,7 +215,7 @@ jobs:
           fi
 
           if [ -n "$CODEX_CFG" ] && [ "$CODEX_ACTIVE" -eq 0 ]; then
-            PROBLEMS="${PROBLEMS}Codex configured (AGENTS.md) but never touched this PR — comment '@codex review'. "
+            PROBLEMS="${PROBLEMS}Codex configured (AGENTS.md § Code Review Rules) but never touched this PR — comment '@codex review'. "
           fi
           if [ "$CODEX_ACTIVE" -gt 0 ]; then
             THREADS=$(gh api graphql \
