@@ -42,9 +42,17 @@ permissions:
   issues: read
   statuses: write
 
-concurrency:
-  group: merge-gate-${{ github.event.pull_request.number || github.event.issue.number || github.event.inputs.pr_number || github.run_id }}
-  cancel-in-progress: true
+# NO concurrency group, on purpose. Event bursts (PR open + review + comment land within
+# seconds, all on the SAME head SHA) made cancel-in-progress cancel sibling runs, and the
+# "Cancelled" check-run rows pinned to the head read as failed CI even with the verdict
+# status green. Nothing gates on run conclusions (the hook and skills read statuses and
+# reviews directly), runs are ~30s, and stamps are per-SHA — parallel runs are cheap and
+# near-idempotent. The one dangerous ordering — an older run finishing last and stamping
+# success over a newer run's failure (stale GREEN a human could merge on) — is closed by
+# stampOk below: success never overwrites a failure stamped by a later-starting run.
+# Stale red over newer green is left alone: fail-closed, and the next event re-greens it.
+# (The old group's run_id fallback also meant dispatches were never actually deduped —
+# dropping this loses nothing.)
 
 jobs:
   gate:
@@ -67,16 +75,22 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           PR_NUM: ${{ github.event.pull_request.number }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
+          # Staleness is judged against the LIVE head, not the event's payload SHA (P1s,
+          # PR #20 rounds 2-3): with no concurrency group a delayed run for an old push
+          # can execute after newer pushes — comparing against its stale payload SHA would
+          # dismiss Claude's VALID approval on the current head. Against the live head the
+          # dismissal is correct by construction, however delayed this run is: it can only
+          # select an approval whose commit is not the PR's head at query time.
+          CUR=$(gh api "repos/$REPO/pulls/$PR_NUM" --jq .head.sha)
           # NOTE: gh rejects --slurp combined with --jq (cli/cli#10459) — pipe to jq
           # like the rest of this file, or the query silently never yields an id.
           RID=$(gh api --paginate --slurp "repos/$REPO/pulls/$PR_NUM/reviews" 2>/dev/null \
-            | jq -r "[add[] | select(.user.login == \"claude[bot]\")] | last | select(.state == \"APPROVED\") | select(.commit_id != \"$HEAD_SHA\") | .id" || true)
+            | jq -r "[add[] | select(.user.login == \"claude[bot]\")] | last | select(.state == \"APPROVED\") | select(.commit_id != \"$CUR\") | .id" || true)
           if [ -n "$RID" ]; then
             gh api -X PUT "repos/$REPO/pulls/$PR_NUM/reviews/$RID/dismissals" \
-              -f message="Stale: approval was for a superseded commit — new head $HEAD_SHA awaits Claude re-review." --silent
+              -f message="Stale: approval was for a superseded commit — current head $CUR awaits Claude re-review." --silent
             echo "dismissed stale approval (review $RID)"
           else
             echo "no stale approval to dismiss"
@@ -99,6 +113,8 @@ jobs:
         run: |
           set -euo pipefail
           NAME="${REPO##*/}"
+          # Captured BEFORE any data fetch: the freshness reference for stampOk below.
+          RUN_T0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
           HEAD_SHA=$(gh api "repos/$REPO/pulls/$PR_NUM" --jq .head.sha 2>/dev/null || echo "$PAYLOAD_SHA")
           [ -z "$HEAD_SHA" ] && { echo "::error::merge-gate: cannot determine head SHA"; exit 1; }
@@ -106,6 +122,36 @@ jobs:
           # Fail-closed: any unhandled error stamps red on the head before the job dies.
           stamp() { D="$2"; gh api "repos/$REPO/statuses/$HEAD_SHA" -f state="$1" -f context=merge-gate -f description="${D:0:135}" --silent; }
           trap 'stamp failure "gate errored — treat as NOT approved"' ERR
+          # Success may never overwrite a FAILURE stamped by a run that started after us —
+          # without a concurrency group an older run can finish last, and its data predates
+          # whatever the newer run saw (P1s from PR #20 review, rounds 1-2). Timestamps are
+          # second-granularity ISO-8601 UTC (lexicographic compare), so an EQUAL timestamp
+          # is treated as unsafe too (>= via "not <") — a same-second tie costs at most a
+          # skipped green the next event repairs. The freshness lookup is deliberately NOT
+          # error-suppressed: a failed read falls into the ERR trap and stamps red, because
+          # "couldn't check" must never become "assume clean". Red stamps stay unguarded:
+          # stale red is fail-closed and the next event re-greens it.
+          stampOk() {
+            NEWEST_FAIL=$(gh api "repos/$REPO/statuses/$HEAD_SHA" \
+              --jq "[.[] | select(.context==\"merge-gate\")][0] | select(.state==\"failure\") | .created_at")
+            if [ -n "$NEWEST_FAIL" ] && ! [ "$NEWEST_FAIL" \< "$RUN_T0" ]; then
+              echo "::notice::merge-gate: not stamping success — newer-or-concurrent failure ($NEWEST_FAIL >= run start $RUN_T0)"
+              return 0
+            fi
+            stamp success "$1"
+            # Post-write verify (P1, round 3): a failure written between the read above and
+            # the success write above would be buried (GitHub shows the latest status per
+            # context). Re-read after writing: any such failure happened before this read,
+            # so it's visible here — restore it on top. A failure written after our success
+            # supersedes it naturally. Together that closes the stale-green window, not
+            # just shrinks it; a failed re-read lands in the ERR trap (red, fail-closed).
+            POST_FAIL=$(gh api "repos/$REPO/statuses/$HEAD_SHA" \
+              --jq "[.[] | select(.context==\"merge-gate\") | select(.state==\"failure\")][0].created_at // empty")
+            if [ -n "$POST_FAIL" ] && ! [ "$POST_FAIL" \< "$RUN_T0" ]; then
+              stamp failure "restored: a concurrent run stamped failure ($POST_FAIL) — that verdict stands, not this run's stale success"
+              echo "::notice::merge-gate: success superseded — restored concurrent failure from $POST_FAIL"
+            fi
+          }
 
           # cfg PATH -> "yes" if the file exists, "" if a genuine 404, FAIL (exit) on any
           # other error so a transient API hiccup can't be read as "reviewer not configured".
@@ -165,7 +211,7 @@ jobs:
             [ "$TOTAL_THREADS" -gt 100 ] && PROBLEMS="${PROBLEMS}${TOTAL_THREADS} review threads — too many to verify (cap 100). "
             [ "$UNRESOLVED" -gt 0 ] && PROBLEMS="${PROBLEMS}${UNRESOLVED} unresolved Codex thread(s). "
 
-            # Clean = a Codex comment with the exact clean phrase whose embedded 7-40 hex
+            # Clean = a Codex comment with the exact clean phrase whose embedded 10+ hex-char
             # SHA prefixes the head. Reaction is NOT trusted here (no event re-fires it).
             CLEAN=$(gh api --paginate "repos/$REPO/issues/$PR_NUM/comments" \
               --jq "[.[] | select(.user.login == \"$CODEX_REST\") | select(.body | test(\"didn'?t find any major issues\"; \"i\")) | select([.body | scan(\"[0-9a-f]{10,40}\") | . as \$s | select(\"$HEAD_SHA\" | startswith(\$s))] | length > 0)] | length" \
@@ -194,13 +240,21 @@ jobs:
             stampCodex pending "review in flight or awaiting '@codex review' on current head"
           fi
 
+          # A waiver must never reduce the applicable reviewer count to zero (mirror the
+          # local hook merge-gate.mjs). A workflow-only self-edit in a repo with no Codex
+          # leg would otherwise fall through to green with no review at all — the Claude
+          # action self-skips code-review.yml PRs, so nothing looked at the change.
+          if [ -n "$NOTE" ] && [ -z "$CODEX_CFG" ] && [ "$CODEX_ACTIVE" -eq 0 ]; then
+            PROBLEMS="${PROBLEMS}self-edit waiver leaves ZERO reviewers — merge via the web UI after personal review. "
+          fi
+
           if [ -z "$CLAUDE_CFG" ] && [ -z "$CODEX_CFG" ] && [ "$CLAUDE_ACTIVE" -eq 0 ] && [ "$CODEX_ACTIVE" -eq 0 ]; then
-            stamp success "no AI reviewers configured or active — gate not applicable"
+            stampOk "no AI reviewers configured or active — gate not applicable"
           elif [ -n "$PROBLEMS" ]; then
             # Verdict lives in the STATUS alone — the job stays green. A red verdict used
             # to also exit 1, double-reporting as a red check-run row; humans read that as
             # a second failure. Red job now = infrastructure failure (ERR trap), only.
             stamp failure "${NOTE}${PROBLEMS}"; echo "::error::merge-gate: ${NOTE}${PROBLEMS}"
           else
-            stamp success "${NOTE}all applicable reviewers clean on head"
+            stampOk "${NOTE}all applicable reviewers clean on head"
           fi
