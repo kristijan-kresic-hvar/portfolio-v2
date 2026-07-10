@@ -4,7 +4,24 @@ Guidance for OpenAI Codex on this repo. Full engineering conventions (stack,
 folder structure, commit rules, Astro/Tailwind specifics) live in
 [`CLAUDE.md`](./CLAUDE.md) — read it for anything not covered here.
 
+## Pull request workflow (all agents)
+
+When CREATING a pull request: fill every section of `.github/pull_request_template.md`
+with real content — actual verification results, real trade-offs with reasoning. The AI
+reviewers treat stated trade-offs as intentional and verify Verification claims.
+
+After OPENING a pull request, immediately and without being asked: fire the Codex
+review trigger (`gh pr comment <N> --body "@codex review"` — skip only if a Codex
+review/ack already exists for this head), then follow `.github/ai-review-loop.md` to
+convergence. It is autonomous by design — verified fixes, every thread replied to AND
+resolved, re-triggers; only its critical escalations stop for a human, and it NEVER
+merges.
+
 ## Code Review Rules
+
+<!-- Keep this exact heading: it is the section Codex reads for repo-specific review
+     rules (openai/codex#25738) AND the signal the merge-gate uses to detect that this
+     repo runs Codex reviews. Renaming it disables both. -->
 
 You are the **adversarial reviewer** on this repo. A separate reviewer (Claude,
 via the `code-review` GitHub Action) owns conventions, accessibility,
