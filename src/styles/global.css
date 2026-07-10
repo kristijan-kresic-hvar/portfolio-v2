@@ -4,8 +4,8 @@
 
 @theme {
   /* Fonts */
-  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'Geist Mono Variable', ui-monospace, monospace;
+  --font-sans: 'Geist Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
 
   /* Backgrounds — 4 elevation steps (dark-only) */
   --color-bg-base: #0a0a0b;
@@ -46,6 +46,32 @@
   --color-code-keyword: #fbbf24;
   --color-code-string: #86efac;
   --color-code-number: #f87171;
+
+  /* ── Typography ─────────────────────────────────────── */
+  /* Type scale (--text-xs … --text-display) */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 32px;
+  --text-4xl: 40px;
+  --text-5xl: 56px;
+  --text-6xl: 72px;
+  --text-display: clamp(48px, 8vw, 96px);
+
+  /* Line-heights (--leading-*) */
+  --leading-tight: 1.1;
+  --leading-snug: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.6;
+
+  /* Letter-spacing (--tracking-*) */
+  --tracking-tighter: -0.04em;
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.05em;
 }
 
 @layer base {
