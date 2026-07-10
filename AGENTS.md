@@ -6,7 +6,7 @@ folder structure, commit rules, Astro/Tailwind specifics) live in
 
 ## Pull request workflow (all agents)
 
-When CREATING a pull request: fill every section of `.github/pull_request_template.md`
+When CREATING a pull request: fill every section of `.github/PULL_REQUEST_TEMPLATE.md`
 with real content — actual verification results, real trade-offs with reasoning. The AI
 reviewers treat stated trade-offs as intentional and verify Verification claims.
 
