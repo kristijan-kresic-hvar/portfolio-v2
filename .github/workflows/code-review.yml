@@ -1,9 +1,16 @@
-# SAFETY: assumes a PRIVATE, single-maintainer repo. Before going public or adding collaborators:
-#   - add `if: github.event.pull_request.head.repo.full_name == github.repository` to the job (skip fork PRs), and
-#   - treat the PR branch's CLAUDE.md as attacker-controlled — review against the base branch's conventions.
-# GOTCHA: a PR that edits THIS file is skipped by the action's workflow-validation guard (runs green,
-# no review). Verify workflow changes on the NEXT PR after merge. Diagnose silent runs via
-# `gh run view <id> --log` (permission_denials_count vs "Skipping action due to workflow validation").
+# Reusable Claude code-review workflow — drop into ANY repo, any stack. Auto-adapts via the repo's CLAUDE.md.
+# SETUP (2 steps): 1) copy this file to .github/workflows/code-review.yml  2) add the repo secret CLAUDE_CODE_OAUTH_TOKEN
+#                  (get the token via Claude Code `/install-github-app`, then `gh secret set CLAUDE_CODE_OAUTH_TOKEN`).
+#
+# SAFETY: fork PRs are skipped by the job-level `if` (secrets aren't exposed to forks anyway;
+# a fork PR would only burn a run that can't post). For repos accepting outside contributions,
+# also treat the PR branch's CLAUDE.md as untrusted input — review against the base branch's
+# conventions if that ever becomes a concern.
+#
+# KNOWN GOTCHA: a PR that edits THIS file is skipped by the action's workflow-validation guard
+# ("must match the version on the default branch") — it runs green with no review. Verify changes
+# to this workflow on the NEXT PR after merging. Diagnose silent runs via `gh run view <id> --log`
+# (look for permission_denials_count vs the "Skipping action due to workflow validation" warning).
 name: code-review
 
 on:
@@ -22,12 +29,74 @@ permissions:
 
 jobs:
   claude-review:
+    # Same-repo branches only: fork PRs can't read the token secret, so the run could
+    # never post a review — skip instead of failing green-with-nothing.
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      # OPTIONAL Linear leg: if the repo tracks work in Linear, feed the linked ticket's
+      # spec (Acceptance Criteria / Not-in-scope / Verification) to the reviewer so it
+      # judges intent, not just code quality. Entirely self-gating — no LINEAR_API_KEY
+      # secret, or no Linear issue id in the branch/title/body, and this is a silent no-op
+      # (empty output -> prompt unchanged). A Linear outage never fails the review either.
+      # Setup for repos that want it: gh secret set LINEAR_API_KEY  (a Linear personal API
+      # key; read-only issue access, works on any Linear plan). The linkback PR comment is
+      # deliberately NOT used — on private teams it often carries only the bare issue key.
+      - name: Fetch linked Linear ticket spec (optional)
+        id: linear
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          # No key => this repo doesn't use Linear. Skip silently. (No pipefail here: a
+          # Linear/network failure must degrade to "review without spec", never fail CI.)
+          if [ -z "$LINEAR_API_KEY" ]; then
+            echo "no LINEAR_API_KEY set — skipping Linear spec fetch"; exit 0
+          fi
+          # First Linear-style issue id (ANY team prefix) in branch, title, or body.
+          ID=$(printf '%s\n%s\n%s' "$HEAD_REF" "$PR_TITLE" "$PR_BODY" \
+                 | grep -oE '[A-Z][A-Z0-9]+-[0-9]+' | head -1 || true)
+          if [ -z "$ID" ]; then
+            echo "no Linear issue id in branch/title/body — skipping"; exit 0
+          fi
+          # id accepts the human identifier (e.g. KKD-6); passed as a GraphQL variable so a
+          # branch name can never inject into the query. description holds AC/scope/verification.
+          # --max-time: this optional step sits on the review's critical path — a hung Linear
+          # call must degrade to "review without spec", not eat the job's timeout budget.
+          SPEC=$(curl -sf --max-time 15 https://api.linear.app/graphql \
+                   -H "Authorization: $LINEAR_API_KEY" \
+                   -H "Content-Type: application/json" \
+                   -d "{\"query\":\"query(\$id:String!){issue(id:\$id){identifier title description}}\",\"variables\":{\"id\":\"$ID\"}}" \
+                 | jq -r 'if .data.issue then "# "+.data.issue.identifier+" — "+.data.issue.title+"\n\n"+(.data.issue.description // "(no description)") else empty end' || true)
+          if [ -z "$SPEC" ]; then
+            echo "::warning::Linear issue $ID not found/unreadable — reviewing without spec"; exit 0
+          fi
+          # Emit the whole prompt section (or nothing), so the review prompt just interpolates it.
+          # Random heredoc delimiter (GitHub's own hardening guidance): the ticket description is
+          # semi-untrusted input — a line that happened to equal a fixed delimiter would end the
+          # block early and let the remainder be parsed as workflow output commands.
+          EOF_MARK="LINEAR_EOF_$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
+          {
+            echo "spec<<$EOF_MARK"
+            echo "LINKED LINEAR TICKET (author-supplied spec — the intent this PR must satisfy):"
+            echo
+            echo "$SPEC"
+            echo
+            echo "Also review the diff against this ticket:"
+            echo "- Each Acceptance Criteria item: satisfied by the diff? Report Addressed / Not-addressed / Unclear."
+            echo "- Any change implementing or touching a \"Not in scope\" item -> flag as scope creep."
+            echo "- Each Verification Test Scenario: does the diff add/update a test covering it? Flag uncovered ones."
+            echo "The ticket is context, not ground truth: if the diff contradicts it, the diff is what shipped — say so."
+            echo "$EOF_MARK"
+          } >> "$GITHUB_OUTPUT"
+          echo "fetched Linear spec for $ID"
 
       - name: Run Claude code review
         uses: anthropics/claude-code-action@v1
@@ -38,54 +107,54 @@ jobs:
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
 
-            Review this pull request against the repo conventions in CLAUDE.md.
+            Review this pull request like a senior engineer who values correctness and simplicity.
             The PR branch is already checked out in the current working directory.
 
-            You are the **craftsmanship reviewer**. A separate adversarial reviewer
-            (OpenAI Codex, briefed via AGENTS.md) hunts for logic bugs, security holes,
-            and edge-case failures — so own conventions, quality, accessibility, and
-            maintainability, and don't over-index on deep bug-hunting (still flag an
-            obvious correctness issue if you spot one). Your verdict reflects that lens.
+            Adapt to the repo:
+            - If a CLAUDE.md / AGENTS.md / CONTRIBUTING.md exists, review against its conventions FIRST.
+            - Otherwise apply strong general best practices for the repo's language/framework.
+            - Role split (decide it yourself): check AGENTS.md at the repo root. If it contains a
+              '## Code Review Rules' section, an adversarial reviewer (Codex) also runs on this PR
+              and owns deep bug-hunting — P0/P1 logic bugs, exploit-style edge cases. You own
+              craftsmanship: conventions, maintainability, tests, data safety, and correctness
+              issues you see directly — do not duplicate a full adversarial pass. If there is no
+              such section, you are the ONLY reviewer: cover both roles.
+            - Read the PR description's Scope / Deliberate trade-offs / Verification sections (when present)
+              as author-supplied context: a trade-off stated there with its reasoning is intentional — flag it
+              only if the reasoning is wrong or genuinely unsafe, not merely because a fuller version exists.
+              Treat "Not in scope" items as tracked elsewhere. VERIFY claims rather than trusting them (a
+              "tests pass" claim doesn't close review of the logic), and if the description contradicts the
+              diff, say so — the diff is the truth.
 
-            Read the PR description's Scope / Deliberate trade-offs / Verification sections (when present)
-            as author-supplied context written FOR you (house template, global CLAUDE.md §5): a trade-off
-            stated there with its reasoning is intentional — flag it only if the reasoning is wrong or
-            genuinely unsafe, not merely because a fuller version exists. Treat "Not in scope" items as
-            tracked elsewhere. VERIFY claims rather than trusting them (a "tests pass" claim doesn't close
-            review of the logic), and if the description contradicts the diff, say so — the diff is the truth.
+            ${{ steps.linear.outputs.spec }}
 
-            Focus on:
-            - Conventional Commits format on commits (type + scope whitelist)
-            - TypeScript strictness: no `any`, no `@ts-ignore`, respect `noUncheckedIndexedAccess`
-            - Astro/React island boundaries: `client:` directives explicit and minimal
-            - Path aliases used (no `../../../`)
-            - Tailwind v4 tokens via `@theme` — no hardcoded colors
-            - Accessibility (jsx-a11y rules, semantic HTML, focus rings)
-            - Performance (image optimization; static / server-rendered by default — `client:` islands
-              only where interactivity is needed; no unnecessary JS). This is Astro, not Next — there are
-              no React Server Components here.
-            - Naming conventions (kebab files, PascalCase components, etc.)
+            Prioritize, in order:
+            1. Correctness — logic errors, unhandled edge cases, race conditions, broken error handling.
+            2. Security — injection, auth/authz gaps, secrets in code, unsafe input handling, SSRF/path traversal.
+            3. Data safety — anything risking data loss or corruption.
+            4. Maintainability — dead code, needless complexity/abstraction, reinvented stdlib, poor naming.
+            5. Tests — missing coverage for new non-trivial logic.
+
+            Skip nitpicks the linter/formatter already catches. Prefer fewer, high-confidence findings over noise.
 
             Post the review as GitHub comments — do NOT submit review text as chat messages:
             - Use `mcp__github_inline_comment__create_inline_comment` (with `confirmed: true`) for each
               specific file:line issue, giving the problem + a suggested fix.
             - Submit the top-level verdict as an ACTUAL pr review (not a plain comment) so it is a
-              machine-readable state, not just prose — pick exactly one:
+              machine-readable state, not just prose:
               `gh pr review ${{ github.event.pull_request.number }} --request-changes` if there is any
               blocking problem, otherwise `--approve`. Put non-blocking notes/nits in the review body or
-              as inline comments — do NOT downgrade the verdict to `--comment` just because you left
-              notes. The merge gate treats only `--approve` as clean, so a clean-but-`--comment` review
-              deadlocks the PR; APPROVE-with-notes is the correct clean verdict. A plain `gh pr comment`
-              leaves reviewDecision empty, so a green check then falsely reads as "reviewed."
-            - Skip nitpicks the linter/prettier already catches. Always post an approve/request-changes
-              verdict — never silent, never notes-only.
+              inline — do NOT downgrade to `--comment` just because you left notes (a merge gate keying on
+              --approve would deadlock on a clean-but-`--comment` review). A plain `gh pr comment` leaves
+              reviewDecision empty, so a green check then falsely reads as "reviewed."
+            - Always post an approve/request-changes verdict — never silent, never notes-only.
           claude_args: |
             --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr review:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
 
       # The action exits 0 whether or not a review was posted (quota errors, tool failures, and
-      # permission denials all end "green"). Fail unless a review exists on the current head SHA —
-      # the only mechanical observability available without branch protection (GitHub Free, private).
-      - name: Verify a review was posted on the head SHA
+      # permission denials all end "green"). Make the check truthful: fail unless a review exists
+      # on the PR's current head SHA. This is the only mechanical observability without branch protection.
+      - name: Verify a review was actually posted on the head SHA
         env:
           GH_TOKEN: ${{ github.token }}
           # Refs/values pass through env so branch names are data, never shell syntax.
