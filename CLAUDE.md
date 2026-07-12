@@ -207,18 +207,18 @@ Before touching components, layouts, sections, motion, or a11y: invoke `/impecca
 
 ### Phase → skill mapping
 
-| Phase | Task                                                                      | Primary skill(s)                                                                                                                  |
-| ----- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| 2     | Design tokens + primitives (Button, Card, Chip, Link, Section, Container) | `/impeccable document` once to verify DESIGN.md, then `/impeccable craft` per primitive                                           |
-| 3     | Layouts (Nav, Footer, PageShell)                                          | `/impeccable shape` brief, then `/impeccable craft`                                                                               |
-| 4     | Landing sections (Hero, TrustStrip, FeaturedWork, etc.)                   | `/impeccable craft` per section, `/impeccable polish` over the full page                                                          |
-| 5     | Case study template + 3 real studies                                      | `/impeccable craft` template, `/impeccable polish` per filled study; screenshot optimization by hand (WebP, sizing, lazy-load — the old `image` skill is gone) |
-| 6     | Blog templates (Brief + Deep-dive)                                        | `/impeccable craft` for templates, `/impeccable typeset` for prose tuning                                                         |
-| 7     | About + Contact pages                                                     | `/impeccable craft` per page, `/impeccable harden` on the contact form, `playwright-cli` for browser QA                           |
-| 8     | Motion polish                                                             | `/impeccable animate` page-by-page, `/impeccable polish` for hover micro-interactions                                             |
-| 9     | SEO / structured data / meta                                              | Manual JSON-LD authoring + technical sweep (`find-docs` for schema.org/meta references; the old `schema`/`seo-audit`/`ai-seo` skills are gone) |
+| Phase | Task                                                                      | Primary skill(s)                                                                                                                                                                   |
+| ----- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2     | Design tokens + primitives (Button, Card, Chip, Link, Section, Container) | `/impeccable document` once to verify DESIGN.md, then `/impeccable craft` per primitive                                                                                            |
+| 3     | Layouts (Nav, Footer, PageShell)                                          | `/impeccable shape` brief, then `/impeccable craft`                                                                                                                                |
+| 4     | Landing sections (Hero, TrustStrip, FeaturedWork, etc.)                   | `/impeccable craft` per section, `/impeccable polish` over the full page                                                                                                           |
+| 5     | Case study template + 3 real studies                                      | `/impeccable craft` template, `/impeccable polish` per filled study; screenshot optimization by hand (WebP, sizing, lazy-load — the old `image` skill is gone)                     |
+| 6     | Blog templates (Brief + Deep-dive)                                        | `/impeccable craft` for templates, `/impeccable typeset` for prose tuning                                                                                                          |
+| 7     | About + Contact pages                                                     | `/impeccable craft` per page, `/impeccable harden` on the contact form, `playwright-cli` for browser QA                                                                            |
+| 8     | Motion polish                                                             | `/impeccable animate` page-by-page, `/impeccable polish` for hover micro-interactions                                                                                              |
+| 9     | SEO / structured data / meta                                              | Manual JSON-LD authoring + technical sweep (`find-docs` for schema.org/meta references; the old `schema`/`seo-audit`/`ai-seo` skills are gone)                                     |
 | 10    | A11y + perf pass                                                          | `/impeccable audit` site-wide, `/impeccable harden` for fixes, `playwright-cli` cross-device checks, `npx lighthouse` for CWV (old `webapp-testing`/`web-quality-skills` are gone) |
-| 11    | Deploy + launch                                                           | `vercel` CLI for deploys; launch sequencing + directory submissions by hand (old `deploy-to-vercel`/`launch`/`directory-submissions` skills are gone) |
+| 11    | Deploy + launch                                                           | `vercel` CLI for deploys; launch sequencing + directory submissions by hand (old `deploy-to-vercel`/`launch`/`directory-submissions` skills are gone)                              |
 
 Phases 1 (setup) is mechanical — no impeccable.
 
@@ -290,3 +290,26 @@ To bypass (rare): `git commit --no-verify`. Don't.
 
 - Vault spec: `~/Obsidian/brain/01 - Projects/portfolio-v2/` (portfolio-v2.md, dev-conventions.md, stack-decisions.md, design-system.md, content-outline.md)
 - Architecture overview: [`./ARCHITECTURE.md`](./ARCHITECTURE.md)
+
+## AI review loop (ai-review-kit — auto-run)
+
+When CREATING a pull request in this repo, fill every section of
+`.github/PULL_REQUEST_TEMPLATE.md` with real content — actual verification results,
+real trade-offs with reasoning. The AI reviewers treat stated trade-offs as intentional
+and verify Verification claims; empty or false sections make reviews worse, not softer.
+
+After opening ANY pull request in this repo, immediately and without being asked:
+fire the Codex trigger (`gh pr comment <N> --body "@codex review"`) — skip it if an
+ack for this head already exists OR the repo has no Codex leg (no `## Code Review
+Rules` section in AGENTS.md) — then read `.github/ai-review-loop.md` fully and drive
+it to convergence. It is autonomous by design — only its critical escalations stop for a
+human, and it NEVER merges. Report the end state in one line.
+
+At the START of a session in this repo: `gh search prs --author "@me" --state open
+--repo kristijan-kresic-hvar/portfolio-v2` — THIS repository only (other repos' sweeps
+belong to their own sessions/crons); anything actionable → run the playbook's sweep
+mode unprompted, restricted to this repo. Quiet when idle.
+(For coverage between sessions: "schedule a recurring task: babysit my PRs every 30
+minutes" — or cron the installed `.claude/ai-review-babysit.sh`.)
+
+Installed by ai-review-kit's setup.sh — keep this section when editing CLAUDE.md.
