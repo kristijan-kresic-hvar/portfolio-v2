@@ -1,16 +1,25 @@
-## What
+## Summary
 
-<one-line summary of the change>
+<!-- What changed and WHY — intent first, mechanics second. 2-3 bullets. -->
 
-## Why
+## Scope
 
-<problem / motivation> · Linear: KKD-\_\_\_
+<!-- Behavior changes: the files/areas where the real change lives.
+     Mechanical churn: renames, moves, formatting — safe to skim (omit if none).
+     Not in scope: adjacent issues deliberately untouched + where they're tracked. -->
+
+## Deliberate trade-offs
+
+<!-- Each intentional simplification/stub: what, why, and its ceiling. "None." if none.
+     Reviewers treat trade-offs stated here as intentional — they re-flag one only when
+     the reasoning is wrong or genuinely unsafe. -->
 
 ## Verification
 
-<how you confirmed it works — UI screenshots, behaviour checked, edge cases.
-CI already runs typecheck / lint / build, so don't restate those.>
+<!-- Commands run + ACTUAL results (e.g. "yarn test → 42 pass"), manual checks for UI.
+     CI already runs typecheck / lint / build — don't restate those.
+     Be honest — reviewers verify these claims. -->
 
-## Notes for reviewer
+## Linear
 
-<decisions, trade-offs, anything to look at closely — or "none">
+<!-- KKD-___ (or "no ticket — small real change") -->
