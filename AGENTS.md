@@ -17,6 +17,11 @@ convergence. It is autonomous by design — verified fixes, every thread replied
 resolved, re-triggers; only its critical escalations stop for a human, and it NEVER
 merges.
 
+At the START of a session in this repo: check your open PRs in THIS repository only
+(`gh search prs --author "@me" --state open --repo kristijan-kresic-hvar/portfolio-v2`
+— other repos' sweeps belong to their own sessions/crons) and run the loop's sweep,
+restricted to this repo, if anything is actionable. Quiet when idle.
+
 ## Code Review Rules
 
 <!-- Keep this exact heading: it is the section Codex reads for repo-specific review
