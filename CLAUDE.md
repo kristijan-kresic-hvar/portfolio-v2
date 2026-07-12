@@ -275,7 +275,9 @@ To bypass (rare): `git commit --no-verify`. Don't.
 ## CI
 
 - `.github/workflows/ci.yml` — typecheck + lint + test + build on PR
-- `.github/workflows/code-review.yml` — Claude Code Action on PR open/sync; auth via `CLAUDE_CODE_OAUTH_TOKEN` repo secret (Claude subscription OAuth, not API credits)
+- `.github/workflows/code-review.yml` — Claude Code Action on PR open/sync; auth via `CLAUDE_CODE_OAUTH_TOKEN` repo secret (Claude subscription OAuth, not API credits). With the `LINEAR_API_KEY` repo secret set, it also fetches the Linear ticket named in the branch/title/body and reviews the diff against its spec (silent no-op otherwise)
+- `.github/workflows/merge-gate.yml` — adaptive two-leg merge gate; stamps the `merge-gate` commit status, green only when every applicable AI reviewer is clean on the current head
+- Review-fix loop: `.github/ai-review-loop.md` (canonical playbook — see the "AI review loop" section below for the auto-run wiring)
 
 ## What we are NOT doing (v1)
 
