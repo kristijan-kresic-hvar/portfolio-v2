@@ -31,6 +31,7 @@ export default {
         'motion',
         'a11y',
         'deps',
+        'cv',
       ],
     ],
     'subject-case': [2, 'always', ['lower-case', 'sentence-case', 'start-case']],
