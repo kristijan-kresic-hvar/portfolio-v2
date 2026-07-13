@@ -42,7 +42,7 @@
     --muted: #71717a;        /* meta, stack tails */
     --hairline: #e4e4e7;
     --amber: #f59e0b;        /* thick rules only (DESIGN.md --color-accent) */
-    --amber-text: #d97706;   /* small text on white, AA (DESIGN.md --color-accent-active) */
+    --amber-text: #b45309;   /* small text on white, AA 5.0:1 (amber-700; #d97706 is only 3.19:1) */
     --sans: 'Geist Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --mono: 'Geist Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
   }
@@ -74,7 +74,7 @@
     line-height: 1.1;
     color: var(--ink);
   }
-  h1 .dot { color: var(--amber-text); }
+  h1 .dot { color: #d97706; } /* 24px bold = WCAG large text, 3:1 threshold */
   .headline {
     font-size: 12.5px;
     font-weight: 600;
@@ -191,7 +191,7 @@
       <span class="project-title">BioCirV Data Portal <span class="hook">· public biomass-discovery platform (<a href="https://biocirv.beamcircular.org">biocirv.beamcircular.org</a>)</span></span>
       <span class="dates">Feb 2026 – Jul 2026</span>
     </div>
-    <ul>
+    <ul role="list">
       <li>Shipped the public discovery UI end-to-end: search, filters, interactive maps, biomass profiles, and Recharts dashboards over a Django API.</li>
       <li>Owned URL-synced filter state (nuqs) and the TanStack Query data layer, so every search is shareable as a plain link.</li>
     </ul>
@@ -203,7 +203,7 @@
       <span class="project-title">OnCallable <span class="hook">· marketplace connecting customers with service professionals (<a href="https://oncallable.com">oncallable.com</a>)</span></span>
       <span class="dates">Jan 2026 – Jul 2026</span>
     </div>
-    <ul>
+    <ul role="list">
       <li>Replatformed the static marketing site to a fully CMS-driven Sanity architecture in ~2 weeks using an AI-augmented workflow (Claude Code).</li>
       <li>Editors self-serve everything: sections as CMS blocks, site settings, media, popups, redirects, page templates, A/B tests, with zero developer deploys.</li>
       <li>Built SEO plus AEO (answer-engine optimization) with structured JSON FAQ schemas.</li>
@@ -216,7 +216,7 @@
       <span class="project-title">Suello <span class="hook">· BLE-connected smart-planter app, Toronto IoT startup</span></span>
       <span class="dates">Apr 2025 – Nov 2025</span>
     </div>
-    <ul>
+    <ul role="list">
       <li>Built the companion mobile app from scratch: BLE (Bluetooth Low Energy) pairing and communication with the planter hardware, plus auth.</li>
       <li>Designed and built the full onboarding flow with custom mobile animations.</li>
     </ul>
@@ -228,7 +228,7 @@
       <span class="project-title">Vetster <span class="hook">· pet-telehealth marketplace, Toronto</span></span>
       <span class="dates">Jul 2024 – Apr 2025</span>
     </div>
-    <ul>
+    <ul role="list">
       <li>Shipped frontend features and PHP backend changes on a 24/7 vet-video platform serving 100k+ app users (Laravel, Vue, PostgreSQL).</li>
     </ul>
   </div>
@@ -238,7 +238,7 @@
       <span class="project-title">Naitur <span class="hook">· first digital platform for licensed psilocybin therapy clinics (US, HIPAA)</span></span>
       <span class="dates">Aug 2023 – Jul 2024</span>
     </div>
-    <ul>
+    <ul role="list">
       <li>Shipped the frontend for a first-of-its-kind US-regulated platform that onboarded 100+ facilitators and 15+ clinics in week one.</li>
       <li>Built JWT magic-link auth, multi-party e-signature flows, data tables, export, and analytics on HIPAA-compliant infrastructure.</li>
     </ul>
@@ -250,7 +250,7 @@
       <span class="project-title">BuddyIns <span class="hook">· US long-term-care insurance platform</span></span>
       <span class="dates">Jan 2023 – Jul 2023</span>
     </div>
-    <ul>
+    <ul role="list">
       <li>Built the frontend: auth, PayPal subscription payments, CRUD flows, data tables, and export (Next.js over a Django API).</li>
     </ul>
   </div>
