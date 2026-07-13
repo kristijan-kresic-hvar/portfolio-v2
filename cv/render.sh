@@ -4,11 +4,21 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-CHROME="${CHROME:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
 OUT="../public/cv/kristijan-kresic-cv.pdf"
 
-if [ ! -x "$CHROME" ]; then
-  echo "Chrome not found at: $CHROME (set CHROME env var)" >&2
+if [ -z "${CHROME:-}" ]; then
+  for candidate in \
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+    google-chrome chromium chromium-browser; do
+    if command -v "$candidate" >/dev/null 2>&1; then
+      CHROME="$candidate"
+      break
+    fi
+  done
+fi
+
+if [ -z "${CHROME:-}" ] || ! command -v "$CHROME" >/dev/null 2>&1; then
+  echo "Chrome/Chromium not found on PATH or default location (set CHROME env var)" >&2
   exit 1
 fi
 
