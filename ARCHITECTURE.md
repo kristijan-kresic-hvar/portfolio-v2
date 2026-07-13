@@ -35,7 +35,7 @@ src/pages/index.astro
       ├─ <TrustStrip />              (years + past companies)
       ├─ <FeaturedWork />            (3 case study cards)
       ├─ <Capabilities />            (what I do)
-      ├─ <Workflow />                (how I work — AI-assisted manifesto)
+      ├─ <Workflow />                (how I work — AI-augmented manifesto)
       ├─ <StackChips />              (recruiter-searchable terms)
       ├─ <FeaturedWriting />         (3 latest Briefs)
       ├─ <CTABand />                 (split: Hire / Project)
