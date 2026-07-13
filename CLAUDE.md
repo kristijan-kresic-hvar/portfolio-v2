@@ -311,8 +311,11 @@ At the START of a session in this repo: `gh search prs --author "@me" --state op
 --repo kristijan-kresic-hvar/portfolio-v2` — THIS repository only (other repos' sweeps
 belong to their own sessions/crons); anything actionable → run the playbook's sweep
 mode unprompted, restricted to this repo. Quiet when idle.
-(Coverage between sessions is owned by the CRON babysitter — `.claude/ai-review-babysit.sh`
-on a `*/30` crontab. Do NOT also create a Claude scheduled task for sweeping: it runs
-under interactive permission settings and doesn't take the script's lock.)
+(Coverage between sessions is owned by the babysitter — install it with
+`.claude/ai-review-babysit.sh --install-cron`, which picks the right scheduler per OS:
+macOS gets a LaunchAgent, NOT crontab (plain cron can't reach the login Keychain for
+`gh`/`claude` auth — every cron sweep would 401); Linux gets a `*/30` crontab. Do NOT
+also create a Claude scheduled task for sweeping: it runs under interactive permission
+settings and doesn't take the script's lock.)
 
 Installed by ai-review-kit's setup.sh — keep this section when editing CLAUDE.md.
