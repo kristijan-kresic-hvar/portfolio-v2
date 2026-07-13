@@ -18,12 +18,12 @@ All three read in English. CET timezone is surfaced on the Contact page (respons
 
 ## Brand
 
-**Positioning:** Senior full-stack developer for modern web products. Builds with an AI-assisted workflow, hand-finishes everything before it ships. Operates at the forefront of modern web development without making the site feel "about AI".
+**Positioning:** Senior full-stack developer for modern web products. Builds with an AI-augmented workflow, hand-finishes everything before it ships. Operates at the forefront of modern web development without making the site feel "about AI".
 
 **Hero copy (locked, Seed 1):**
 
 - Headline: "Full-stack developer for modern web products."
-- Sub: "I ship fast, polished work end-to-end — AI-assisted workflow, hand-finished by me."
+- Sub: "I ship fast, polished work end-to-end — AI-augmented workflow, hand-finished by me."
 - Tertiary (locked 2026-05-19, per [[research-actionable]] L-1): "Currently at Agilno · Hvar, Croatia (CET)." — recruiter-scan anchor: current company + location + timezone in <8 words. Availability stays implicit via CTAs.
 
 **Experience framing (locked):** "4 years professional · Building for the web since 2016" — split framing reads honest, gives recruiters the professional number while showing depth of exposure. Title is "Full-stack developer" — not "Senior" — earned by case studies, not asserted.
@@ -39,7 +39,7 @@ All three read in English. CET timezone is surfaced on the Contact page (respons
 - **Terse.** Short sentences. Fragments OK when they read clean.
 - **Confident, not boastful.** Outcomes over adjectives. "200% inquiry boost" beats "I built an amazing site". "Built for the web since 2016" beats "passionate about web development".
 - **Craft-aware.** Specific names + versions. "React 19", "Astro 6", "Tailwind v4" — not "modern stack" or "the latest frameworks".
-- **AI-assisted, not AI-product.** Workflow is honest about AI tooling (Claude, Cursor, Codex) but the product is a _human-finished web product_. Transparency footer on every blog post: "Researched with Claude. Edited and published by me."
+- **AI-augmented, not AI-product.** Workflow is honest about AI tooling (Claude, Cursor, Codex) but the product is a _human-finished web product_. Transparency footer on every blog post: "Researched with Claude. Edited and published by me."
 - **Name the AI boundary explicitly.** Per 2026 freelance positioning research: "AI-augmented" alone is now generic noise. Differentiator = naming _where_ AI helps and _where it doesn't_. Locked boundary line for About + How-I-work + FAQ band: **"AI for codegen scaffolds and research drafts. Not for architecture decisions, security review, or anything that ships under my name."** Calms the "did you actually do this?" objection funded buyers now carry.
 - **No hedging.** Cut "in my opinion", "I think", "perhaps", "might".
 - **No em-dashes overuse.** The model loves them; the brand doesn't.
@@ -62,7 +62,7 @@ Look at instead: rauno.me · paco.me · brittanychiang.com · leerob.io · emilk
 ## Strategic principles
 
 1. **Primary KPI = conversion to hiring or project contact.** Every page, every section, earns its place by moving the visitor closer to Contact, or by being a load-bearing trust signal for one that does. Pages that don't pull weight get cut.
-2. **Funnel framing:** Land → 5-second hook (hero + CTA) → Trust (logos, years, real work, social proof) → Proof (3 case studies with concrete outcomes) → Conviction (workflow narrative, AI-assisted with craftsman review) → Convert (split-path Contact: hire-for-role vs project inquiry).
+2. **Funnel framing:** Land → 5-second hook (hero + CTA) → Trust (logos, years, real work, social proof) → Proof (3 case studies with concrete outcomes) → Conviction (workflow narrative, AI-augmented with craftsman review) → Convert (split-path Contact: hire-for-role vs project inquiry).
 3. **Trust strip before featured work.** Hierarchy: company logos + experience line directly under the hero, _before_ the work cards. Proof > narrative.
 4. **Contact is first-class.** Sticky-nav accent button is always visible. Contact form is a real form (not a `mailto:` link). Two intent paths (hire / project) drive the email subject line for triage.
 5. **Real headshot, intentionally treated.** HeadshotPro portrait integrated on hero — small/medium, treated (duotone / cutout / scroll-reveal — final treatment decided after photo arrives). Differentiator: across 16 reference portfolios, real-headshot-on-hero is genuinely rare.
@@ -72,4 +72,4 @@ Look at instead: rauno.me · paco.me · brittanychiang.com · leerob.io · emilk
 
 ## Product Purpose
 
-This site exists to convert visitors into either (a) a hiring conversation for a senior full-stack role, or (b) a scoped project inquiry. Every section is engineered for that conversion. The brand is "experienced full-stack developer who works at the forefront of modern web development with AI-assisted workflows, but ships hand-finished work end-to-end." The blog ("Web Dev Brief", monthly, AI-research + human-polish) compounds trust over time via SEO and topical authority — secondary to direct conversion in v1, primary in v2.
+This site exists to convert visitors into either (a) a hiring conversation for a senior full-stack role, or (b) a scoped project inquiry. Every section is engineered for that conversion. The brand is "experienced full-stack developer who works at the forefront of modern web development with AI-augmented workflows, but ships hand-finished work end-to-end." The blog ("Web Dev Brief", monthly, AI-research + human-polish) compounds trust over time via SEO and topical authority — secondary to direct conversion in v1, primary in v2.
