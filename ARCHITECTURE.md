@@ -22,6 +22,8 @@ High-level overview of how the portfolio is wired together. Read this if you wan
 /_actions/contact      Astro Action (contact form) → Resend
 ```
 
+The landing page shows featured content only (3 case studies, 3 latest Briefs); `/work` and `/blog` are the full indexes. Both ship **unpaginated** — a single grid/list. Add Astro's `paginate()` only when either collection passes ~20 entries; a paginated route with 3 posts reads worse than none. (Decided 2026-07-17.)
+
 The Brief pipeline has no route — it runs as a **scheduled GitHub Action** (`.github/workflows/brief.yml`, monthly), not a Vercel cron. See "Brief pipeline" below.
 
 ## Data flow — landing page
