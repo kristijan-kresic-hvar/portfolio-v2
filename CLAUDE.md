@@ -227,7 +227,7 @@ Every page/section-level `/impeccable shape` or `craft` starts from real product
 
 Primitives (Phase 2) skip this — they're token application. Mobbin is a deliberate exception to the CLI-over-MCP preference: no CLI exists.
 
-**Source fit:** Mobbin covers product UI — strongest for component/flow patterns (forms, indexes, card grids, nav, CTA bands); personal portfolios aren't in its library. Portfolio-identity sections (hero, work showcase) lean on the Phase 0 moodboard (rauno.me, paco.me, brittanychiang.com, leerob.io, emilkowal.ski, vercel/linear/framer) + portfolio galleries (godly.website, land-book) via firecrawl/exa. **Subscription timing:** subscribe right before Phase 3 (first phase with a reference pass), cancel after Phase 8 motion polish if design work is done — just-in-time per section, no upfront batch pull.
+**Source fit:** Mobbin covers product UI — strongest for component/flow patterns (forms, indexes, card grids, nav, CTA bands); personal portfolios aren't in its library. Portfolio-identity sections (hero, work showcase) lean on the locked moodboard (canonical list: `PRODUCT.md` § Anti-references → "Look at instead") + portfolio galleries (godly.website, land-book) via firecrawl/exa. **Subscription timing:** subscribe right before Phase 3 (first phase with a reference pass), cancel after Phase 8 motion polish if design work is done — just-in-time per section, no upfront batch pull.
 
 ### Phase → skill mapping
 
