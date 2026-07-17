@@ -12,6 +12,12 @@ export const workSchema = z.object({
   constraint: z.string().optional(),
   retrospective: z.string().optional(),
   cover: z.string().optional(),
+  links: z
+    .object({
+      live: z.url().optional(),
+      repo: z.url().optional(),
+    })
+    .default({}),
   draft: z.boolean().default(false),
   featured: z.boolean().default(false),
   order: z.number().optional(),
