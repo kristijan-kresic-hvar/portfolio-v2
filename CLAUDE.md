@@ -143,6 +143,7 @@ Branch naming: `<type>/<scope>-<short-slug>` (e.g. `feat/hero-with-headshot`, `c
 - Default: zero JS. Interactivity is progressive enhancement in plain `<script>` tags.
 - Animation: vanilla `motion` (`animate`, `inView`) or CSS scroll-driven animations — never re-add `framer-motion`/React for it.
 - **Conversion-first motion budget:** reveals ≤400ms, opacity + small translate only, trigger once, never gate content (hero copy readable immediately, no scroll hijacking).
+- **Motion psychology playbook** — DESIGN.md § "Motion psychology" governs WHAT animates and why: one moving element per resting viewport (CTA-first), stagger-to-CTA reading order, single-fire arrival emphasis, ≥500ms labor illusion on form submit, no loops / fake urgency / attention-jacking. Consult it before animating anything.
 - **Reduced-motion HARD RULE — every animation respects `prefers-reduced-motion`, no exceptions.** The `global.css` blanket override (0.01ms durations) is a floor, not a substitute: it only catches CSS/WAAPI animations. Motion's JS springs run on rAF and bypass it — every `animate()`/`inView` call gates itself on `matchMedia('(prefers-reduced-motion: reduce)')` first. New CSS animations go inside `@media (prefers-reduced-motion: no-preference)`. Ship the reduced variant first; the animated version is the enhancement.
 - If a genuinely stateful island ever becomes necessary, adding `@astrojs/react` back is a deliberate decision — raise it first, don't drift into it.
 
