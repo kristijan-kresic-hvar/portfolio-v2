@@ -21,7 +21,7 @@ Dark only. Single amber accent. Geist + Geist Mono.
 
 **KKD-6/7/8/9 encode these tokens into `global.css @theme`** (colors, typography, spacing/radius/shadow, motion). This doc is what those tickets cite.
 
-> **Status:** the token spec below is now **locked** (KKD-5) and being encoded into `src/styles/global.css @theme` across KKD-6/7/8/9. Before those land, `global.css` still holds only Phase-1 placeholder tokens — until a ticket encodes a given group, don't assume a token named here resolves in CSS.
+> **Status:** the token spec below is **locked and fully encoded** into `src/styles/global.css @theme` (landed in PR #24, incl. the color-sweep refinements). `global.css` is the code-level source of truth; this doc mirrors it.
 >
 > Non-`@theme` scales (z-index, breakpoints, component tokens) keep their descriptive form — Tailwind v4 provides `--breakpoint-*` natively and z-index is a plain custom-property set, not a utility-generating namespace.
 

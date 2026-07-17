@@ -10,12 +10,13 @@ a11y review is **manual** via `/impeccable audit` — there is no enforcement ho
 
 ## Stack
 
-- Astro 6 (App Router-style file-based routing) — `output: 'static'` w/ Vercel adapter
+- Astro 6 (file-based routing) — `output: 'static'` w/ Vercel adapter
 - TypeScript strict + `noUncheckedIndexedAccess`
 - Tailwind CSS v4 (`@theme {}` block in `src/styles/global.css`)
 - MDX via Astro Content Collections (`work` + `blog`)
-- React islands only (`@astrojs/react`); default zero JS
-- Framer Motion (inside React islands) + Lenis (smooth scroll) + Astro View Transitions
+- **No client framework** — React dropped 2026-07-17 (nothing in the spec needs client state); zero JS by default
+- **Motion** (vanilla `motion` package — NOT `framer-motion`, that's the legacy name) in plain `<script>` tags + CSS scroll-driven animations; **native cross-document View Transitions** (CSS `@view-transition` in `global.css` — no `<ClientRouter />`); native scroll (Lenis dropped — smooth-scroll libs only earn their cost on choreographed scroll storytelling, which this site deliberately avoids)
+- **Astro Actions** for the contact form (`src/actions/index.ts`, `accept: 'form'` + Zod) — not a hand-rolled `/api/contact` endpoint
 - Geist + Geist Mono via `@fontsource-variable`
 - Yarn 4 Berry (`nodeLinker: node-modules`)
 
@@ -32,42 +33,44 @@ a11y review is **manual** via `/impeccable audit` — there is no enforcement ho
 
 ## Folder structure
 
+Target structure — most of it is `.gitkeep` scaffolding until Phases 2+ land (same status caveat as ARCHITECTURE.md).
+
 ```
 src/
+├── actions/
+│   └── index.ts         # Astro Actions (contact form: Zod + Resend)
 ├── components/
 │   ├── primitives/      # Button, Card, Chip, Link, Section, Container
 │   ├── layout/          # Nav, Footer, PageShell
 │   ├── sections/        # Hero, TrustStrip, FeaturedWork, CTABand (landing)
-│   ├── mdx/             # MDX-only components (Callout, Image, Video, Code)
-│   └── motion/          # React islands w/ Framer Motion
+│   └── mdx/             # MDX-only components (Callout, Image, Video, Code)
 ├── content/
 │   ├── blog/            # MDX briefs + deep-dives
 │   └── work/            # MDX case studies
 ├── content.config.ts    # Zod schemas for collections (Astro 6: src root, NOT content/config.ts)
 ├── layouts/             # RootLayout, BlogLayout, WorkLayout
 ├── lib/
-│   ├── brief/           # AI Brief workflow (Anthropic SDK + Octokit)
+│   ├── brief/           # AI Brief workflow (Anthropic SDK + Octokit; run by scripts/brief.ts)
 │   │   ├── prompts/     # research.md, draft.md (version-controlled)
 │   │   ├── generate.ts
 │   │   └── github.ts
-│   ├── motion/          # Spring presets, motion utilities
+│   ├── motion/          # Spring presets, motion utilities (vanilla `motion`)
 │   ├── seo/             # JSON-LD builders, OG image template
 │   ├── email/           # Resend wrapper
 │   └── utils/           # Generic helpers
 ├── pages/
-│   ├── api/
-│   │   ├── contact.ts
-│   │   └── cron/brief.ts
-│   ├── og/[slug].png.ts
+│   ├── og/[slug].png.ts # Dynamic OG generator (server-runtime)
 │   ├── blog/
 │   ├── work/
 │   ├── about.astro
 │   ├── contact.astro
 │   └── index.astro
 ├── styles/
-│   ├── global.css       # @theme {} block + base reset
+│   ├── global.css       # @theme {} block + base reset + @view-transition
 │   └── prose.css        # MDX typography
 └── env.d.ts
+scripts/
+└── brief.ts             # Brief runner — scheduled GitHub Action + local debug (same entry)
 ```
 
 ## Path aliases
@@ -104,7 +107,7 @@ Format:
 
 **Types:** `feat` `fix` `refactor` `style` `chore` `docs` `perf` `test` `build` `ci`
 
-**Scopes (whitelist in commitlint.config.js):** `setup` `tokens` `primitives` `layout` `hero` `trust-strip` `featured-work` `capabilities` `workflow` `stack-chips` `cta-band` `work` `blog` `brief-cron` `contact` `about` `seo` `motion` `a11y` `deps`
+**Scopes (whitelist in commitlint.config.js):** `setup` `tokens` `primitives` `layout` `hero` `trust-strip` `featured-work` `capabilities` `workflow` `stack-chips` `cta-band` `work` `blog` `brief-cron` `contact` `about` `seo` `motion` `a11y` `deps` `cv`
 
 **Banned in commits:**
 
@@ -135,12 +138,12 @@ Branch naming: `<type>/<scope>-<short-slug>` (e.g. `feat/hero-with-headshot`, `c
 - No `any` — use `unknown` and narrow
 - No `// @ts-ignore` — fix or use `// @ts-expect-error <reason>`
 
-## React island rules
+## Interactivity rules (no client framework)
 
-- One island per file
-- `client:` directive chosen explicitly (`client:load` above-fold, `client:visible` below)
-- Co-locate islands with their Astro parent in `src/components/sections/<Section>/`
-- Hooks: `react-hooks/exhaustive-deps` enforced by ESLint
+- Default: zero JS. Interactivity is progressive enhancement in plain `<script>` tags.
+- Animation: vanilla `motion` (`animate`, `inView`) or CSS scroll-driven animations — never re-add `framer-motion`/React for it.
+- **Conversion-first motion budget:** reveals ≤400ms, opacity + small translate only, trigger once, never gate content (hero copy readable immediately, no scroll hijacking). Respect `prefers-reduced-motion` (global.css handles the blanket case).
+- If a genuinely stateful island ever becomes necessary, adding `@astrojs/react` back is a deliberate decision — raise it first, don't drift into it.
 
 ## Astro component rules
 
@@ -153,15 +156,17 @@ Branch naming: `<type>/<scope>-<short-slug>` (e.g. `feat/hero-with-headshot`, `c
 
 `astro.config.mjs` uses `output: 'static'` (Astro 5+ default; the legacy `output: 'hybrid'` was removed). Static mode prerenders everything at build time, which breaks server-runtime endpoints.
 
-Every file under `src/pages/api/**` (and any other route that must run on Vercel at request time — e.g. dynamic OG generator `src/pages/og/[slug].png.ts`) **must export `prerender = false`** at the top, before any other code:
+Every route that must run on Vercel at request time — e.g. the dynamic OG generator `src/pages/og/[slug].png.ts`, or any future file under `src/pages/api/**` — **must export `prerender = false`** at the top, before any other code:
 
 ```ts
-// src/pages/api/contact.ts
+// src/pages/og/[slug].png.ts
 export const prerender = false;
 
 import type { APIRoute } from 'astro';
 // …
 ```
+
+(The contact form uses Astro Actions, which are server-handled by design — no flag needed there.)
 
 Forgetting this means Astro tries to evaluate the endpoint at build time, which either fails (no env vars) or produces a useless static response. The Vercel adapter relies on this flag to know which routes ship as serverless functions.
 
@@ -207,22 +212,22 @@ Before touching components, layouts, sections, motion, or a11y: invoke `/impecca
 
 ### Phase → skill mapping
 
-| Phase | Task                                                                      | Primary skill(s)                                                                                                                                                                   |
-| ----- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2     | Design tokens + primitives (Button, Card, Chip, Link, Section, Container) | `/impeccable document` once to verify DESIGN.md, then `/impeccable craft` per primitive                                                                                            |
-| 3     | Layouts (Nav, Footer, PageShell)                                          | `/impeccable shape` brief, then `/impeccable craft`                                                                                                                                |
-| 4     | Landing sections (Hero, TrustStrip, FeaturedWork, etc.)                   | `/impeccable craft` per section, `/impeccable polish` over the full page                                                                                                           |
-| 5     | Case study template + 3 real studies                                      | `/impeccable craft` template, `/impeccable polish` per filled study; screenshot optimization by hand (WebP, sizing, lazy-load — the old `image` skill is gone)                     |
-| 6     | Blog templates (Brief + Deep-dive)                                        | `/impeccable craft` for templates, `/impeccable typeset` for prose tuning                                                                                                          |
-| 7     | About + Contact pages                                                     | `/impeccable craft` per page, `/impeccable harden` on the contact form, `playwright-cli` for browser QA                                                                            |
-| 8     | Motion polish                                                             | `/impeccable animate` page-by-page, `/impeccable polish` for hover micro-interactions                                                                                              |
-| 9     | SEO / structured data / meta                                              | Manual JSON-LD authoring + technical sweep (`find-docs` for schema.org/meta references; the old `schema`/`seo-audit`/`ai-seo` skills are gone)                                     |
-| 10    | A11y + perf pass                                                          | `/impeccable audit` site-wide, `/impeccable harden` for fixes, `playwright-cli` cross-device checks, `npx lighthouse` for CWV (old `webapp-testing`/`web-quality-skills` are gone) |
-| 11    | Deploy + launch                                                           | `vercel` CLI for deploys; launch sequencing + directory submissions by hand (old `deploy-to-vercel`/`launch`/`directory-submissions` skills are gone)                              |
+| Phase | Task                                                                      | Primary skill(s)                                                                                                                                                                                                                     |
+| ----- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2     | Design tokens + primitives (Button, Card, Chip, Link, Section, Container) | `/impeccable document` once to verify DESIGN.md, then ONE batched `/impeccable craft` pass over the primitive set (per-primitive ceremony dropped 2026-07-17 — tokens are locked; quality gate moves to page-level `polish`/`audit`) |
+| 3     | Layouts (Nav, Footer, PageShell)                                          | `/impeccable shape` brief, then `/impeccable craft`                                                                                                                                                                                  |
+| 4     | Landing sections (Hero, TrustStrip, FeaturedWork, etc.)                   | `/impeccable craft` per section, `/impeccable polish` over the full page                                                                                                                                                             |
+| 5     | Case study template + 3 real studies                                      | `/impeccable craft` template, `/impeccable polish` per filled study; screenshot optimization by hand (WebP, sizing, lazy-load — the old `image` skill is gone)                                                                       |
+| 6     | Blog templates (Brief + Deep-dive)                                        | `/impeccable craft` for templates, `/impeccable typeset` for prose tuning                                                                                                                                                            |
+| 7     | About + Contact pages                                                     | `/impeccable craft` per page, `/impeccable harden` on the contact form, `playwright-cli` for browser QA                                                                                                                              |
+| 8     | Motion polish                                                             | `/impeccable animate` page-by-page, `/impeccable polish` for hover micro-interactions                                                                                                                                                |
+| 9     | SEO / structured data / meta                                              | Manual JSON-LD authoring + technical sweep (`find-docs` for schema.org/meta references; the old `schema`/`seo-audit`/`ai-seo` skills are gone)                                                                                       |
+| 10    | A11y + perf pass                                                          | `/impeccable audit` site-wide, `/impeccable harden` for fixes, `playwright-cli` cross-device checks, `npx lighthouse` for CWV (old `webapp-testing`/`web-quality-skills` are gone)                                                   |
+| 11    | Deploy + launch                                                           | `vercel` CLI for deploys; launch sequencing + directory submissions by hand (old `deploy-to-vercel`/`launch`/`directory-submissions` skills are gone)                                                                                |
 
 Phases 1 (setup) is mechanical — no impeccable.
 
-**Don't compress impeccable's gates.** Several sub-commands (especially `craft`) have multi-step user-confirmation gates between shape → mock direction → palette → build. Respect them; they're how the skill avoids generic output.
+**Gate granularity (revised 2026-07-17):** respect `craft`'s multi-step gates (shape → mock direction → palette → build) at the **page/section level** — they're how the skill avoids generic output. Don't run the full gate sequence per primitive; with DESIGN.md locked, primitives are token application, and per-primitive ceremony is where the original 2-week plan stalled.
 
 `/impeccable live` warms context via `live.mjs` and serves a local browser session for real-time iteration. Use it during Phase 4 polish.
 
@@ -233,7 +238,7 @@ When working in this repo, invoke these skills proactively. Default to **CLI + s
 ### Primary (always-on for matching phases)
 
 - **`impeccable`** — primary design driver for all UI work. See "Design workflow (impeccable)" above for the gate + sub-command mapping. Preferred over `frontend-design` for this project — broader scope + auto-loads PRODUCT.md / DESIGN.md.
-- **`claude-api`** — BEFORE writing or modifying any code that imports `@anthropic-ai/sdk`. Applies to `src/pages/api/cron/brief.ts`, `src/lib/brief/generate.ts`, and any future Anthropic SDK integration. Skill bundles current best practices (prompt caching, model migration, tool use, batch, citations).
+- **`claude-api`** — BEFORE writing or modifying any code that imports `@anthropic-ai/sdk`. Applies to `scripts/brief.ts`, `src/lib/brief/generate.ts`, and any future Anthropic SDK integration. Skill bundles current best practices (prompt caching, model migration, tool use, batch, citations).
 - **`verify-library-api`** (paired with `find-docs` — see Auxiliary, which owns its description) — for non-trivial `.astro` work, content collections, adapter config: check the installed Astro/Tailwind version first, then version-pinned docs. (The old `astro` skill is gone — these two cover it.)
 
 ### Phase-bound
@@ -285,8 +290,13 @@ To bypass (rare): `git commit --no-verify`. Don't.
 - Storybook (component count too low)
 - Design tokens build step (Tailwind v4 `@theme` handles it natively)
 - i18n (EN only)
-- Analytics in v1 (add Plausible later if useful)
+- React / any client framework (dropped 2026-07-17 — vanilla `motion` covers animation, Actions cover the form)
+- Lenis / smooth-scroll libs (dropped 2026-07-17 — no choreographed scroll on a conversion site)
+- Contact-form rate limiting (in-memory counters are placebo on serverless; honeypot + min-time + Zod v1, Turnstile/Upstash only on real spam)
+- `astro-seo` package / Partytown (inline meta component; no heavy 3rd-party scripts to offload)
 - husky (using lefthook — single YAML config, no postinstall)
+
+**Changed 2026-07-17:** analytics ship AT launch (Vercel Analytics free tier) — the conversion KPI (2-4% target) is unmeasurable without it. Plausible later only if it earns its cost.
 
 ## Reference
 
