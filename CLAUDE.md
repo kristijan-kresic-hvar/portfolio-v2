@@ -221,13 +221,13 @@ Before touching components, layouts, sections, motion, or a11y: invoke `/impecca
 
 Every page/section-level `/impeccable shape` or `craft` starts from real production references, not the model's priors — AI guessing layout patterns from scratch is the failure mode this step exists to prevent.
 
-1. Pull 5–10 references for the target (hero, case-study page, blog index, contact form, …) via the **Mobbin MCP** (subscription planned 2026-07; until it's wired, `firecrawl` CLI + `exa` over real portfolio/agency sites).
+1. Pull 5–10 references for the target (hero, case-study page, blog index, contact form, …) via the **Mobbin MCP** (subscribed + registered at user scope 2026-07-17, official HTTP server `api.mobbin.com/mcp`; `firecrawl` CLI + `exa` stay for portfolio-gallery pulls outside Mobbin's library).
 2. Choose the best-fit pattern against `PRODUCT.md` (tone, anti-references) and name the chosen references + why in the shape/craft brief.
 3. Only then run the impeccable flow, with the chosen pattern as the layout starting point.
 
 Primitives (Phase 2) skip this — they're token application. Mobbin is a deliberate exception to the CLI-over-MCP preference: no CLI exists.
 
-**Source fit:** Mobbin covers product UI — strongest for component/flow patterns (forms, indexes, card grids, nav, CTA bands); personal portfolios aren't in its library. Portfolio-identity sections (hero, work showcase) lean on the locked moodboard (canonical list: `PRODUCT.md` § Anti-references → "Look at instead") + portfolio galleries (godly.website, land-book) via firecrawl/exa. **Subscription timing:** subscribe right before Phase 3 (first phase with a reference pass), cancel after Phase 8 motion polish if design work is done — just-in-time per section, no upfront batch pull.
+**Source fit:** Mobbin covers product UI — strongest for component/flow patterns (forms, indexes, card grids, nav, CTA bands); personal portfolios aren't in its library. Portfolio-identity sections (hero, work showcase) lean on the locked moodboard (canonical list: `PRODUCT.md` § Anti-references → "Look at instead") + portfolio galleries (godly.website, land-book) via firecrawl/exa. **Subscription timing:** subscribed 2026-07-17; cancel after Phase 8 motion polish if design work is done — references are pulled just-in-time per section, no upfront batch pull.
 
 ### Phase → skill mapping
 
