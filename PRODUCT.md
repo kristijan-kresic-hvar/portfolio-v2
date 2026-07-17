@@ -25,6 +25,7 @@ All three read in English. CET timezone is surfaced on the Contact page (respons
 - Headline: "Full-stack developer for modern web products."
 - Sub: "I ship fast, polished work end-to-end — AI-augmented workflow, hand-finished by me."
 - Tertiary (re-locked 2026-07-13; originally 2026-05-19 per [[research-actionable]] L-1): "Available from August 2026 · Hvar, Croatia (CET)." — recruiter-scan anchor: availability + location + timezone in <8 words. Availability went explicit (notice given at Agilno 2026-07-09, employed until first week of August 2026); company history lives in the About timeline. Re-verify this line against reality at launch (pre-launch copy sweep ticket).
+- Stack line (added 2026-07-17): small muted mono row under the tertiary — `React · Next.js · TypeScript · Node.js · Astro` (≤5 recruiter-search terms). High-volume recruiters keyword-match their must-have stack during the first-screen scan, before deciding to scroll; the full chip grid lives too far down to serve that pass. Visual weight stays minimal — this is metadata, not a headline.
 
 **Experience framing (locked):** "4 years professional · Building for the web since 2016" — split framing reads honest, gives recruiters the professional number while showing depth of exposure. Title is "Full-stack developer" — not "Senior" — earned by case studies, not asserted.
 

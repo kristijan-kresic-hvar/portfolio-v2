@@ -21,7 +21,7 @@ Dark only. Single amber accent. Geist + Geist Mono.
 
 **KKD-6/7/8/9 encode these tokens into `global.css @theme`** (colors, typography, spacing/radius/shadow, motion). This doc is what those tickets cite.
 
-> **Status:** the token spec below is now **locked** (KKD-5) and being encoded into `src/styles/global.css @theme` across KKD-6/7/8/9. Before those land, `global.css` still holds only Phase-1 placeholder tokens — until a ticket encodes a given group, don't assume a token named here resolves in CSS.
+> **Status:** the token spec below is **locked and fully encoded** into `src/styles/global.css @theme` (landed in PR #24, incl. the color-sweep refinements). `global.css` is the code-level source of truth; this doc mirrors it.
 >
 > Non-`@theme` scales (z-index, breakpoints, component tokens) keep their descriptive form — Tailwind v4 provides `--breakpoint-*` natively and z-index is a plain custom-property set, not a utility-generating namespace.
 
@@ -257,9 +257,9 @@ Easings use the `--ease-*` namespace.
 | `--ease-in`       | `cubic-bezier(0.7, 0, 0.84, 0)`     | Exits                                  |
 | `--ease-bounce`   | `cubic-bezier(0.34, 1.56, 0.64, 1)` | Playful micro-interactions (sparingly) |
 
-### Framer Motion springs
+### Motion springs (vanilla `motion`)
 
-Defined in `src/lib/motion/springs.ts`:
+Defined in `src/lib/motion/springs.ts` — pass as `animate()` transition options:
 
 ```ts
 export const gentle = { type: 'spring', stiffness: 100, damping: 20 };
@@ -267,11 +267,25 @@ export const snappy = { type: 'spring', stiffness: 300, damping: 30 };
 export const bouncy = { type: 'spring', stiffness: 400, damping: 17 };
 ```
 
-### Reduced motion
+### Reduced motion — HARD RULE
 
-- Wrap entrance animations in `@media (prefers-reduced-motion: no-preference)` OR use Motion's `useReducedMotion` hook.
-- Page transitions degrade to opacity-only crossfade when reduced.
-- Lenis smooth scroll disabled when `prefers-reduced-motion: reduce`.
+- **Every animation respects `prefers-reduced-motion`, no exceptions.** The `global.css` blanket override only catches CSS/WAAPI; Motion JS springs run on rAF and bypass it — each `animate()`/`inView` call self-gates on `matchMedia('(prefers-reduced-motion: reduce)')`.
+- New CSS animations go inside `@media (prefers-reduced-motion: no-preference)`; the `@view-transition` rule is already wrapped.
+- Reduced variant ships first; the animated version is the enhancement.
+
+### Motion psychology (conversion playbook — locked 2026-07-17)
+
+Motion is a conversion instrument, not decoration. Everything below operates inside the motion budget (reveals ≤400ms, opacity + small translate, content never gated) and the reduced-motion hard rule. Marginal gains on top of copy + proof — never a substitute.
+
+1. **Motion hierarchy (saliency + isolation effect):** at rest, at most ONE element per viewport carries motion, and it must be conversion-relevant (primary CTA, or a trust signal's arrival). Peripheral vision is drawn to movement — spend that draw on the click target. Decorative elements never self-animate.
+2. **Staggered reveal = guided reading order:** section children reveal in intended reading order with 40–80ms stagger, CTA last — the last thing to move is the last thing read and the best remembered (serial-position).
+3. **Single-fire CTA arrival emphasis:** when a CTA band enters the viewport, the primary card gets ONE subtle amber glow sweep. Never loops — a repeated cue becomes a nag and trains banner blindness.
+4. **Instant feedback = perceived craftsmanship (halo effect):** hover/press respond within `--duration-instant` (100ms). On a portfolio the meta-message IS the product — a site that feels precise transfers to "this person ships quality."
+5. **Labor illusion on contact submit:** show a working state for ≥500ms even if the Action resolves faster, then a definite confirmation with the response-time line. Instant flips read as "did that even send?"; brief visible work reads as reliability.
+6. **Goal-gradient on the project form:** chip selections confirm instantly (~150ms scale tick) — each answered step feels like progress and pulls toward completion.
+7. **Peak-end:** the last scroll moment of every page is a mini-CTA carrying rule 3's arrival emphasis. The end of the page is the point of decision — make it the best-crafted beat.
+8. **Human-warmth sequencing on the hero:** copy is readable at first paint; the headshot's amber glow fades in one beat later (~300ms delay). Faces win eye fixations — let the positioning headline land first, then the human warmth.
+9. **Banned (backfires):** looping/idle animations, attention-jacking wiggles, fake urgency or fake activity toasts ("someone just hired…"), hover-only reveals of load-bearing content, anything that delays copy. Dark-pattern motion burns the exact trust this site sells.
 
 ## Breakpoints (mobile-first)
 
@@ -374,7 +388,7 @@ Source-of-truth files:
 
 - `src/styles/global.css` — `@theme {}` definitions + base reset (loaded by every page)
 - `src/styles/prose.css` — MDX prose typography (created in Phase 6)
-- `src/lib/motion/springs.ts` — Framer Motion spring presets
+- `src/lib/motion/springs.ts` — Motion spring presets (vanilla `motion`)
 - `src/components/primitives/` — Button, Card, Chip, Input wrappers binding these tokens
 
 ## Open items (resolve before / during Phase 2)

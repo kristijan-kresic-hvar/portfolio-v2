@@ -6,15 +6,15 @@ Personal portfolio of **Kristijan Krešić** — full-stack developer based in H
 
 ## Stack
 
-- **Astro 6** (static-first w/ React islands)
+- **Astro 6** (static-first, zero JS by default — no client framework)
 - **TypeScript** (strict + `noUncheckedIndexedAccess`)
 - **Tailwind CSS v4** (`@theme` tokens, dark only)
 - **MDX** via Astro Content Collections (`work` + `blog`)
-- **Framer Motion** + **Lenis** + Astro View Transitions
+- **Motion** (vanilla) + native cross-document View Transitions (CSS `@view-transition`)
 - **Geist** + **Geist Mono** (self-hosted variable fonts)
-- **Resend** for contact form + cron alerts
-- **Anthropic API** for the monthly "Web Dev Brief" cron pipeline
-- **Vercel** (hosting + cron + adapter)
+- **Resend** for contact form + Brief failure alerts
+- **Anthropic API** for the monthly "Web Dev Brief" (scheduled GitHub Action)
+- **Vercel** (hosting + adapter)
 
 ## Run locally
 

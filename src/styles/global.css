@@ -133,6 +133,15 @@
   --z-max: 9999;
 }
 
+/* Cross-document view transitions — native browser MPA transitions (Baseline 2026),
+   replaces Astro's <ClientRouter /> JS router. Guarded so reduced-motion users get
+   instant swaps; per-element morphs opt in via view-transition-name. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
 @layer base {
   html {
     color-scheme: dark;
