@@ -1,0 +1,20 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "geist",
+        "reason": "Locked design-system §2 decision (2026-05-18): Geist chosen with Vercel-coded risk explicitly acknowledged and accepted",
+        "createdAt": "2026-07-17T10:07:25.083Z"
+      },
+      {
+        "rule": "overused-font",
+        "value": "geist mono",
+        "reason": "Locked design-system §2 decision (2026-05-18): Geist Mono chosen with Vercel-coded risk explicitly acknowledged and accepted",
+        "createdAt": "2026-07-17T10:07:25.122Z"
+      }
+    ]
+  }
+}
