@@ -14,6 +14,31 @@ describe('workSchema', () => {
 
     expect(parsed.draft).toBe(false);
     expect(parsed.featured).toBe(false);
+    expect(parsed.links).toEqual({});
+  });
+
+  it('parses live and repo links and rejects non-url values', () => {
+    const parsed = workSchema.parse({
+      title: 'Acme redesign',
+      summary: 'Rebuilt the marketing site.',
+      role: 'Lead engineer',
+      stack: ['Astro'],
+      year: 2026,
+      links: { live: 'https://example.com', repo: 'https://github.com/acme/site' },
+    });
+
+    expect(parsed.links.live).toBe('https://example.com');
+
+    expect(() =>
+      workSchema.parse({
+        title: 'x',
+        summary: 'x',
+        role: 'x',
+        stack: [],
+        year: 2026,
+        links: { live: 'not-a-url' },
+      }),
+    ).toThrow();
   });
 
   it('rejects frontmatter missing a required title', () => {
