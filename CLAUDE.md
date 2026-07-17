@@ -149,8 +149,8 @@ Branch naming: `<type>/<scope>-<short-slug>` (e.g. `feat/hero-with-headshot`, `c
 
 ## Images
 
-- **Every image slot that lacks its real asset uses a placeholdit.com placeholder at the final intended dimensions** — e.g. `https://placeholdit.com/800x600/141416/f59e0b?text=Agrivi+hero` (bg = `--color-bg-elev-1`, text = accent; format `WxH/bg-hex/text-hex?text=…`, hex without `#`). Correct dimensions keep layout and CLS honest during build; never leave an `img` slot empty or commented out.
-- **No placeholder ships.** Pre-launch gate: `grep -r "placeholdit.com" src/` must return zero hits before the Phase 11 deploy.
+- **Every image slot that lacks its real asset uses a placehold.co placeholder at the final intended dimensions** — e.g. `https://placehold.co/800x600/141416/f59e0b?text=Agrivi+hero` (bg = `--color-bg-elev-1`, text = accent; format `WxH/bg-hex/text-hex?text=…`, hex without `#`). Correct dimensions keep layout and CLS honest during build; never leave an `img` slot empty or commented out.
+- **No placeholder ships.** Pre-launch gate: `grep -r "placehold.co" src/` must return zero hits before the Phase 11 deploy.
 
 ## Astro component rules
 
