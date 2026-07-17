@@ -146,6 +146,11 @@ Branch naming: `<type>/<scope>-<short-slug>` (e.g. `feat/hero-with-headshot`, `c
 - **Reduced-motion HARD RULE — every animation respects `prefers-reduced-motion`, no exceptions.** The `global.css` blanket override (0.01ms durations) is a floor, not a substitute: it only catches CSS/WAAPI animations. Motion's JS springs run on rAF and bypass it — every `animate()`/`inView` call gates itself on `matchMedia('(prefers-reduced-motion: reduce)')` first. New CSS animations go inside `@media (prefers-reduced-motion: no-preference)`. Ship the reduced variant first; the animated version is the enhancement.
 - If a genuinely stateful island ever becomes necessary, adding `@astrojs/react` back is a deliberate decision — raise it first, don't drift into it.
 
+## Images
+
+- **Every image slot that lacks its real asset uses a placeholdit.com placeholder at the final intended dimensions** — e.g. `https://placeholdit.com/800x600/141416/f59e0b?text=Agrivi+hero` (bg = `--color-bg-elev-1`, text = accent; format `WxH/bg-hex/text-hex?text=…`, hex without `#`). Correct dimensions keep layout and CLS honest during build; never leave an `img` slot empty or commented out.
+- **No placeholder ships.** Pre-launch gate: `grep -r "placeholdit.com" src/` must return zero hits before the Phase 11 deploy.
+
 ## Astro component rules
 
 - Frontmatter (`---`) for data fetching + props (TypeScript-typed)
