@@ -380,6 +380,19 @@ Component tokens reference the `--color-*`, `--radius-*`, and `--shadow-*` token
 - Visible only on `:focus-visible` (keyboard nav)
 - Mandatory on every interactive element
 
+## Performance budget — Lighthouse 100 (locked 2026-07-19)
+
+Launch bar: **100/100/100/100 mobile throttled** (performance, accessibility, best practices, SEO). Desktop 100 is not the bar — mobile throttled is. Enforcement (Lighthouse CI on PRs) + formal audit owned by Linear [KKD-14](https://linear.app/kkdev/issue/KKD-14/phase-10-lighthouse-100-budget-perfa11y-guardrails-ci-enforcement); decision record in vault `perf-budget.md`.
+
+Structural advantage: static Astro, zero-JS default, self-hosted fonts — the site starts at ~100 and only loses points as features land. These rules stop the point loss:
+
+- **Fonts:** `<link rel="preload">` for both Geist variable woff2 files in the base layout — import the built asset URL (Vite hashes fontsource filenames; never hardcode paths). `font-display: swap`. Metric-matched fallback (`size-adjust`) only if CLS shows up in reports.
+- **Hero headshot (LCP element):** AVIF, explicit `width`/`height`, `fetchpriority="high"`, never lazy-loaded. Every other image: `loading="lazy"` + explicit dimensions (the placehold.co convention already keeps dimensions honest pre-asset).
+- **JS:** the zero-JS default stands. Motion stays in per-component `<script>` tags; no site-wide script bundles. Re-adding a client framework is both a deliberate decision (root `CLAUDE.md` rule) and a Lighthouse-budget event.
+- **Third-party:** Vercel Analytics (launch decision 2026-07-17) loads deferred; nothing render-blocking. Any new third-party script requires a budget check first.
+- **Contrast floors (a11y 100):** `--color-text-disabled` `#5C5C62` fails AA on every surface — decorative only, never information-carrying text. `--color-text-muted` `#8E8E8E` must be re-verified ≥4.5:1 on elevated surfaces (`bg-elev-2`/`bg-elev-3`) in the Phase 10 audit. Focus rings + reduced-motion rules above are part of the same score.
+- **Regression guard:** Lighthouse CI check on every PR (KKD-14) — any category below threshold fails the check; tighten threshold to 100 pre-launch.
+
 ## Implementation notes
 
 Tokens live in `src/styles/global.css` inside the `@theme {}` block. Tailwind v4 generates utility classes automatically from the reserved namespaces above (e.g. `--color-accent` → `bg-accent` / `text-accent`; `--spacing-4` → `p-4`; `--radius-md` → `rounded-md`). Raw names outside these namespaces generate no utilities — that is why KKD-5 locked the `--color-*` / `--text-*` / `--font-*` / `--spacing-*` / `--radius-*` / `--shadow-*` / `--leading-*` / `--tracking-*` / `--ease-*` / `--duration-*` convention.
@@ -394,4 +407,4 @@ Source-of-truth files:
 ## Open items (resolve before / during Phase 2)
 
 - Headshot treatment final pick (after HeadshotPro photo arrives) — may affect hero spacing tokens
-- Verify accent contrast on actual buttons in Phase 2 (eyeball test on real screens, then formal a11y audit in Phase 10)
+- Verify accent contrast on actual buttons in Phase 2 (eyeball test on real screens; formal a11y audit in Phase 10 — owned by [KKD-14](https://linear.app/kkdev/issue/KKD-14/phase-10-lighthouse-100-budget-perfa11y-guardrails-ci-enforcement))
