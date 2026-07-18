@@ -314,6 +314,7 @@ To bypass (rare): `git commit --no-verify`. Don't.
 - Contact-form rate limiting (in-memory counters are placebo on serverless; honeypot + min-time + Zod v1, Turnstile/Upstash only on real spam)
 - `astro-seo` package / Partytown (inline meta component; no heavy 3rd-party scripts to offload)
 - husky (using lefthook — single YAML config, no postinstall)
+- PWA — no service worker, no offline, no install prompt (decided 2026-07-19). The site is a one-visit conversion funnel: nobody installs a portfolio, and a service worker's cache can serve stale availability/CV copy — the exact drift class KKD-12 guards against. Lighthouse dropped its PWA category in v12, so there's no score value either. Allowance: a plain web manifest (`theme-color`, icons) as part of Phase 9 meta — that's the whole budget. Do not add `@vite-pwa/astro` or hand-rolled SW code.
 
 **Changed 2026-07-17:** analytics ship AT launch (Vercel Analytics free tier) — the conversion KPI (2-4% target) is unmeasurable without it. Plausible later only if it earns its cost.
 
