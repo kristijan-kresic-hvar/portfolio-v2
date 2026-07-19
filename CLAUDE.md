@@ -272,6 +272,7 @@ When working in this repo, invoke these skills proactively. Default to **CLI + s
 - **`firecrawl` CLI** — for content research (Brief enrichment, reference site scraping); the old `firecrawl-*` skills are gone, the CLI is installed and allowlisted. `exa` MCP for general web search.
 - **`find-docs`** — verify Astro 6 / Tailwind v4 / Resend / Octokit API references before writing integration code (Anthropic SDK → `claude-api` instead).
 - **`simplify`** — pre-PR code review for reuse + quality.
+- **`copywriting` / `copy-editing` / `marketing-psychology`** — ALL marketing copy (headlines, hero copy, CTAs, value props, case-study framing, About/Contact persuasion) runs through `copywriting`; polish existing copy via `copy-editing`; conversion-psychology framing (social proof, anchoring, objection handling) via `marketing-psychology`. Context file: `.claude/product-marketing.md` (symlink → root `PRODUCT.md` — the skill reads it before asking questions). UX microcopy (buttons, empty states, errors) stays with impeccable. Canonical machinery doc: global `~/.claude/CLAUDE.md` §8 (pointers only elsewhere — do not restate).
 
 ### Community skills
 
