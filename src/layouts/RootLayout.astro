@@ -30,13 +30,17 @@ const canonicalUrl = canonical ?? new URL(Astro.url.pathname, Astro.site).toStri
     <meta property="og:url" content={canonicalUrl} />
   </head>
   <body class="flex min-h-dvh flex-col">
+    <a
+      href="#main"
+      class="focus:bg-bg-elev-2 focus:text-text-primary sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-(--z-max) focus:rounded-md focus:px-4 focus:py-2 focus:text-sm focus:font-medium"
+    >
+      Skip to content
+    </a>
     <Nav />
-    {
-      /* flex-1 wrapper pins the footer on short pages; PageShell (KKD-19) replaces it with <main> */
-    }
-    <div class="flex-1">
+    {/* flex-1 pins the footer on short pages */}
+    <main id="main" class="flex-1">
       <slot />
-    </div>
+    </main>
     <Footer />
   </body>
 </html>

@@ -154,6 +154,17 @@ describe('RootLayout', () => {
     expect(html).toContain('<footer');
     expect(html.indexOf('page content')).toBeLessThan(html.indexOf('<footer'));
     expect(html).toMatch(/<body[^>]*class="[^"]*min-h-dvh[^"]*"/);
-    expect(html).toMatch(/<div class="flex-1"[^>]*>\s*page content/);
+  });
+
+  it('wraps page content in the single main landmark', async () => {
+    const html = await renderLayout();
+    expect(html).toMatch(/<main id="main"[^>]*class="[^"]*flex-1[^"]*"[^>]*>\s*page content/);
+    expect(html.match(/<main/g)).toHaveLength(1);
+  });
+
+  it('renders a skip link to #main before the Nav', async () => {
+    const html = await renderLayout();
+    expect(html).toContain('href="#main"');
+    expect(html.indexOf('href="#main"')).toBeLessThan(html.indexOf('<nav'));
   });
 });
