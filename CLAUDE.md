@@ -217,6 +217,10 @@ All non-trivial UI work runs through the `impeccable` skill. The skill loads two
 
 Before touching components, layouts, sections, motion, or a11y: invoke `/impeccable <sub-command> <target>`. The sub-command tells the skill what flow to load.
 
+### Effort routing (Fable 5) — taste work runs at xhigh via the `design-taste` subagent
+
+Sessions run at `high` effort by default. Taste-judged work — anything the phase marker or the mapping below tags as `/impeccable shape`, `craft`, `polish`, `animate`, `typeset`, the Mobbin reference pass, or persuasive copy (hero, CTAs, case-study prose) — MUST be delegated to the **`design-taste`** subagent (`.claude/agents/design-taste.md`, `effort: xhigh`) instead of being done inline. Spec'd build work (assembly, plumbing, config, checklist tasks) stays inline at session effort. Per-phase defaults live as `⚡ effort:` markers on the phase headings in the Obsidian project note.
+
 ### Reference pass (Mobbin) — before design, never after
 
 Every page/section-level `/impeccable shape` or `craft` starts from real production references, not the model's priors — AI guessing layout patterns from scratch is the failure mode this step exists to prevent.
