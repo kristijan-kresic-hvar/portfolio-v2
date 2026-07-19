@@ -2,7 +2,7 @@
 
 High-level overview of how the portfolio is wired together. Read this if you want to understand the project beyond a tour of the repo. Engineering conventions live in [`CLAUDE.md`](./CLAUDE.md); design tokens in [`src/styles/global.css`](./src/styles/global.css).
 
-> **Status — documents the intended end-state, not `main` today.** Most of `src/` is currently scaffolded (`.gitkeep` placeholders); only `RootLayout.astro`, `index.astro`, `global.css`, `content.config.ts`, and `env.d.ts` exist. Routes, `lib/`, API/cron endpoints, layouts beyond `RootLayout`, and content land in Phases 2+. Treat the paths below as the target structure.
+> **Status — documents the intended end-state, not `main` today.** Most of `src/` is currently scaffolded (`.gitkeep` placeholders); real files so far: `RootLayout.astro`, `index.astro`, `global.css`, `content.config.ts` (+ its test), `env.d.ts`, and `lib/motion/springs.ts`. Remaining routes, `lib/` modules, server endpoints, layouts beyond `RootLayout`, and content land in Phases 2+. Treat the paths below as the target structure.
 
 ## Route map
 

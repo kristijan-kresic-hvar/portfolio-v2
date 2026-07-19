@@ -17,7 +17,7 @@ The Vercel adapter relies on `export const prerender = false;` to know which rou
 
 Auto-invoke whenever:
 
-1. Creating a new file under `src/pages/api/**` (any depth — e.g. `src/pages/api/contact.ts`, `src/pages/api/cron/brief.ts`)
+1. Creating a new file under `src/pages/api/**` (any depth; none exist today — contact is an Astro Action and the Brief is a scheduled GitHub Action — but any future endpoint lands here)
 2. Creating a new file under `src/pages/og/**` (dynamic OG image generators — e.g. `src/pages/og/[slug].png.ts`)
 3. Editing any existing file in those paths
 4. Authoring any new `src/pages/**` route that uses `Astro.request`, fetches secrets, sends emails, or otherwise needs request-time execution
@@ -34,7 +34,7 @@ Auto-invoke whenever:
 The canonical pattern (per `CLAUDE.md` "API endpoints" section):
 
 ```ts
-// src/pages/api/contact.ts
+// src/pages/og/[slug].png.ts
 export const prerender = false;
 
 import type { APIRoute } from 'astro';
