@@ -25,6 +25,21 @@ Dark only. Single amber accent. Geist + Geist Mono.
 >
 > Non-`@theme` scales (z-index, breakpoints, component tokens) keep their descriptive form — Tailwind v4 provides `--breakpoint-*` natively and z-index is a plain custom-property set, not a utility-generating namespace.
 
+## Design register & elevation bar (LOCKED — 2026-07-20, KKD-30 rescope)
+
+Origin: the Phase-4 landing shipped six AC-compliant sections that read "dead, plain, templated" (KK verdict on live review, 2026-07-20). Root cause: craft passes ran in the default quiet register and tickets measured only compliance (locked copy, zero JS, tokens) — nothing measured distinctiveness. This section is the durable fix. **It applies to EVERY new surface** — Phase 5 case studies, Phase 6 blog, Phase 7 About/Contact, post-launch sections — not just the landing.
+
+Rules for every new page/section craft pass:
+
+- **Bolder direction by default** — run impeccable's bolder register for new surfaces; "quiet" is reserved for deliberately quiet bands (footer), not the site's voice.
+- **One signature moment per section** — scale contrast, asymmetry, oversized numeral/eyebrow, band treatment, distinctive border/background. A section that reads as "same card stack as its neighbor" fails.
+- **Accent presence at every scroll depth** — amber appears deliberately (eyebrows, numerals, key stats, quote marks, hover states, band edges) in every viewport-height of scroll. Never a full screen without it.
+- **Hierarchy contrast** — section headers carry the hero's type-scale drama; mono meta-rows are seasoning, not the default voice.
+- **Imagery earns proof surfaces** — work cards and case studies lead with real product imagery (harvest → astro:assets), never text-only slabs.
+- **Definition of done:** AC-compliance alone ≠ done. The screenshot test — _would a designer screenshot this section?_ — is part of the bar, judged at the six locked widths (§ All-viewport rule).
+
+**Ticket-authoring rule:** every UI ticket's Acceptance Criteria must include a design-ambition criterion (signature moment + accent presence + screenshot judgment) alongside compliance checks. An agent that satisfies compliance AC but ships a flat surface has not finished the ticket.
+
 ## Colors
 
 All color tokens use the `--color-*` namespace (`--color-accent` → `bg-accent` / `text-accent` / `border-accent`).
