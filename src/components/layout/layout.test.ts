@@ -49,6 +49,11 @@ describe('Nav', () => {
     expect(html).toMatch(/href="\/work"[^>]*aria-current="page"/);
   });
 
+  it('does not activate a section for sibling path prefixes', async () => {
+    const html = await renderNavAt('/workshop');
+    expect(html).not.toContain('aria-current');
+  });
+
   it('marks no route active on the home page (wordmark is home)', async () => {
     const html = await renderNavAt('/');
     expect(html).not.toContain('aria-current');
