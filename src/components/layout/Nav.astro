@@ -23,7 +23,7 @@ const isActive = (href: string) => pathname === href || pathname.startsWith(`${h
       <a
         href="/"
         aria-label="Kristijan Krešić — home"
-        class="text-text-primary mr-auto text-base font-bold"
+        class="text-text-primary mr-auto py-2 text-base font-bold"
       >
         <span class="hidden sm:inline">Kristijan Krešić</span>
         <span class="sm:hidden">KK</span>
@@ -34,7 +34,7 @@ const isActive = (href: string) => pathname === href || pathname.startsWith(`${h
             href={href}
             aria-current={isActive(href) ? 'page' : undefined}
             class:list={[
-              'ease-standard text-sm font-medium transition-colors duration-(--duration-fast)',
+              'ease-standard py-2 text-sm font-medium transition-colors duration-(--duration-fast)',
               isActive(href)
                 ? 'text-text-primary decoration-accent underline decoration-2 underline-offset-[6px]'
                 : 'text-text-secondary hover:text-text-primary',
