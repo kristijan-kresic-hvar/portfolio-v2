@@ -132,6 +132,12 @@ describe('Footer', () => {
     expect(html).not.toMatch(/#[0-9a-fA-F]{6}/);
     expect(html).not.toContain('<script');
   });
+
+  it('renders the build-time freshness receipt in the meta line', async () => {
+    const html = await renderFooter();
+    // Loose on purpose: the date is build-time, only the label is stable.
+    expect(html).toMatch(/Last deployed/);
+  });
 });
 
 describe('PageHeader', () => {
