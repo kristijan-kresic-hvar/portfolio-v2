@@ -276,7 +276,7 @@ When working in this repo, invoke these skills proactively. Default to **CLI + s
 
 ### Community skills
 
-**None installed.** `web-quality-skills`, `accessibility-agents`, and `schema-markup-generator` were all removed in (or never survived) the `.claude` rebuild — a11y is manual via `/impeccable audit`, Lighthouse via `npx lighthouse`, JSON-LD by hand. Listed only so they aren't re-added by mistake.
+**None installed in this repo.** The community-sourced exception lives globally: the `copywriting` / `copy-editing` / `marketing-psychology` trio under Auxiliary above is cherry-picked from `coreyhaines31/marketingskills` into `~/.claude/skills/` (tracked in the claude-setup-2026 config repo, not here). `web-quality-skills`, `accessibility-agents`, and `schema-markup-generator` were all removed in (or never survived) the `.claude` rebuild — a11y is manual via `/impeccable audit`, Lighthouse via `npx lighthouse`, JSON-LD by hand. Listed only so they aren't re-added by mistake.
 
 ### Project-local skills (committed to repo at `.claude/skills/`)
 
