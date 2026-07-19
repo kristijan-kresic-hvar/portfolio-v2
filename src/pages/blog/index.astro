@@ -38,12 +38,8 @@ const formatDate = (date: Date) =>
                     {formatDate(post.data.date)}
                   </time>
                 </p>
-                <a
-                  href={`/blog/${post.id}`}
-                  class="text-text-primary mt-2 inline-block font-semibold"
-                >
-                  {post.data.title}
-                </a>
+                {/* ponytail: unlinked until the detail route lands (KKD-22, Phase 6) */}
+                <p class="text-text-primary mt-2 font-semibold">{post.data.title}</p>
                 <p class="text-text-body mt-2 text-sm">{post.data.summary}</p>
               </li>
             ))}

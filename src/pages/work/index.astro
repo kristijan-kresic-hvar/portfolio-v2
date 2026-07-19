@@ -29,9 +29,8 @@ const entries = (await getCollection('work', ({ data }) => !data.draft)).sort(
           <ul class="mt-12 grid gap-6 sm:grid-cols-2">
             {entries.map((entry) => (
               <li>
-                <a href={`/work/${entry.id}`} class="text-text-primary font-semibold">
-                  {entry.data.title}
-                </a>
+                {/* ponytail: unlinked until the detail route lands (KKD-22, Phase 5) */}
+                <p class="text-text-primary font-semibold">{entry.data.title}</p>
                 <p class="text-text-body mt-2 text-sm">{entry.data.summary}</p>
               </li>
             ))}
