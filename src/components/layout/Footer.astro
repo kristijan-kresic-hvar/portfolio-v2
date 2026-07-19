@@ -9,6 +9,14 @@ const routes = [
 ];
 
 const year = new Date().getFullYear();
+
+// Build time IS deploy time (`output: 'static'` — every merge redeploys). An absolute
+// date stays honest on a static page; a frozen "N days ago" would read "today" forever.
+const deployedOn = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+}).format(new Date());
 ---
 
 <footer class="border-border-subtle bg-bg-base border-t py-16 md:py-24">
@@ -32,9 +40,6 @@ const year = new Date().getFullYear();
         }
       </nav>
     </div>
-    {
-      /* Phase 4 freshness receipt ("Last deployed N days ago") slots into this meta line — content-outline §Footer */
-    }
     {/* Separator dots ride with the preceding item so a wrapped line never opens with one. */}
     <p class="text-text-muted mt-8 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs">
       <span class="inline-flex min-h-11 items-center gap-x-2">
@@ -67,7 +72,11 @@ const year = new Date().getFullYear();
         </a>
         <span aria-hidden="true">·</span>
       </span>
-      <span class="inline-flex min-h-11 items-center select-all">hello@kristijankresic.com</span>
+      <span class="inline-flex min-h-11 items-center gap-x-2">
+        <span class="select-all">hello@kristijankresic.com</span>
+        <span aria-hidden="true">·</span>
+      </span>
+      <span class="inline-flex min-h-11 items-center">Last deployed {deployedOn}</span>
     </p>
   </Container>
 </footer>
