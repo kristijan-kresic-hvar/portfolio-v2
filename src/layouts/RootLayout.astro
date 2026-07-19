@@ -1,6 +1,7 @@
 ---
 import '@/styles/global.css';
 
+import Footer from '@/components/layout/Footer.astro';
 import Nav from '@/components/layout/Nav.astro';
 
 interface Props {
@@ -28,8 +29,14 @@ const canonicalUrl = canonical ?? new URL(Astro.url.pathname, Astro.site).toStri
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalUrl} />
   </head>
-  <body>
+  <body class="flex min-h-dvh flex-col">
     <Nav />
-    <slot />
+    {
+      /* flex-1 wrapper pins the footer on short pages; PageShell (KKD-19) replaces it with <main> */
+    }
+    <div class="flex-1">
+      <slot />
+    </div>
+    <Footer />
   </body>
 </html>

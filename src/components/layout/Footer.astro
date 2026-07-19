@@ -1,0 +1,61 @@
+---
+import Container from '@/components/primitives/Container.astro';
+
+// Mirrors the Nav route set (Blog re-enters when Brief 001 publishes) plus Contact.
+const routes = [
+  { href: '/work', label: 'Work' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+];
+
+const year = new Date().getFullYear();
+---
+
+<footer class="border-border-subtle bg-bg-base border-t py-16 md:py-24">
+  <Container width="wide">
+    <div class="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
+      <div class="max-w-xl">
+        <p class="text-text-primary text-base font-bold">
+          Kristijan Krešić<span class="text-accent" aria-hidden="true">.</span>
+        </p>
+        <p class="text-text-muted mt-2 text-sm">Full-stack developer for modern web products.</p>
+      </div>
+      <nav aria-label="Footer" class="flex flex-wrap items-center gap-x-6 gap-y-2">
+        {
+          routes.map(({ href, label }) => (
+            <a
+              href={href}
+              class="ease-standard text-text-secondary hover:text-text-primary py-2 text-sm font-medium transition-colors duration-(--duration-fast)"
+            >
+              {label}
+            </a>
+          ))
+        }
+      </nav>
+    </div>
+    {
+      /* Phase 4 freshness receipt ("Last deployed N days ago") slots into this meta line — content-outline §Footer */
+    }
+    <p class="text-text-muted mt-12 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs">
+      <span>© {year} Kristijan Krešić</span>
+      <span aria-hidden="true">·</span>
+      <span>Hvar, Croatia (CET)</span>
+      <span aria-hidden="true">·</span>
+      <a
+        href="https://github.com/kristijan-kresic-hvar"
+        class="ease-standard hover:text-text-primary transition-colors duration-(--duration-fast)"
+      >
+        GitHub
+      </a>
+      <span aria-hidden="true">·</span>
+      <a
+        href="https://www.linkedin.com/in/kristijan-kre%C5%A1i%C4%87-2b1176154"
+        class="ease-standard hover:text-text-primary transition-colors duration-(--duration-fast)"
+      >
+        LinkedIn
+      </a>
+      <span aria-hidden="true">·</span>
+      <span class="select-all">hello@kristijankresic.com</span>
+    </p>
+  </Container>
+</footer>

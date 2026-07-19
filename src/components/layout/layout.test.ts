@@ -2,6 +2,7 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import BrandMark from '@/components/layout/BrandMark.astro';
+import Footer from '@/components/layout/Footer.astro';
 import Nav from '@/components/layout/Nav.astro';
 import RootLayout from '@/layouts/RootLayout.astro';
 
@@ -94,16 +95,64 @@ describe('BrandMark', () => {
   });
 });
 
+describe('Footer', () => {
+  const renderFooter = () => container.renderToString(Footer);
+
+  it('renders a footer landmark with the copyright and build-time year', async () => {
+    const html = await renderFooter();
+    expect(html).toContain('<footer');
+    expect(html).toContain(`© ${new Date().getFullYear()} Kristijan Krešić`);
+  });
+
+  it('echoes exactly the Nav route set plus Contact — no dead hrefs', async () => {
+    const html = await renderFooter();
+    expect(html).toContain('href="/work"');
+    expect(html).toContain('href="/about"');
+    expect(html).toContain('href="/contact"');
+    expect(html).not.toContain('href="/blog"');
+  });
+
+  it('links GitHub and LinkedIn', async () => {
+    const html = await renderFooter();
+    expect(html).toContain('href="https://github.com/kristijan-kresic-hvar"');
+    expect(html).toContain(
+      'href="https://www.linkedin.com/in/kristijan-kre%C5%A1i%C4%87-2b1176154"',
+    );
+  });
+
+  it('shows the email as plain text, never a mailto link (form is the primary contact path)', async () => {
+    const html = await renderFooter();
+    expect(html).toContain('hello@kristijankresic.com');
+    expect(html).not.toContain('mailto:');
+  });
+
+  it('uses tokens only and ships zero JS', async () => {
+    const html = await renderFooter();
+    expect(html).not.toMatch(/#[0-9a-fA-F]{6}/);
+    expect(html).not.toContain('<script');
+  });
+});
+
 describe('RootLayout', () => {
-  it('renders the Nav on every page', async () => {
-    const html = await container.renderToString(RootLayout, {
+  const renderLayout = () =>
+    container.renderToString(RootLayout, {
       // canonical passed explicitly: the container API drops astroConfig.site,
       // so the Astro.site-derived branch cannot run in tests
       props: { title: 't', canonical: 'https://example.com/' },
       request: new Request('https://example.com/'),
       slots: { default: 'page content' },
     });
+
+  it('renders the Nav on every page', async () => {
+    const html = await renderLayout();
     expect(html).toContain('<nav');
     expect(html).toContain('page content');
+  });
+
+  it('renders the Footer below the page content in a min-height shell', async () => {
+    const html = await renderLayout();
+    expect(html).toContain('<footer');
+    expect(html.indexOf('page content')).toBeLessThan(html.indexOf('<footer'));
+    expect(html).toMatch(/<body[^>]*class="[^"]*min-h-dvh[^"]*"/);
   });
 });
