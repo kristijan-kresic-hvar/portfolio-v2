@@ -1,0 +1,71 @@
+---
+import Button from '@/components/primitives/Button.astro';
+import Container from '@/components/primitives/Container.astro';
+
+const routes = [
+  { href: '/work', label: 'Work' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/about', label: 'About' },
+];
+
+const pathname = Astro.url.pathname;
+const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+---
+
+<header
+  class="border-border-subtle bg-bg-base/80 sticky top-0 z-(--z-sticky) border-b backdrop-blur-md [view-transition-name:site-nav]"
+>
+  <Container width="wide">
+    <nav
+      aria-label="Main"
+      class="flex min-h-14 flex-wrap items-center gap-x-6 gap-y-2 py-2 sm:min-h-16"
+    >
+      <a
+        href="/"
+        aria-label="Kristijan Krešić — home"
+        class="text-text-primary mr-auto text-base font-bold"
+      >
+        <span class="hidden sm:inline">Kristijan Krešić</span>
+        <span class="sm:hidden">KK</span>
+      </a>
+      {
+        routes.map(({ href, label }) => (
+          <a
+            href={href}
+            aria-current={isActive(href) ? 'page' : undefined}
+            class:list={[
+              'ease-standard text-sm font-medium transition-colors duration-(--duration-fast)',
+              isActive(href)
+                ? 'text-text-primary decoration-accent underline decoration-2 underline-offset-[6px]'
+                : 'text-text-secondary hover:text-text-primary',
+            ]}
+          >
+            {label}
+          </a>
+        ))
+      }
+      <Button href="/contact" size="sm">Contact</Button>
+    </nav>
+  </Container>
+</header>
+
+<style>
+  /* Border hairline reveals on scroll (zero JS); static border is the
+     no-support / reduced-motion fallback. */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      header {
+        border-color: transparent;
+        animation: nav-border-reveal linear both;
+        animation-timeline: scroll();
+        animation-range: 0 100px;
+      }
+
+      @keyframes nav-border-reveal {
+        to {
+          border-color: var(--color-border-subtle);
+        }
+      }
+    }
+  }
+</style>
