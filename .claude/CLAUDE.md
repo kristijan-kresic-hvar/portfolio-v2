@@ -35,6 +35,8 @@ Merges with global `~/.claude/CLAUDE.md`. Project design/product/architecture do
 
 ## Sharp Edges
 
+- **All-viewport UI rule (2026-07-19, from the KKD-23 hero rework):** every section is verified by SCREENSHOT at 375 / 768 / 1280 / 1440 / 1920 / 2560 before sign-off — a 1280-only check shipped a hero that collapsed at ≥1440 (4-line headline tower, thumbnail portrait, flat void). The full rule + failure catalog lives in root `DESIGN.md` § "All-viewport rule" — read it before building or reviewing any section. Prototype look-checks use the production font (Geist), not a fallback — wrap math measured in Inter regressed in Geist.
+
 - **a11y target = 100** (not 95) — recruiters tab through; a11y bugs cost conversions. The old a11y PreToolUse enforce-hook + the `accessibility-agents` plugin are **gone** (removed in the `.claude` rebuild) — a11y review is now **manual** via `/impeccable audit`. Don't rely on a hook to gate UI edits.
 - Phase 2 color-sweep refinements to apply when encoding tokens: `--text-muted #8C8C8C→#8E8E8E`; `--accent-subtle 0.10→0.13`; surface-aware focus ring (outline + offset, not a fixed-bg halo). OKLCH encoding recommended (Tailwind v4 native).
 - Commit gate: Conventional Commits + scope whitelist (commitlint + lefthook + repo skill `commit-scope-validator`). The `astro-prerender-check` skill enforces `prerender=false` on endpoints.

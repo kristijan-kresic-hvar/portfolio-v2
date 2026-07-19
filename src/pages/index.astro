@@ -1,4 +1,5 @@
 ---
+import Hero from '@/components/sections/Hero.astro';
 import RootLayout from '@/layouts/RootLayout.astro';
 ---
 
@@ -6,21 +7,5 @@ import RootLayout from '@/layouts/RootLayout.astro';
   title="Kristijan Krešić — Full-stack developer"
   description="Full-stack developer for modern web products. I ship fast, polished work end-to-end — AI-augmented workflow, hand-finished by me."
 >
-  <div class="mx-auto flex min-h-screen max-w-3xl flex-col justify-center px-6 py-24">
-    <p class="font-mono text-sm tracking-wide text-[color:var(--color-accent)]">
-      portfolio-v2 — coming soon
-    </p>
-    <h1 class="mt-4 text-5xl font-semibold tracking-tight md:text-6xl">Kristijan Krešić</h1>
-    <p class="mt-4 max-w-xl text-lg text-[color:var(--color-text-muted)]">
-      Full-stack developer for modern web products. New site in progress.
-    </p>
-    <p class="mt-12 font-mono text-sm text-[color:var(--color-text-muted)]">
-      <a
-        href="mailto:kristijan.kresic.dev@gmail.com"
-        class="underline decoration-[color:var(--color-accent)] decoration-2 underline-offset-4 hover:text-[color:var(--color-accent)]"
-      >
-        kristijan.kresic.dev@gmail.com
-      </a>
-    </p>
-  </div>
+  <Hero />
 </RootLayout>
