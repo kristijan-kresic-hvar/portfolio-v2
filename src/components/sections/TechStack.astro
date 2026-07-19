@@ -1,0 +1,60 @@
+---
+import Chip from '@/components/primitives/Chip.astro';
+import Container from '@/components/primitives/Container.astro';
+import Section from '@/components/primitives/Section.astro';
+
+// Recruiter-search keywords (KKD-26 locked list) — verbatim strings matter.
+// Keep "React.js" not "React"; don't normalize. PostgreSQL confirmed from the
+// Agilno project record (Naitur, Vetster); Prisma unconfirmed, deliberately out.
+const groups = [
+  {
+    label: 'Frontend',
+    terms: [
+      'Next.js',
+      'React.js',
+      'Vue.js',
+      'TypeScript',
+      'JavaScript',
+      'Redux',
+      'Tailwind CSS',
+      'Sass',
+      'HTML5',
+      'CSS3',
+    ],
+  },
+  {
+    label: 'Backend',
+    terms: ['Node.js', 'PHP', 'REST APIs', 'OOP', 'PostgreSQL'],
+  },
+  {
+    label: 'Tools',
+    terms: ['Git', 'GitHub', 'CLI/Terminal', 'Vercel'],
+  },
+  {
+    label: 'AI-augmented workflow',
+    terms: ['Claude', 'GPT', 'Codex', 'Cursor', 'Agentic coding'],
+  },
+];
+---
+
+<Section aria-labelledby="tech-stack-heading">
+  <Container width="wide">
+    <h2 id="tech-stack-heading" class="text-text-primary text-3xl font-bold tracking-tight">
+      Tech stack
+    </h2>
+    <dl class="mt-10 flex flex-col gap-8">
+      {
+        groups.map((group) => (
+          <div class="grid gap-3 sm:grid-cols-[11rem_1fr] sm:gap-6">
+            <dt class="text-text-muted font-mono text-sm sm:pt-1">{group.label}</dt>
+            <dd class="flex flex-wrap gap-2">
+              {group.terms.map((term) => (
+                <Chip>{term}</Chip>
+              ))}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </Container>
+</Section>

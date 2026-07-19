@@ -1,0 +1,46 @@
+---
+import Card from '@/components/primitives/Card.astro';
+import Container from '@/components/primitives/Container.astro';
+import Section from '@/components/primitives/Section.astro';
+
+// AI-boundary line mirrors the locked copy in PRODUCT.md — keep them in sync.
+const capabilities = [
+  {
+    title: 'Full-stack web',
+    line: 'Frontends, APIs, and the data layer behind them — built end-to-end by one owner, first commit to production.',
+  },
+  {
+    title: 'Product engineering',
+    line: 'Features scoped against the product goal, not the ticket. Trade-offs named before they are built.',
+  },
+  {
+    title: 'AI-augmented workflow',
+    line: 'AI for codegen scaffolds and research drafts. Not for architecture decisions, security review, or anything that ships under my name.',
+  },
+  {
+    title: 'Performance & UX polish',
+    line: 'Fast pages, stable layouts, keyboard-clean interactions. The last 10% gets finished, not skipped.',
+  },
+];
+---
+
+<Section aria-labelledby="what-i-do-heading">
+  <Container width="wide">
+    <h2 id="what-i-do-heading" class="text-text-primary text-3xl font-bold tracking-tight">
+      What I do
+    </h2>
+    {/* Non-elevated cards on purpose — FeaturedWork's elevated grid sits directly above. */}
+    <ul role="list" class="mt-10 grid gap-6 sm:grid-cols-2">
+      {
+        capabilities.map((capability) => (
+          <li>
+            <Card class="h-full">
+              <h3 class="text-text-primary text-lg font-semibold">{capability.title}</h3>
+              <p class="text-text-secondary mt-3 text-pretty">{capability.line}</p>
+            </Card>
+          </li>
+        ))
+      }
+    </ul>
+  </Container>
+</Section>
