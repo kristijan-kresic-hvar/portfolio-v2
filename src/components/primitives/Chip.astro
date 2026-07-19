@@ -1,0 +1,25 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'span'> {
+  variant?: 'neutral' | 'accent';
+}
+
+const { variant = 'neutral', class: className, ...rest } = Astro.props;
+
+const variants = {
+  neutral: 'border-border-subtle bg-bg-elev-1 text-text-secondary',
+  accent: 'border-accent-subtle bg-accent-subtle text-accent-text',
+};
+---
+
+<span
+  class:list={[
+    'inline-flex h-7 items-center rounded-full border px-2.5 font-mono text-sm font-medium tracking-wide whitespace-nowrap',
+    variants[variant],
+    className,
+  ]}
+  {...rest}
+>
+  <slot />
+</span>
