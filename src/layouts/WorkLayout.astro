@@ -1,0 +1,40 @@
+---
+import Container from '@/components/primitives/Container.astro';
+import Section from '@/components/primitives/Section.astro';
+import RootLayout from '@/layouts/RootLayout.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  canonical?: string;
+}
+
+const { title, description, canonical } = Astro.props;
+---
+
+<RootLayout {title} {description} {canonical}>
+  <article>
+    <Section>
+      <Container width="reading">
+        <header class="mb-12">
+          <h1 class="text-text-primary text-4xl font-bold tracking-tight">{title}</h1>
+          {description && <p class="text-text-body mt-4 text-lg">{description}</p>}
+          {/* meta strip (role · stack · year) — populated by the Phase 5 template */}
+          <slot name="meta" />
+        </header>
+      </Container>
+      {
+        Astro.slots.has('wide') && (
+          <Container width="wide" class="mb-12">
+            <slot name="wide" />
+          </Container>
+        )
+      }
+      <Container width="reading">
+        <div class="prose">
+          <slot />
+        </div>
+      </Container>
+    </Section>
+  </article>
+</RootLayout>

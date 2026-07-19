@@ -1,0 +1,39 @@
+---
+import Container from '@/components/primitives/Container.astro';
+import Section from '@/components/primitives/Section.astro';
+import RootLayout from '@/layouts/RootLayout.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  date: Date;
+  readingTime?: string;
+  canonical?: string;
+}
+
+const { title, description, date, readingTime, canonical } = Astro.props;
+
+const isoDate = date.toISOString().slice(0, 10);
+const displayDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' }).format(date);
+---
+
+<RootLayout {title} {description} {canonical}>
+  <article>
+    <Section>
+      <Container width="reading">
+        <header class="mb-12">
+          <p class="text-text-muted font-mono text-xs tracking-wide uppercase">
+            <time datetime={isoDate}>{displayDate}</time>
+            {readingTime && <span aria-hidden="true"> · </span>}
+            {readingTime && <span>{readingTime}</span>}
+          </p>
+          <h1 class="text-text-primary mt-4 text-4xl font-bold tracking-tight">{title}</h1>
+          {description && <p class="text-text-body mt-4 text-lg">{description}</p>}
+        </header>
+        <div class="prose">
+          <slot />
+        </div>
+      </Container>
+    </Section>
+  </article>
+</RootLayout>
