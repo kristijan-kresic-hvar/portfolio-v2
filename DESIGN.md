@@ -288,7 +288,7 @@ Motion is a conversion instrument, not decoration. Everything below operates ins
 5. **Labor illusion on contact submit:** show a working state for ≥500ms even if the Action resolves faster, then a definite confirmation with the response-time line. Instant flips read as "did that even send?"; brief visible work reads as reliability.
 6. **Goal-gradient on the project form:** chip selections confirm instantly (~150ms scale tick) — each answered step feels like progress and pulls toward completion.
 7. **Peak-end:** the last scroll moment of every page is a mini-CTA carrying rule 3's arrival emphasis. The end of the page is the point of decision — make it the best-crafted beat.
-8. **Human-warmth sequencing on the hero:** copy is readable at first paint; the headshot's amber glow fades in one beat later (~300ms delay). Faces win eye fixations — let the positioning headline land first, then the human warmth.
+8. **Human-warmth sequencing on the hero:** copy is readable at first paint; the headshot's amber glow fades in one beat later (~300ms delay). Faces win eye fixations — let the positioning headline land first, then the human warmth. **Deferred 2026-07-19 (KKD-23): the glow itself was dropped from v1 after four rejected treatments — the hero currently ships glow-less. Revisit with the Phase 8 motion pass (KKD-32); this rule governs the sequencing IF/WHEN it returns.**
 9. **Banned (backfires):** looping/idle animations, attention-jacking wiggles, fake urgency or fake activity toasts ("someone just hired…"), hover-only reveals of load-bearing content, anything that delays copy. Dark-pattern motion burns the exact trust this site sells.
 
 ## Breakpoints (mobile-first)
@@ -305,10 +305,23 @@ Tailwind v4 exposes these natively via the `--breakpoint-*` namespace; the defau
 
 ### Responsive type drops
 
-- Hero `--text-display` uses `clamp(48px, 8vw, 96px)` — handles itself.
+- Hero headline is sized by **wrap math per tier**, not `--text-display`'s global clamp — see the all-viewport rule below. (`--text-display` stays available for surfaces where a capped clamp genuinely fits.)
 - H1 page titles: `text-4xl md:text-5xl` (40 → 56).
 - H2 section headers: `text-2xl md:text-3xl` (24 → 32).
 - Body stays 16px across breakpoints.
+
+### All-viewport rule (added 2026-07-19 after the KKD-23 hero rework)
+
+Every section must look GOOD — not merely unbroken — at **375, 768, 1280, 1440, 1920 and 2560**. Sign-off requires an actual screenshot at each width, looked at, before the build is called done. A 1280-tuned layout that floats in a larger void is the failure this rule exists to prevent. Distilled from the hero's failure modes:
+
+1. **Type fills its measure.** Size headlines by wrap math per breakpoint tier (measure the real line widths in-browser, in the production font); a display-size cap that wraps into a narrow ragged tower at wide viewports is wrong even if it "fits". Prototype fonts lie — re-measure after the real font loads (Inter-sized wrap math broke in Geist).
+2. **Focal imagery scales as viewport share, not fixed px.** A 460px portrait that reads right at 1280 is a lost thumbnail at 2560; target a proportional share (hero portrait: ~35–45% of viewport width at wide tiers) with srcset tiers to match.
+3. **Dark sections need background body.** A cutout (or any focal element) on flat `--color-bg-base` reads as floating in nothingness; give the background mass (offset elevation-lobe radials — non-concentric, or they read as a spotlight) and dissolve the element INTO it on every visible edge.
+4. **The tablet tier (640–1024) is a real tier**, not interpolation leftovers — it gets its own sizing and field treatment pass.
+5. **Gradient/pseudo layers complete their fade inside their own box** (overshoot draws rectangle seams) and must not bleed past the section (horizontal scroll at 375 — clip at the section, and verify `scrollWidth === innerWidth` at every width).
+6. **Glow shapes around people are treacherous**: head-height radial = halo; masked ellipse = half-circle; amber inside a cutout's dissolve zone shines through the fading torso; silhouette-hugging light = rim glow. If a glow won't land after two treatments, ship without it and file the revisit (KKD-32).
+7. **`<Picture>` always gets an explicit `width`** capping the fallback `<img>` (otherwise Astro emits the intrinsic-size original for no-srcset UAs).
+8. **Utility overrides on primitives lose CSS-order battles** (`lg:py-0` vs Section's `lg:py-24`) — use the important modifier (`lg:py-0!`) or a prop, and verify the computed style, not the class list.
 
 ## Z-index
 
