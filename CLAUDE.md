@@ -272,10 +272,11 @@ When working in this repo, invoke these skills proactively. Default to **CLI + s
 - **`firecrawl` CLI** — for content research (Brief enrichment, reference site scraping); the old `firecrawl-*` skills are gone, the CLI is installed and allowlisted. `exa` MCP for general web search.
 - **`find-docs`** — verify Astro 6 / Tailwind v4 / Resend / Octokit API references before writing integration code (Anthropic SDK → `claude-api` instead).
 - **`simplify`** — pre-PR code review for reuse + quality.
+- **`copywriting` / `copy-editing` / `marketing-psychology`** — ALL marketing copy (headlines, hero copy, CTAs, value props, case-study framing, About/Contact persuasion) runs through `copywriting`; polish existing copy via `copy-editing`; conversion-psychology framing (social proof, anchoring, objection handling) via `marketing-psychology`. Context file: `.claude/product-marketing.md` (symlink → root `PRODUCT.md` — the skill reads it before asking questions). UX microcopy (buttons, empty states, errors) stays with impeccable. Canonical machinery doc: global `~/.claude/CLAUDE.md` §8 (pointers only elsewhere — do not restate).
 
 ### Community skills
 
-**None installed.** `web-quality-skills`, `accessibility-agents`, and `schema-markup-generator` were all removed in (or never survived) the `.claude` rebuild — a11y is manual via `/impeccable audit`, Lighthouse via `npx lighthouse`, JSON-LD by hand. Listed only so they aren't re-added by mistake.
+**None installed in this repo.** The community-sourced exception lives globally: the `copywriting` / `copy-editing` / `marketing-psychology` trio under Auxiliary above is cherry-picked from `coreyhaines31/marketingskills` into `~/.claude/skills/` (tracked in the claude-setup-2026 config repo, not here). `web-quality-skills`, `accessibility-agents`, and `schema-markup-generator` were all removed in (or never survived) the `.claude` rebuild — a11y is manual via `/impeccable audit`, Lighthouse via `npx lighthouse`, JSON-LD by hand. Listed only so they aren't re-added by mistake.
 
 ### Project-local skills (committed to repo at `.claude/skills/`)
 
