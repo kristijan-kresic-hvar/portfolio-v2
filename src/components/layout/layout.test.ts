@@ -186,6 +186,8 @@ describe('RootLayout', () => {
     const html = await renderLayout();
     expect(html).toMatch(/<main id="main"[^>]*class="[^"]*flex-1[^"]*"[^>]*>\s*page content/);
     expect(html.match(/<main/g)).toHaveLength(1);
+    // programmatically focusable so the skip link lands reliably across browser/AT combos
+    expect(html).toMatch(/<main[^>]*tabindex="-1"/);
   });
 
   it('renders a skip link to #main before the Nav', async () => {

@@ -14,7 +14,10 @@ interface Props {
 const { title, description, date, readingTime, canonical } = Astro.props;
 
 const isoDate = date.toISOString().slice(0, 10);
-const displayDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' }).format(date);
+// timeZone pinned so the display date can't drift a day from the UTC datetime attr
+const displayDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' }).format(
+  date,
+);
 ---
 
 <RootLayout {title} {description} {canonical}>

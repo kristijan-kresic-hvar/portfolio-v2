@@ -12,7 +12,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
 );
 
 const formatDate = (date: Date) =>
-  new Intl.DateTimeFormat('en-US', { dateStyle: 'long' }).format(date);
+  new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' }).format(date);
 ---
 
 <RootLayout
