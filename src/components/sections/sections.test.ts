@@ -4,6 +4,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import FeaturedWork from '@/components/sections/FeaturedWork.astro';
 import Hero from '@/components/sections/Hero.astro';
 import TrustStrip from '@/components/sections/TrustStrip.astro';
+import WhatIDo from '@/components/sections/WhatIDo.astro';
 import { selectFeaturedWork } from '@/lib/utils/featured-work';
 
 let container: AstroContainer;
@@ -11,6 +12,7 @@ let html: string;
 let trustStripHtml: string;
 let featuredWorkHtml: string;
 let emptyFeaturedWorkHtml: string;
+let whatIDoHtml: string;
 
 // Mirrors the stub MDX entries in src/content/work/ — getCollection() resolves
 // empty under vitest, so the render tests inject entries via the test seam.
@@ -70,6 +72,7 @@ beforeAll(async () => {
   emptyFeaturedWorkHtml = await container.renderToString(FeaturedWork, {
     props: { entries: [] },
   });
+  whatIDoHtml = await container.renderToString(WhatIDo);
 });
 
 describe('Hero', () => {
@@ -202,5 +205,26 @@ describe('FeaturedWork', () => {
 
   it('renders nothing for an empty collection without throwing', () => {
     expect(emptyFeaturedWorkHtml.trim()).toBe('');
+  });
+});
+
+describe('WhatIDo', () => {
+  it('renders the four capability card titles', () => {
+    expect(whatIDoHtml).toContain('Full-stack web');
+    expect(whatIDoHtml).toContain('Product engineering');
+    expect(whatIDoHtml).toContain('AI-augmented workflow');
+    expect(whatIDoHtml).toContain('Performance &amp; UX polish');
+  });
+
+  it('renders a supporting line per card, including the locked AI boundary', () => {
+    expect(whatIDoHtml).toContain('AI for codegen scaffolds and research drafts.');
+    expect(whatIDoHtml).toContain('anything that ships under my name');
+    // One representative line per remaining card proves each card carries support copy.
+    expect(whatIDoHtml).toContain('end-to-end');
+  });
+
+  it('ships zero client JS and no raw hex', () => {
+    expect(whatIDoHtml).not.toContain('<script');
+    expect(whatIDoHtml).not.toMatch(/#[0-9a-fA-F]{6}/);
   });
 });
