@@ -2,6 +2,7 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import BrandMark from '@/components/layout/BrandMark.astro';
+import PageHeader from '@/components/layout/PageHeader.astro';
 import Footer from '@/components/layout/Footer.astro';
 import Nav from '@/components/layout/Nav.astro';
 import RootLayout from '@/layouts/RootLayout.astro';
@@ -130,6 +131,31 @@ describe('Footer', () => {
     const html = await renderFooter();
     expect(html).not.toMatch(/#[0-9a-fA-F]{6}/);
     expect(html).not.toContain('<script');
+  });
+});
+
+describe('PageHeader', () => {
+  it('renders the title as the page h1 with an optional lead', async () => {
+    const html = await container.renderToString(PageHeader, {
+      props: { title: 'Work', description: 'Selected projects.' },
+    });
+    expect(html).toMatch(/<h1[^>]*>\s*Work\s*<\/h1>/);
+    expect(html).toContain('Selected projects.');
+    expect(html).toContain('<header');
+  });
+
+  it('renders a mono eyebrow above the title when provided', async () => {
+    const html = await container.renderToString(PageHeader, {
+      props: { title: 'Work', eyebrow: 'Case studies' },
+    });
+    expect(html).toContain('Case studies');
+    expect(html.indexOf('Case studies')).toBeLessThan(html.indexOf('<h1'));
+    expect(html).toContain('font-mono');
+  });
+
+  it('uses tokens only', async () => {
+    const html = await container.renderToString(PageHeader, { props: { title: 'Work' } });
+    expect(html).not.toMatch(/#[0-9a-fA-F]{6}/);
   });
 });
 

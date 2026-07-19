@@ -1,0 +1,55 @@
+---
+import { getCollection } from 'astro:content';
+
+import PageHeader from '@/components/layout/PageHeader.astro';
+import Container from '@/components/primitives/Container.astro';
+import Section from '@/components/primitives/Section.astro';
+import RootLayout from '@/layouts/RootLayout.astro';
+
+// ponytail: unpaginated by decision 2026-07-17; revisit paginate() at ~20 entries
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const formatDate = (date: Date) =>
+  new Intl.DateTimeFormat('en-US', { dateStyle: 'long' }).format(date);
+---
+
+<RootLayout
+  title="Blog — Kristijan Krešić"
+  description="Web Dev Brief — short, practical writing on building for the modern web."
+>
+  <Section>
+    <Container width="content">
+      <PageHeader
+        eyebrow="Web Dev Brief"
+        title="Blog"
+        description="Short, practical writing on building for the modern web."
+      />
+      {
+        posts.length === 0 ? (
+          <p class="text-text-muted mt-12">The first issue is on the way.</p>
+        ) : (
+          <ul class="mt-12 flex flex-col gap-8">
+            {posts.map((post) => (
+              <li>
+                <p class="text-text-muted font-mono text-xs tracking-wide uppercase">
+                  <time datetime={post.data.date.toISOString().slice(0, 10)}>
+                    {formatDate(post.data.date)}
+                  </time>
+                </p>
+                <a
+                  href={`/blog/${post.id}`}
+                  class="text-text-primary mt-2 inline-block font-semibold"
+                >
+                  {post.data.title}
+                </a>
+                <p class="text-text-body mt-2 text-sm">{post.data.summary}</p>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </Container>
+  </Section>
+</RootLayout>
