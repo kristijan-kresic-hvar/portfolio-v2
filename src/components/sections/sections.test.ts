@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 
 import FeaturedWork from '@/components/sections/FeaturedWork.astro';
 import Hero from '@/components/sections/Hero.astro';
+import HowIWork from '@/components/sections/HowIWork.astro';
 import TechStack from '@/components/sections/TechStack.astro';
 import TrustStrip from '@/components/sections/TrustStrip.astro';
 import WhatIDo from '@/components/sections/WhatIDo.astro';
@@ -15,6 +16,7 @@ let featuredWorkHtml: string;
 let emptyFeaturedWorkHtml: string;
 let whatIDoHtml: string;
 let techStackHtml: string;
+let howIWorkHtml: string;
 
 // Mirrors the stub MDX entries in src/content/work/ — getCollection() resolves
 // empty under vitest, so the render tests inject entries via the test seam.
@@ -76,6 +78,7 @@ beforeAll(async () => {
   });
   whatIDoHtml = await container.renderToString(WhatIDo);
   techStackHtml = await container.renderToString(TechStack);
+  howIWorkHtml = await container.renderToString(HowIWork);
 });
 
 describe('Hero', () => {
@@ -229,6 +232,46 @@ describe('WhatIDo', () => {
   it('ships zero client JS and no raw hex', () => {
     expect(whatIDoHtml).not.toContain('<script');
     expect(whatIDoHtml).not.toMatch(/#[0-9a-fA-F]{6}/);
+  });
+});
+
+describe('HowIWork', () => {
+  it('renders the locked AI-boundary line verbatim', () => {
+    expect(howIWorkHtml).toContain('AI for codegen scaffolds and research drafts.');
+    expect(howIWorkHtml).toContain(
+      'Not for architecture decisions, security review, or anything that ships under my name.',
+    );
+  });
+
+  it('renders the three reliability steps with their labels', () => {
+    const discovery = howIWorkHtml.indexOf('Discovery');
+    const build = howIWorkHtml.indexOf('Build');
+    const support = howIWorkHtml.indexOf('Support');
+    expect(discovery).toBeGreaterThan(-1);
+    expect(build).toBeGreaterThan(discovery);
+    expect(support).toBeGreaterThan(build);
+  });
+
+  it('keeps every reliability step line at 12 words or fewer', () => {
+    // Hard rule from research L-4, enforced at render time via the data attribute.
+    const lines = [...howIWorkHtml.matchAll(/data-step-line[^>]*>([^<]+)</g)].map((m) => m[1]);
+    expect(lines).toHaveLength(3);
+    for (const line of lines) {
+      expect((line ?? '').trim().split(/\s+/).length).toBeLessThanOrEqual(12);
+    }
+  });
+
+  it('names Linear and links both public kit repos', () => {
+    expect(howIWorkHtml).toContain('Linear');
+    expect(howIWorkHtml).toContain(
+      'href="https://github.com/kristijan-kresic-hvar/linear-pipeline-kit"',
+    );
+    expect(howIWorkHtml).toContain('href="https://github.com/kristijan-kresic-hvar/ai-review-kit"');
+  });
+
+  it('ships zero client JS and no raw hex', () => {
+    expect(howIWorkHtml).not.toContain('<script');
+    expect(howIWorkHtml).not.toMatch(/#[0-9a-fA-F]{6}/);
   });
 });
 
