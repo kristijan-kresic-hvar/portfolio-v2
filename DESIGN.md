@@ -196,9 +196,13 @@ Spacing uses the `--spacing-*` namespace (`--spacing-4` → `p-4` / `gap-4` / `m
 
 ### Container max-widths
 
-- Reading (blog body): 680px
-- Default page content: 1200px
-- Wide (work grid, case study hero): 1280px
+Encoded in the Tailwind v4 `--container-*` namespace (`--container-reading` → `max-w-reading`).
+
+| Token                 | Value  | Use                        |
+| --------------------- | ------ | -------------------------- |
+| `--container-reading` | 680px  | Blog + case study body     |
+| `--container-content` | 1200px | Default page content       |
+| `--container-wide`    | 1280px | Work grid, case study hero |
 
 ## Radius
 

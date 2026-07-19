@@ -1,0 +1,54 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+type Props = HTMLAttributes<'a'> &
+  HTMLAttributes<'button'> & {
+    variant?: 'primary' | 'secondary' | 'ghost';
+    size?: 'sm' | 'md' | 'lg' | 'xl';
+  };
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  type = 'button',
+  class: className,
+  ...rest
+} = Astro.props;
+
+/* duration-(--duration-*): Tailwind 4.3 generates duration-* utilities from
+   --transition-duration-*, not our locked --duration-* namespace — reference
+   the token via the custom-property syntax instead of a raw ms value. */
+const base =
+  'inline-flex cursor-pointer items-center justify-center gap-2 rounded-md whitespace-nowrap transition duration-(--duration-instant) ease-standard disabled:cursor-not-allowed disabled:bg-bg-elev-2 disabled:text-text-disabled disabled:shadow-none';
+
+const sizes = {
+  sm: 'h-8 px-3 text-sm',
+  md: 'h-10 px-4 text-base',
+  lg: 'h-12 px-5 text-base',
+  xl: 'h-14 px-6 text-lg',
+};
+
+const variants = {
+  primary:
+    'bg-accent font-bold text-bg-base hover:bg-accent-hover hover:shadow-glow active:bg-accent-active',
+  secondary:
+    'border border-border-default font-semibold text-text-primary hover:border-border-strong active:bg-bg-elev-1',
+  ghost:
+    'font-medium text-text-secondary underline-offset-4 hover:text-text-primary hover:underline',
+};
+
+const classes = [base, sizes[size], variants[variant], className];
+---
+
+{
+  href ? (
+    <a href={href} class:list={classes} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <button type={type} class:list={classes} {...rest}>
+      <slot />
+    </button>
+  )
+}
