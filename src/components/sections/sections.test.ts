@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 
 import FeaturedWork from '@/components/sections/FeaturedWork.astro';
 import Hero from '@/components/sections/Hero.astro';
+import TechStack from '@/components/sections/TechStack.astro';
 import TrustStrip from '@/components/sections/TrustStrip.astro';
 import WhatIDo from '@/components/sections/WhatIDo.astro';
 import { selectFeaturedWork } from '@/lib/utils/featured-work';
@@ -13,6 +14,7 @@ let trustStripHtml: string;
 let featuredWorkHtml: string;
 let emptyFeaturedWorkHtml: string;
 let whatIDoHtml: string;
+let techStackHtml: string;
 
 // Mirrors the stub MDX entries in src/content/work/ — getCollection() resolves
 // empty under vitest, so the render tests inject entries via the test seam.
@@ -73,6 +75,7 @@ beforeAll(async () => {
     props: { entries: [] },
   });
   whatIDoHtml = await container.renderToString(WhatIDo);
+  techStackHtml = await container.renderToString(TechStack);
 });
 
 describe('Hero', () => {
@@ -226,5 +229,46 @@ describe('WhatIDo', () => {
   it('ships zero client JS and no raw hex', () => {
     expect(whatIDoHtml).not.toContain('<script');
     expect(whatIDoHtml).not.toMatch(/#[0-9a-fA-F]{6}/);
+  });
+});
+
+describe('TechStack', () => {
+  it('renders all four group labels', () => {
+    expect(techStackHtml).toContain('Frontend');
+    expect(techStackHtml).toContain('Backend');
+    expect(techStackHtml).toContain('Tools');
+    expect(techStackHtml).toContain('AI-augmented workflow');
+  });
+
+  it('renders every locked recruiter-search chip term verbatim', () => {
+    const frontend = [
+      'Next.js',
+      'React.js',
+      'Vue.js',
+      'TypeScript',
+      'JavaScript',
+      'Redux',
+      'Tailwind CSS',
+      'Sass',
+      'HTML5',
+      'CSS3',
+    ];
+    const backend = ['Node.js', 'PHP', 'REST APIs', 'OOP', 'PostgreSQL'];
+    const tools = ['GitHub', 'CLI/Terminal', 'Vercel'];
+    const ai = ['Claude', 'GPT', 'Codex', 'Cursor', 'Agentic coding'];
+    for (const term of [...frontend, ...backend, ...tools, ...ai]) {
+      expect(techStackHtml).toContain(term);
+    }
+    // "Git" as its own chip — substring check would pass via "GitHub" alone.
+    expect(techStackHtml).toMatch(/>\s*Git\s*</);
+  });
+
+  it('renders chip terms inside rounded-full Chip pills', () => {
+    expect(techStackHtml).toContain('rounded-full');
+  });
+
+  it('ships zero client JS and no raw hex', () => {
+    expect(techStackHtml).not.toContain('<script');
+    expect(techStackHtml).not.toMatch(/#[0-9a-fA-F]{6}/);
   });
 });
