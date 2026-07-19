@@ -71,7 +71,7 @@ import Section from '@/components/primitives/Section.astro';
         </div>
       </div>
       <div
-        class="hero-portrait-wrap relative w-full max-w-[420px] justify-self-center lg:max-w-[460px] lg:justify-self-end xl:max-w-none"
+        class="hero-portrait-wrap relative w-full max-w-[420px] justify-self-center sm:max-w-[560px] lg:max-w-[460px] lg:justify-self-end xl:max-w-none"
       >
         <Picture
           src={headshot}
@@ -79,7 +79,7 @@ import Section from '@/components/primitives/Section.astro';
           fallbackFormat="webp"
           width={1440}
           widths={[460, 544, 720, 920, 1088, 1440]}
-          sizes="(min-width: 1780px) 720px, (min-width: 1280px) 43vw, (min-width: 1024px) 460px, min(100vw - 48px, 420px)"
+          sizes="(min-width: 1780px) 720px, (min-width: 1280px) 43vw, (min-width: 1024px) 460px, (min-width: 640px) 560px, min(100vw - 48px, 420px)"
           loading="eager"
           fetchpriority="high"
           alt="Kristijan Krešić — full-stack developer"
@@ -91,12 +91,17 @@ import Section from '@/components/primitives/Section.astro';
 </Section>
 
 <style>
-  /* Mobile keeps the signed-off subtle lift; at lg+ the field becomes a large
-     organic mass of stacked elevation lobes behind the portrait (Friedman/WRITER
-     pattern: the background has body, so the portrait dissolves INTO something
-     instead of floating in a void). Static — no reduced-motion concern. */
+  /* One field language at every width (Friedman/WRITER pattern: the background
+     has body, so the portrait dissolves INTO something instead of floating in
+     a void). Below lg the layout stacks with the portrait last, so the lobes
+     sit bottom-center behind it; at lg+ the mass moves low-right under the
+     split-view portrait. Static — no reduced-motion concern. */
   .hero-field {
-    background: radial-gradient(100% 90% at 70% 40%, var(--color-bg-elev-1), transparent 70%);
+    background:
+      radial-gradient(34% 16% at 50% 88%, var(--color-bg-elev-3), transparent 72%),
+      radial-gradient(52% 26% at 42% 82%, var(--color-bg-elev-2), transparent 76%),
+      radial-gradient(60% 30% at 58% 92%, var(--color-bg-elev-2), transparent 76%),
+      radial-gradient(95% 45% at 50% 88%, var(--color-bg-elev-1), transparent 85%);
   }
 
   @media (min-width: 1024px) {
