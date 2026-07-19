@@ -1,0 +1,55 @@
+---
+import Container from '@/components/primitives/Container.astro';
+import Section from '@/components/primitives/Section.astro';
+
+// Text wordmarks, not logo images — trademark decision 2026-07-17 (KKD-24).
+const companies = ['Agilno', 'amondi GmbH', 'Reroot'];
+---
+
+{
+  /* Quiet band, not a full section — mirrors Footer.astro's meta-line register.
+    The py overrides need the important modifier to beat Section's own py-*
+    (same specificity, later in the generated CSS). */
+}
+<Section
+  aria-label="Experience and endorsements"
+  class="border-border-subtle bg-bg-base border-y py-10! sm:py-12! lg:py-16!"
+>
+  <Container width="wide">
+    <div class="flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
+      <div class="flex flex-col gap-5">
+        {/* Separator dots ride with the preceding item so a wrapped line never opens with one. */}
+        <p
+          class="text-text-secondary flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs sm:text-sm"
+        >
+          <span class="inline-flex items-center gap-x-2">
+            <span>4 years professional</span>
+            <span aria-hidden="true">·</span>
+          </span>
+          <span>Building for the web since 2016</span>
+        </p>
+        <ul
+          role="list"
+          class="text-text-muted flex flex-wrap items-baseline gap-x-10 gap-y-3 font-mono text-sm font-medium tracking-wide sm:text-base"
+        >
+          {companies.map((name) => <li>{name}</li>)}
+        </ul>
+        <p class="text-text-muted flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs">
+          <span class="inline-flex items-center gap-x-2">
+            <span>Sveučilište Algebra Bernays</span>
+            <span aria-hidden="true">·</span>
+          </span>
+          <span>Web Dev + PHP Backend (2016–2018)</span>
+        </p>
+      </div>
+      <figure class="lg:max-w-md lg:shrink-0">
+        <blockquote class="text-text-secondary text-base leading-normal text-pretty">
+          <p>&ldquo;Great to build with, sharp, and always on top of the details.&rdquo;</p>
+        </blockquote>
+        <figcaption class="text-text-muted mt-3 font-mono text-xs">
+          &mdash; Frane Žunić, Full Stack Developer
+        </figcaption>
+      </figure>
+    </div>
+  </Container>
+</Section>
