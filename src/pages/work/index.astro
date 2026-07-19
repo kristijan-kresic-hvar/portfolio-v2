@@ -14,17 +14,17 @@ const entries = (await getCollection('work', ({ data }) => !data.draft)).sort(
 
 <RootLayout
   title="Work — Kristijan Krešić"
-  description="Selected projects and case studies — full-stack work shipped end-to-end."
+  description="Selected projects and case studies from full-stack work shipped end-to-end."
 >
   <Section>
     <Container width="wide">
       <PageHeader
         title="Work"
-        description="Selected projects and case studies — what was built, how, and what it changed."
+        description="Selected projects and case studies: what was built, how, and what it changed."
       />
       {
         entries.length === 0 ? (
-          <p class="text-text-muted mt-12">Case studies are being written — check back soon.</p>
+          <p class="text-text-muted mt-12">Case studies are being written. Check back soon.</p>
         ) : (
           <ul class="mt-12 grid gap-6 sm:grid-cols-2">
             {entries.map((entry) => (
