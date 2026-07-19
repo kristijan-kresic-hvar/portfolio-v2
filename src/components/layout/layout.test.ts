@@ -154,5 +154,6 @@ describe('RootLayout', () => {
     expect(html).toContain('<footer');
     expect(html.indexOf('page content')).toBeLessThan(html.indexOf('<footer'));
     expect(html).toMatch(/<body[^>]*class="[^"]*min-h-dvh[^"]*"/);
+    expect(html).toMatch(/<div class="flex-1"[^>]*>\s*page content/);
   });
 });
