@@ -11,7 +11,12 @@ import Section from '@/components/primitives/Section.astro';
   /* overflow-x-clip: the glow bleeds past the portrait edges and would cause
     horizontal scroll at 375px otherwise (caught on the signed-off prototype) */
 }
-<Section class="overflow-x-clip lg:py-0">
+{
+  /* lg:py-0! — needs the important modifier to beat Section's own lg:py-24
+    (same specificity, later in the generated CSS); the grid's min-h owns the
+    full-viewport height at lg instead */
+}
+<Section class="overflow-x-clip lg:py-0!">
   <Container>
     <div
       class="grid items-center gap-12 lg:min-h-[calc(100svh-64px)] lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:content-center lg:gap-16"
