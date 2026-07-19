@@ -1,6 +1,7 @@
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { beforeAll, describe, expect, it } from 'vitest';
 
+import BrandMark from '@/components/layout/BrandMark.astro';
 import Nav from '@/components/layout/Nav.astro';
 import RootLayout from '@/layouts/RootLayout.astro';
 
@@ -19,9 +20,25 @@ describe('Nav', () => {
     expect(html).toContain('<nav');
     expect(html).toContain('href="/"');
     expect(html).toContain('href="/work"');
-    expect(html).toContain('href="/blog"');
     expect(html).toContain('href="/about"');
     expect(html).toContain('Kristijan Krešić');
+  });
+
+  it('does not link Blog at launch (launch cut 2026-07-17; delete when Brief 001 ships)', async () => {
+    const html = await renderNavAt('/');
+    expect(html).not.toContain('href="/blog"');
+  });
+
+  it('renders the amber wordmark dot outside the accessible name', async () => {
+    const html = await renderNavAt('/');
+    expect(html).toMatch(/<span[^>]*class="text-accent"[^>]*aria-hidden="true"[^>]*>\.<\/span>/);
+  });
+
+  it('labels the brand link for the mobile mark', async () => {
+    const html = await renderNavAt('/');
+    expect(html).toMatch(
+      /href="\/"[^>]*aria-label="Kristijan Krešić — home"|aria-label="Kristijan Krešić — home"[^>]*href="\/"/,
+    );
   });
 
   it('renders Contact as an accent Button link', async () => {
@@ -38,10 +55,10 @@ describe('Nav', () => {
   });
 
   it('marks only the current route active via aria-current', async () => {
-    const html = await renderNavAt('/blog');
+    const html = await renderNavAt('/about');
     const active = html.match(/aria-current="page"/g) ?? [];
     expect(active).toHaveLength(1);
-    expect(html).toMatch(/href="\/blog"[^>]*aria-current="page"/);
+    expect(html).toMatch(/href="\/about"[^>]*aria-current="page"/);
   });
 
   it('treats nested paths as active for their section', async () => {
@@ -62,6 +79,18 @@ describe('Nav', () => {
   it('ships zero JS — no entrance animation to gate on reduced motion', async () => {
     const html = await renderNavAt('/');
     expect(html).not.toContain('<script');
+  });
+});
+
+describe('BrandMark', () => {
+  it('renders a decorative token-filled svg', async () => {
+    const html = await container.renderToString(BrandMark);
+    expect(html).toContain('<svg');
+    expect(html).toContain('aria-hidden="true"');
+    expect(html).toContain('focusable="false"');
+    expect(html).toContain('var(--color-accent)');
+    expect(html).toContain('var(--color-text-primary)');
+    expect(html).not.toMatch(/#[0-9a-fA-F]{6}/);
   });
 });
 
