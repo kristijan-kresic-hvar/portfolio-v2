@@ -1,0 +1,129 @@
+/* MDX prose typography (blog posts + case-study bodies) — tokens only.
+   Width/measure comes from the reading Container (680px ≈ 74ch at 16px);
+   .prose styles only the text inside it. Page H1 lives in the layout
+   header, so prose headings start at h2. */
+
+.prose {
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-body);
+
+  & p {
+    margin-block: var(--spacing-5);
+  }
+
+  & h2,
+  & h3,
+  & h4 {
+    color: var(--color-text-primary);
+    font-weight: 600;
+    line-height: var(--leading-snug);
+    margin-block: var(--spacing-12) var(--spacing-4);
+  }
+
+  & h2 {
+    font-size: var(--text-2xl);
+  }
+
+  & h3 {
+    font-size: var(--text-xl);
+  }
+
+  & h4 {
+    font-size: var(--text-lg);
+    margin-block-start: var(--spacing-8);
+  }
+
+  & a {
+    color: var(--color-text-primary);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    transition: color var(--duration-fast) var(--ease-standard);
+
+    &:hover {
+      color: var(--color-accent);
+    }
+  }
+
+  & strong {
+    color: var(--color-text-primary);
+    font-weight: 600;
+  }
+
+  & ul,
+  & ol {
+    margin-block: var(--spacing-5);
+    padding-inline-start: var(--spacing-6);
+  }
+
+  & ul {
+    list-style: disc;
+  }
+
+  & ol {
+    list-style: decimal;
+  }
+
+  & li {
+    margin-block: var(--spacing-2);
+
+    &::marker {
+      color: var(--color-text-muted);
+    }
+  }
+
+  & code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    color: var(--color-code-text);
+    background: var(--color-code-bg);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-sm);
+    padding: 2px var(--spacing-1);
+  }
+
+  & pre {
+    margin-block: var(--spacing-6);
+    padding: var(--spacing-4) var(--spacing-5);
+    background: var(--color-code-bg);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+
+    & code {
+      font-size: var(--text-sm);
+      background: none;
+      border: none;
+      padding: 0;
+    }
+  }
+
+  & blockquote {
+    margin-block: var(--spacing-6);
+    padding-inline-start: var(--spacing-5);
+    border-inline-start: 2px solid var(--color-border-strong);
+    color: var(--color-text-secondary);
+  }
+
+  & hr {
+    margin-block: var(--spacing-12);
+    border: 0;
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  & img {
+    max-width: 100%;
+    border-radius: var(--radius-md);
+    margin-block: var(--spacing-6);
+  }
+
+  & > :first-child {
+    margin-block-start: 0;
+  }
+
+  & > :last-child {
+    margin-block-end: 0;
+  }
+}

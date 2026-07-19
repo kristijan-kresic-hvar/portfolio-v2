@@ -2,6 +2,7 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import BrandMark from '@/components/layout/BrandMark.astro';
+import PageHeader from '@/components/layout/PageHeader.astro';
 import Footer from '@/components/layout/Footer.astro';
 import Nav from '@/components/layout/Nav.astro';
 import RootLayout from '@/layouts/RootLayout.astro';
@@ -133,6 +134,31 @@ describe('Footer', () => {
   });
 });
 
+describe('PageHeader', () => {
+  it('renders the title as the page h1 with an optional lead', async () => {
+    const html = await container.renderToString(PageHeader, {
+      props: { title: 'Work', description: 'Selected projects.' },
+    });
+    expect(html).toMatch(/<h1[^>]*>\s*Work\s*<\/h1>/);
+    expect(html).toContain('Selected projects.');
+    expect(html).toContain('<header');
+  });
+
+  it('renders a mono eyebrow above the title when provided', async () => {
+    const html = await container.renderToString(PageHeader, {
+      props: { title: 'Work', eyebrow: 'Case studies' },
+    });
+    expect(html).toContain('Case studies');
+    expect(html.indexOf('Case studies')).toBeLessThan(html.indexOf('<h1'));
+    expect(html).toContain('font-mono');
+  });
+
+  it('uses tokens only', async () => {
+    const html = await container.renderToString(PageHeader, { props: { title: 'Work' } });
+    expect(html).not.toMatch(/#[0-9a-fA-F]{6}/);
+  });
+});
+
 describe('RootLayout', () => {
   const renderLayout = () =>
     container.renderToString(RootLayout, {
@@ -154,6 +180,19 @@ describe('RootLayout', () => {
     expect(html).toContain('<footer');
     expect(html.indexOf('page content')).toBeLessThan(html.indexOf('<footer'));
     expect(html).toMatch(/<body[^>]*class="[^"]*min-h-dvh[^"]*"/);
-    expect(html).toMatch(/<div class="flex-1"[^>]*>\s*page content/);
+  });
+
+  it('wraps page content in the single main landmark', async () => {
+    const html = await renderLayout();
+    expect(html).toMatch(/<main id="main"[^>]*class="[^"]*flex-1[^"]*"[^>]*>\s*page content/);
+    expect(html.match(/<main/g)).toHaveLength(1);
+    // programmatically focusable so the skip link lands reliably across browser/AT combos
+    expect(html).toMatch(/<main[^>]*tabindex="-1"/);
+  });
+
+  it('renders a skip link to #main before the Nav', async () => {
+    const html = await renderLayout();
+    expect(html).toContain('href="#main"');
+    expect(html.indexOf('href="#main"')).toBeLessThan(html.indexOf('<nav'));
   });
 });

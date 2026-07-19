@@ -1,0 +1,42 @@
+---
+import { getCollection } from 'astro:content';
+
+import PageHeader from '@/components/layout/PageHeader.astro';
+import Container from '@/components/primitives/Container.astro';
+import Section from '@/components/primitives/Section.astro';
+import RootLayout from '@/layouts/RootLayout.astro';
+
+// ponytail: unpaginated by decision 2026-07-17; revisit paginate() at ~20 entries
+const entries = (await getCollection('work', ({ data }) => !data.draft)).sort(
+  (a, b) => (a.data.order ?? Number.MAX_SAFE_INTEGER) - (b.data.order ?? Number.MAX_SAFE_INTEGER),
+);
+---
+
+<RootLayout
+  title="Work — Kristijan Krešić"
+  description="Selected projects and case studies from full-stack work shipped end-to-end."
+>
+  <Section>
+    <Container width="wide">
+      <PageHeader
+        title="Work"
+        description="Selected projects and case studies: what was built, how, and what it changed."
+      />
+      {
+        entries.length === 0 ? (
+          <p class="text-text-muted mt-12">Case studies are being written. Check back soon.</p>
+        ) : (
+          <ul class="mt-12 grid gap-6 sm:grid-cols-2">
+            {entries.map((entry) => (
+              <li>
+                {/* ponytail: unlinked until the detail route lands (KKD-22, Phase 5) */}
+                <p class="text-text-primary font-semibold">{entry.data.title}</p>
+                <p class="text-text-body mt-2 text-sm">{entry.data.summary}</p>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </Container>
+  </Section>
+</RootLayout>

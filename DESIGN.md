@@ -404,7 +404,7 @@ Tokens live in `src/styles/global.css` inside the `@theme {}` block. Tailwind v4
 Source-of-truth files:
 
 - `src/styles/global.css` — `@theme {}` definitions + base reset (loaded by every page)
-- `src/styles/prose.css` — MDX prose typography (created in Phase 6)
+- `src/styles/prose.css` — MDX prose typography (created in Phase 3, KKD-19)
 - `src/lib/motion/springs.ts` — Motion spring presets (vanilla `motion`)
 - `src/components/primitives/` — Button, Card, Chip, Input wrappers binding these tokens
 
