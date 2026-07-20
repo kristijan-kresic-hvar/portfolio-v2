@@ -56,6 +56,7 @@ const workEntries = [
       featured: true,
       order: 1,
       cover: 'naitur-forms.webp',
+      coverPeek: 'naitur-peek.webp',
       coverAlt: 'Naitur forms catalog',
     },
   },
@@ -222,9 +223,8 @@ describe('FeaturedWork', () => {
     expect(featuredWorkHtml).toContain('BioCirV Discover biomass data grid');
     expect(featuredWorkHtml).toContain('Vetster — Ask Vetster AI chat');
     expect(featuredWorkHtml).toContain('loading="lazy"');
-    // 3 main covers + 2 peeking signature frames (naitur ships cover-only:
-    // every other harvest frame shows client-identity placeholder data).
-    expect((featuredWorkHtml.match(/<img/g) ?? []).length).toBeGreaterThanOrEqual(5);
+    // Main cover + peeking signature frame per card = at least 6 images.
+    expect((featuredWorkHtml.match(/<img/g) ?? []).length).toBeGreaterThanOrEqual(6);
   });
 
   it('ships zero client JS and no raw hex', () => {
