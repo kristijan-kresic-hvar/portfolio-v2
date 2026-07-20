@@ -8,43 +8,91 @@ import Section from '@/components/primitives/Section.astro';
 ---
 
 {
-  /* overflow-x-clip: the depth field + the portrait's xl right-bleed extend past
-    the container and would cause horizontal scroll otherwise */
+  /* overflow-x-clip: the portrait's xl right-bleed extends past the container
+    and would cause horizontal scroll otherwise. py-0! (important beats
+    Section's own py-* at equal specificity): the hero owns its spacing — the
+    status bar sits flush under the nav and the portrait stands flush on the
+    section's bottom edge, so Section padding would break both seams. */
 }
-{
-  /* lg:py-0! — needs the important modifier to beat Section's own lg:py-24
-    (same specificity, later in the generated CSS); the grid's min-h owns the
-    full-viewport height at lg instead */
-}
-<Section class="relative isolate overflow-x-clip lg:py-0!">
-  <div class="hero-field absolute inset-0 -z-10" aria-hidden="true"></div>
-  <Container width="wide">
+<Section class="relative isolate flex flex-col overflow-x-clip py-0! lg:min-h-[calc(100svh-64px)]">
+  {
+    /* Floor pool: one bottom-anchored elevation radial grounds the composition
+    without hugging the figure (the four person-hugging glow treatments are
+    dead — KKD-32). Static, grayscale, offset toward the portrait. */
+  }
+  <div class="hero-ground absolute inset-0 -z-10" aria-hidden="true"></div>
+  {
+    /* Amber horizon: the hero exits on the same via-accent band edge CtaBand
+    enters on — the funnel is bookended in amber. Painted before the Container
+    so the bust interrupts the line instead of being sliced by it. */
+  }
+  <div
+    class="via-accent absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent to-transparent"
+    aria-hidden="true"
+  >
+  </div>
+  {
+    /* Signal bar: both locked metadata lines styled as terminal chrome — the
+    recruiter-scan anchor (availability + location + stack keywords) lands at
+    the top of the first paint, and frees the left column below to be pure
+    headline → sub → CTAs. Copy is locked; only the frame is new. */
+  }
+  <div class="border-border-subtle border-b">
+    <Container width="wide" class="min-[1780px]:max-w-[1600px]!">
+      <div
+        class="flex flex-wrap items-center justify-between gap-x-8 gap-y-1.5 py-3.5 font-mono text-xs"
+      >
+        {
+          /* The locked strings render via expressions so Prettier can never
+            reflow them across source lines — the verbatim-copy tests match the
+            contiguous text in the HTML output. */
+        }
+        <p class="text-text-secondary text-balance">
+          <span
+            aria-hidden="true"
+            class="bg-accent mr-2 inline-block size-1.5 rounded-full align-middle"></span>{
+            'Available from August 2026 · Hvar, Croatia (CET).'
+          }
+        </p>
+        <p class="text-text-muted text-balance">React · Next.js · TypeScript · Node.js · Astro</p>
+      </div>
+    </Container>
+  </div>
+  {
+    /* ≥1780px: the 1280 container floats in a void on 1920/2560 screens (the
+    all-viewport failure the rule catalogs), so the frame widens to 1600 and
+    the type/portrait scale with it — headline sizes scale the measured wrap
+    math linearly (em-based tracking keeps the ratios exact). */
+  }
+  <Container width="wide" class="flex flex-1 min-[1780px]:max-w-[1600px]!">
     <div
-      class="grid items-center gap-12 lg:min-h-[calc(100svh-64px)] lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:content-center lg:gap-16 xl:grid-cols-[minmax(0,1fr)_minmax(0,520px)] xl:gap-12"
+      class="grid w-full items-end gap-x-16 min-[1780px]:grid-cols-[minmax(0,1fr)_minmax(0,680px)]! lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] xl:grid-cols-[minmax(0,1fr)_minmax(0,520px)] xl:gap-x-12"
     >
-      <div>
+      <div class="self-center pt-14 pb-4 sm:pt-20 lg:py-24">
         {
           /* xl type is sized by wrap math, not a display cap: the text column is
             664px (1232 container inner − 48 gap − 520 image col); at 60px/-0.04em
-            Geist bold, "Full-stack developer for" = 653px — so the headline
-            breaks once into the balanced 2-line block "Full-stack developer for"
-            / "modern web products." (measured in-browser). NOTE the split
-            "Full-stack developer" / "for modern web products." is impossible in
-            pure CSS: line 2 (741px @64px) is WIDER than line 1 + "for" (697px),
-            and the locked-copy test forbids a <br> inside the h1. Mobile slope
-            is sized so "Full-stack developer" holds one line at 375px in Geist
-            (signed-off 3-line wrap; ≤33.4px measured) */
+            Geist bold, "Full-stack developer for" = 653px — the headline breaks
+            once into the balanced 2-line block "Full-stack developer for" /
+            "modern web products." (measured in-browser). The locked-copy test
+            forbids any markup inside the h1. Mobile slope holds "Full-stack
+            developer" on one line at 375px in Geist (≤33.4px measured). */
         }
         <h1
-          class="text-[clamp(28px,8.7vw,40px)] leading-tight font-bold tracking-tight text-balance sm:text-[clamp(40px,3vw+28px,72px)] lg:max-w-[14ch] lg:tracking-tighter xl:max-w-none xl:text-[60px]"
+          class="text-[clamp(28px,8.7vw,40px)] leading-tight font-bold tracking-tight text-balance min-[1780px]:text-[74px]! sm:text-[clamp(40px,3vw+28px,72px)] lg:max-w-[14ch] lg:tracking-tighter xl:max-w-none xl:text-[60px]"
         >
           Full-stack developer for modern web products.
         </h1>
         <p
-          class="text-text-secondary mt-6 max-w-[46ch] text-lg leading-normal text-pretty xl:text-xl"
+          class="text-text-secondary mt-6 max-w-[46ch] text-lg leading-normal text-pretty min-[1780px]:text-2xl xl:text-xl"
         >
           I ship fast, polished work end-to-end — AI-augmented workflow, hand-finished by me.
         </p>
+        {
+          /* Salience peak: the primary CTA is the only solid amber block in the
+            viewport — every other amber note (status dot, horizon line) stays
+            hairline-scale, so the chroma peak lands on "Start a project". */
+        }
         <div class="mt-10 grid gap-3 sm:flex sm:flex-wrap sm:gap-4">
           <Button href="/contact?intent=project" size="xl" class="group">
             Start a project
@@ -63,32 +111,37 @@ import Section from '@/components/primitives/Section.astro';
             >
           </Button>
         </div>
-        <div class="mt-12 grid gap-2">
-          <p class="text-text-secondary text-sm">
-            <span
-              aria-hidden="true"
-              class="bg-accent mr-1.5 inline-block size-1.5 rounded-full align-middle"
-            ></span>Available from August 2026 · Hvar, Croatia (CET).
-          </p>
-          <p class="text-text-muted font-mono text-xs text-balance sm:text-sm">
-            React · Next.js · TypeScript · Node.js · Astro
-          </p>
-        </div>
       </div>
       <div
-        class="hero-portrait-wrap relative w-full max-w-[420px] justify-self-center sm:max-w-[560px] lg:max-w-[460px] lg:justify-self-end xl:max-w-none"
+        class="hero-portrait-wrap relative mt-6 w-full max-w-[420px] self-end justify-self-center sm:max-w-[560px] lg:mt-0 lg:max-w-[460px] lg:justify-self-end xl:max-w-none"
       >
+        {
+          /* Stage-set planes: an outlined echo frame behind a solid elevated
+          slab (the shadow-card language at architectural scale). The bust
+          stands in front, flush on the section's bottom edge — structure
+          replaces the old dissolve-into-void treatment. */
+        }
+        <div
+          aria-hidden="true"
+          class="border-border-default absolute bottom-0 left-1/2 hidden h-[121%] w-[92%] -translate-x-[54%] border border-b-0 lg:block"
+        >
+        </div>
+        <div
+          aria-hidden="true"
+          class="bg-bg-elev-1 shadow-card absolute bottom-0 left-1/2 h-[104%] w-[82%] -translate-x-1/2 lg:h-[109%]"
+        >
+        </div>
         <Picture
           src={headshot}
           formats={['avif']}
           fallbackFormat="webp"
           width={1440}
-          widths={[460, 544, 720, 920, 1088, 1440]}
-          sizes="(min-width: 1780px) 720px, (min-width: 1280px) 43vw, (min-width: 1024px) 460px, (min-width: 640px) 560px, min(100vw - 48px, 420px)"
+          widths={[460, 544, 720, 920, 1088, 1440, 1760]}
+          sizes="(min-width: 1780px) 880px, (min-width: 1280px) 43vw, (min-width: 1024px) 460px, (min-width: 640px) 560px, min(100vw - 48px, 420px)"
           loading="eager"
           fetchpriority="high"
           alt="Kristijan Krešić — full-stack developer"
-          class="hero-portrait relative h-auto w-full contrast-[1.04] saturate-[0.9]"
+          class="hero-portrait relative z-10 h-auto w-full contrast-[1.04] saturate-[0.9]"
         />
       </div>
     </div>
@@ -96,76 +149,40 @@ import Section from '@/components/primitives/Section.astro';
 </Section>
 
 <style>
-  /* One field language at every width (Friedman/WRITER pattern: the background
-     has body, so the portrait dissolves INTO something instead of floating in
-     a void). Below lg the layout stacks with the portrait last, so the lobes
-     sit bottom-center behind it; at lg+ the mass moves low-right under the
-     split-view portrait. Static — no reduced-motion concern. */
-  .hero-field {
-    background:
-      radial-gradient(34% 16% at 50% 88%, var(--color-bg-elev-3), transparent 72%),
-      radial-gradient(52% 26% at 42% 82%, var(--color-bg-elev-2), transparent 76%),
-      radial-gradient(60% 30% at 58% 92%, var(--color-bg-elev-2), transparent 76%),
-      radial-gradient(95% 45% at 50% 88%, var(--color-bg-elev-1), transparent 85%);
+  /* One quiet elevation pool at the floor line — gives the dark section body
+     (all-viewport rule #3) without any person-hugging shape. */
+  .hero-ground {
+    background: radial-gradient(85% 48% at 62% 100%, var(--color-bg-elev-1), transparent 82%);
   }
 
-  @media (min-width: 1024px) {
-    .hero-field {
-      /* Lobe centers are deliberately non-concentric — concentric rings read as
-         a spotlight, offset lobes read as an organic form. Mass sits low-right
-         because the portrait is bottom-anchored onto it. */
-      background:
-        radial-gradient(24% 30% at 73% 66%, var(--color-bg-elev-3), transparent 72%),
-        radial-gradient(32% 42% at 84% 44%, var(--color-bg-elev-3), transparent 74%),
-        radial-gradient(52% 64% at 65% 72%, var(--color-bg-elev-2), transparent 76%),
-        radial-gradient(58% 72% at 84% 36%, var(--color-bg-elev-2), transparent 76%),
-        radial-gradient(95% 120% at 72% 60%, var(--color-bg-elev-1), transparent 85%);
-    }
+  /* The PNG's lower side edges are hard shoulder crops; dissolve them into the
+     slab/background. The bottom edge needs no fade anymore — it sits flush on
+     the section boundary, so the crop line IS the section edge. */
+  .hero-portrait {
+    -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
   }
 
   /* xl right-bleed: the portrait grows past its 520px grid column into the
      container padding + viewport gutter (24px at 1280 → capped 200px at 1780+),
      so it reads as anchored to the page edge instead of boxed in a column.
-     overflow-x-clip on the Section guards the clip. */
+     overflow-x-clip on the Section guards the clip. A negative margin only
+     SHIFTS a grid item — the explicit width is what widens it past its track. */
   @media (min-width: 1280px) {
     .hero-portrait-wrap {
-      /* A negative margin only SHIFTS a grid item — the explicit width is what
-         actually widens it past its 520px track (verified by measurement).
-         The extra width overflows leftward into the column gap; the h1 clears
-         it by 48px at its widest line (measured). */
       width: calc(100% + min(200px, 24px + (100vw - 1280px) / 2));
       margin-right: calc(-1 * min(200px, 24px + (100vw - 1280px) / 2));
     }
   }
 
-  /* Mobile keeps the signed-off bottom-only dissolve; at lg+ every edge
-     dissolves into the field's mass — no visible cutout boundary on any side.
-     Ellipse center sits at face height so the face stays in the solid zone. */
-  .hero-portrait {
-    -webkit-mask-image: linear-gradient(to bottom, black 72%, transparent 98%);
-    mask-image: linear-gradient(to bottom, black 72%, transparent 98%);
-  }
-
-  @media (min-width: 1024px) {
-    .hero-portrait {
-      /* Two layers INTERSECTED (not the default additive compositing): a
-         horizontal fade dissolves the shoulder/frame side edges, a vertical
-         fade dissolves the torso bottom — both complete inside the frame, so
-         no straight cut line survives on any edge. The top needs no fade: the
-         no-bg PNG is transparent air above the head. A single radial can't do
-         this — its bottom fade can't complete without also dimming the face. */
-      -webkit-mask-image:
-        linear-gradient(to right, transparent, black 14%, black 86%, transparent),
-        linear-gradient(to bottom, black 62%, transparent 97%);
-      -webkit-mask-composite: source-in;
-      mask-image:
-        linear-gradient(to right, transparent, black 14%, black 86%, transparent),
-        linear-gradient(to bottom, black 62%, transparent 97%);
-      mask-composite: intersect;
+  /* ≥1780 the container itself widens to 1600 — re-base the bleed math. */
+  @media (min-width: 1780px) {
+    .hero-portrait-wrap {
+      width: calc(100% + min(200px, 24px + (100vw - 1600px) / 2));
+      margin-right: calc(-1 * min(200px, 24px + (100vw - 1600px) / 2));
     }
   }
 
-  /* Amber glow deliberately absent for v1 (user decision 2026-07-19): the orb
-     treatment never landed visually. DESIGN.md motion rule 8 (glow fades in one
-     beat after copy) is deferred with it — revisit in the Phase 8 motion pass. */
+  /* Amber glow around the person deliberately absent (four treatments rejected
+     2026-07-19, recorded in KKD-32); JS/motion glow is Phase 8. */
 </style>
