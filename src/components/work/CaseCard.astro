@@ -69,7 +69,7 @@ const meta = [role, ...stack, String(year)].join(' · ');
         {peekImage && (
           <div
             class:list={[
-              'border-border-subtle shadow-card absolute -rotate-2 overflow-hidden rounded-md border opacity-80',
+              'border-border-subtle shadow-card absolute aspect-[16/10] -rotate-2 overflow-hidden rounded-md border opacity-80',
               wide
                 ? 'top-10 left-2 w-[55%] lg:top-16 lg:left-0 lg:w-[48%]'
                 : 'top-10 left-2 w-[55%] sm:left-4',
@@ -84,7 +84,7 @@ const meta = [role, ...stack, String(year)].join(' · ');
               sizes="(min-width: 1024px) 20vw, 45vw"
               loading="lazy"
               alt=""
-              class="h-auto w-full"
+              class="h-full w-full object-cover object-left-top"
             />
           </div>
         )}
