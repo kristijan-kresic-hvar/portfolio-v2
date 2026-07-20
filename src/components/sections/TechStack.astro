@@ -6,6 +6,8 @@ import Section from '@/components/primitives/Section.astro';
 // Recruiter-search keywords (KKD-26 locked list) — verbatim strings matter.
 // Keep "React.js" not "React"; don't normalize. PostgreSQL confirmed from the
 // Agilno project record (Naitur, Vetster); Prisma unconfirmed, deliberately out.
+// The AI group sits in an accent-tinted panel: it's the positioning
+// differentiator, and the tint links it visually to WhatIDo's boundary cell.
 const groups = [
   {
     label: 'Frontend',
@@ -30,23 +32,27 @@ const groups = [
     label: 'Tools',
     terms: ['Git', 'GitHub', 'CLI/Terminal', 'Vercel'],
   },
-  {
-    label: 'AI-augmented workflow',
-    terms: ['Claude', 'GPT', 'Codex', 'Cursor', 'Agentic coding'],
-  },
 ];
+
+const aiGroup = {
+  label: 'AI-augmented workflow',
+  terms: ['Claude', 'GPT', 'Codex', 'Cursor', 'Agentic coding'],
+};
 ---
 
 <Section aria-labelledby="tech-stack-heading">
   <Container width="wide">
-    <h2 id="tech-stack-heading" class="text-text-primary text-3xl font-bold tracking-tight">
+    <h2
+      id="tech-stack-heading"
+      class="text-text-primary text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl"
+    >
       Tech stack
     </h2>
-    <dl class="mt-10 flex flex-col gap-8">
+    <dl class="mt-10 lg:mt-12">
       {
         groups.map((group) => (
-          <div class="grid gap-3 sm:grid-cols-[11rem_1fr] sm:gap-6">
-            <dt class="text-text-muted font-mono text-sm sm:pt-1">{group.label}</dt>
+          <div class="border-border-subtle grid gap-3 border-t py-6 sm:grid-cols-[11rem_1fr] sm:gap-6 sm:py-7">
+            <dt class="text-text-secondary font-mono text-sm sm:pt-1">{group.label}</dt>
             <dd class="flex flex-wrap gap-2">
               {group.terms.map((term) => (
                 <Chip>{term}</Chip>
@@ -55,6 +61,14 @@ const groups = [
           </div>
         ))
       }
+      <div
+        class="border-border-default bg-accent-subtle mt-6 grid gap-3 rounded-lg border p-6 sm:grid-cols-[11rem_1fr] sm:gap-6 sm:p-7"
+      >
+        <dt class="text-accent-text font-mono text-sm sm:pt-1">{aiGroup.label}</dt>
+        <dd class="flex flex-wrap gap-2">
+          {aiGroup.terms.map((term) => <Chip>{term}</Chip>)}
+        </dd>
+      </div>
     </dl>
   </Container>
 </Section>
