@@ -1,0 +1,64 @@
+---
+import Button from '@/components/primitives/Button.astro';
+import Card from '@/components/primitives/Card.astro';
+import Container from '@/components/primitives/Container.astro';
+import Section from '@/components/primitives/Section.astro';
+
+// Conversion peak of the page — the deliberately quiet footer follows (see Footer.astro).
+// The ?intent= params are load-bearing: Phase 7's /contact reads them to prefill the
+// form's intent path — don't strip or rename them before that lands.
+// Availability copy is dated on purpose; KKD-12 (pre-launch copy sweep) owns updating it.
+const paths = [
+  {
+    heading: 'Hiring a senior developer?',
+    sub: 'Open to full-stack roles. 4 years professional. Available from August 2026.',
+    cta: 'Talk about a role',
+    href: '/contact?intent=hire',
+  },
+  {
+    heading: 'Have a project that needs shipping?',
+    sub: 'I scope, build, and ship modern web products end-to-end.',
+    cta: 'Start a project',
+    href: '/contact?intent=project',
+  },
+];
+---
+
+<Section
+  aria-labelledby="cta-band-heading"
+  class="border-border-subtle bg-bg-elev-1 relative border-t"
+>
+  {/* Amber band edge — the accent marks the page's decision point, not decoration. */}
+  <div
+    class="via-accent absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent to-transparent"
+    aria-hidden="true"
+  >
+  </div>
+  <Container>
+    <h2
+      id="cta-band-heading"
+      class="text-text-primary text-3xl font-bold tracking-tight text-balance md:text-4xl lg:text-5xl"
+    >
+      Two ways to work with me.
+    </h2>
+    <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-12 lg:gap-6">
+      {
+        paths.map((path) => (
+          <Card class="flex flex-col items-start sm:p-8 lg:p-10">
+            <h3 class="text-text-primary text-xl font-semibold text-balance">{path.heading}</h3>
+            <p class="text-text-secondary mt-3 mb-8 text-pretty">{path.sub}</p>
+            <Button href={path.href} size="lg" class="group mt-auto">
+              {path.cta}
+              <span
+                class="ease-standard transition-transform duration-(--duration-instant) group-hover:translate-x-0.5"
+                aria-hidden="true"
+              >
+                →
+              </span>
+            </Button>
+          </Card>
+        ))
+      }
+    </div>
+  </Container>
+</Section>
