@@ -569,6 +569,10 @@ import Section from '@/components/primitives/Section.astro';
       { passive: true },
     );
     hero.addEventListener('pointerleave', () => {
+      // A trailing frame from pointermove would recompute `lit` from the last
+      // inside coords and re-add .is-lit after this handler cleared it.
+      cancelAnimationFrame(raf);
+      raf = 0;
       hero.style.setProperty('--fx-r', '0px');
       for (const l of lines) {
         l.lit = false;
