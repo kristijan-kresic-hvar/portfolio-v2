@@ -38,6 +38,9 @@ const workEntries = [
       draft: false,
       featured: true,
       order: 3,
+      cover: 'vetster-ai-chat.webp',
+      coverPeek: 'vetster-find-a-vet.webp',
+      coverAlt: 'Vetster — Ask Vetster AI chat',
     },
   },
   {
@@ -52,6 +55,9 @@ const workEntries = [
       draft: false,
       featured: true,
       order: 1,
+      cover: 'naitur-dashboard.webp',
+      coverPeek: 'naitur-journey.webp',
+      coverAlt: 'Naitur client dashboard',
     },
   },
   {
@@ -66,6 +72,9 @@ const workEntries = [
       draft: false,
       featured: true,
       order: 2,
+      cover: 'biocirv-discover.webp',
+      coverPeek: 'biocirv-table.webp',
+      coverAlt: 'BioCirV Discover biomass data grid',
     },
   },
 ];
@@ -209,6 +218,15 @@ describe('FeaturedWork', () => {
     expect(featuredWorkHtml).not.toMatch(/href="\/work\/./);
   });
 
+  it('renders a lazy layered cover composition per card from real harvest picks', () => {
+    expect(featuredWorkHtml).toContain('Naitur client dashboard');
+    expect(featuredWorkHtml).toContain('BioCirV Discover biomass data grid');
+    expect(featuredWorkHtml).toContain('Vetster — Ask Vetster AI chat');
+    expect(featuredWorkHtml).toContain('loading="lazy"');
+    // Main cover + peeking signature frame per card = at least 6 images.
+    expect((featuredWorkHtml.match(/<img/g) ?? []).length).toBeGreaterThanOrEqual(6);
+  });
+
   it('ships zero client JS and no raw hex', () => {
     expect(featuredWorkHtml).not.toContain('<script');
     expect(featuredWorkHtml).not.toMatch(/#[0-9a-fA-F]{6}/);
@@ -232,6 +250,11 @@ describe('WhatIDo', () => {
     expect(whatIDoHtml).toContain('anything that ships under my name');
     // One representative line per remaining card proves each card carries support copy.
     expect(whatIDoHtml).toContain('end-to-end');
+  });
+
+  it('renders an inline decorative SVG icon per capability card', () => {
+    expect((whatIDoHtml.match(/<svg/g) ?? []).length).toBeGreaterThanOrEqual(4);
+    expect(whatIDoHtml).toContain('aria-hidden="true"');
   });
 
   it('ships zero client JS and no raw hex', () => {
@@ -272,6 +295,11 @@ describe('HowIWork', () => {
       'href="https://github.com/kristijan-kresic-hvar/linear-pipeline-kit"',
     );
     expect(howIWorkHtml).toContain('href="https://github.com/kristijan-kresic-hvar/ai-review-kit"');
+  });
+
+  it('renders an inline decorative SVG icon per process step', () => {
+    expect((howIWorkHtml.match(/<svg/g) ?? []).length).toBeGreaterThanOrEqual(3);
+    expect(howIWorkHtml).toContain('aria-hidden="true"');
   });
 
   it('ships zero client JS and no raw hex', () => {
