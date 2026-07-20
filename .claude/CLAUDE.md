@@ -32,6 +32,7 @@ Merges with global `~/.claude/CLAUDE.md`. Project design/product/architecture do
 - Source of truth: `PRODUCT.md` + `DESIGN.md` at repo root (mirror `global.css @theme`).
 - Workflow: `/impeccable document` → `/impeccable craft <primitive>` → `/impeccable polish`. See root `CLAUDE.md` "Design workflow".
 - Locked: dark-only, single accent **amber `#F59E0B`** (hover `#FBBF24`, active `#D97706`), Geist + Geist Mono.
+- **Elevation bar (LOCKED 2026-07-20):** every new surface follows root `DESIGN.md` § "Design register & elevation bar" — bolder direction, signature moment per section, amber at every scroll depth, imagery on proof surfaces. AC-compliance alone ≠ done. Applies to all future phases (5/6/7+), and every UI ticket's AC must carry its design-ambition criterion.
 
 ## Sharp Edges
 

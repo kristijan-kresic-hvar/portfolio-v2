@@ -217,6 +217,8 @@ All non-trivial UI work runs through the `impeccable` skill. The skill loads two
 
 Before touching components, layouts, sections, motion, or a11y: invoke `/impeccable <sub-command> <target>`. The sub-command tells the skill what flow to load.
 
+**Design bar (LOCKED 2026-07-20):** `DESIGN.md` § "Design register & elevation bar" governs every craft/shape pass and every UI ticket — bolder direction by default, one signature moment per section, amber presence at every scroll depth, imagery on proof surfaces. **AC-compliant-but-flat is not done.** Read that section before any page/section craft; ticket authors include its design-ambition criterion in every UI ticket's AC. (Born from the Phase-4 "templated" verdict — six compliant sections shipped flat; KKD-30 fixed the landing, this rule prevents the regression in Phases 5+.)
+
 ### Effort routing (Fable 5) — taste work runs at xhigh via the `design-taste` subagent
 
 Sessions run at `high` effort by default. Taste-judged work — anything the phase marker or the mapping below tags as `/impeccable shape`, `craft`, `polish`, `animate`, `typeset`, the Mobbin reference pass, or persuasive copy (hero, CTAs, case-study prose) — MUST be delegated to the **`design-taste`** subagent (`.claude/agents/design-taste.md`, `effort: xhigh`) instead of being done inline. Spec'd build work (assembly, plumbing, config, checklist tasks) stays inline at session effort. Per-phase defaults live as `⚡ effort:` markers on the phase headings in the Obsidian project note.
