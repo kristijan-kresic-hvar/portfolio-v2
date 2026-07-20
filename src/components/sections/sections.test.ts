@@ -118,8 +118,13 @@ describe('Hero', () => {
     expect(html).toContain('loading="eager"');
   });
 
-  it('ships zero client JS and no raw hex', () => {
-    expect(html).not.toContain('<script');
+  it('ships only the sanctioned reveal script and no raw hex', () => {
+    // Exactly ONE inline script is allowed in the hero (lead-authorized
+    // 2026-07-20, per root CLAUDE.md Interactivity rules): the passive
+    // pointermove writer for the constellation's cursor-proximity reveal.
+    // Progressive enhancement — the page is complete without it.
+    expect(html.match(/<script/g)).toHaveLength(1);
+    expect(html).toContain('pointermove');
     expect(html).not.toMatch(/#[0-9a-fA-F]{6}/);
   });
 });
