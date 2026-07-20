@@ -12,6 +12,8 @@ export const workSchema = z.object({
   constraint: z.string().optional(),
   retrospective: z.string().optional(),
   cover: z.string().optional(),
+  coverPeek: z.string().optional(),
+  coverAlt: z.string().optional(),
   links: z
     .object({
       live: z.url().optional(),

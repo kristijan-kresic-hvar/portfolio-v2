@@ -1,22 +1,27 @@
 ---
+import type { IconName } from '@/components/icons/Icon.astro';
+import Icon from '@/components/icons/Icon.astro';
 import Container from '@/components/primitives/Container.astro';
 import Link from '@/components/primitives/Link.astro';
 import Section from '@/components/primitives/Section.astro';
 
 // Step lines are capped at 12 words (research L-4) — enforced by sections.test.ts
 // via data-step-line. AI-boundary copy mirrors the locked line in PRODUCT.md.
-const steps = [
+const steps: { label: string; line: string; icon: IconName }[] = [
   {
     label: 'Discovery',
     line: 'A paid week to scope the work before anything is built.',
+    icon: 'compass',
   },
   {
     label: 'Build',
     line: 'Weekly written updates. You always know where the work stands.',
+    icon: 'code',
   },
   {
     label: 'Support',
     line: "30 days of post-ship support. I stay until it's stable.",
+    icon: 'shield',
   },
 ];
 
@@ -27,47 +32,69 @@ const boundary =
   'The boundary is explicit. AI for codegen scaffolds and research drafts. Not for architecture decisions, security review, or anything that ships under my name.';
 ---
 
-<Section aria-labelledby="how-i-work-heading">
-  <Container width="reading">
-    <h2 id="how-i-work-heading" class="text-text-primary text-3xl font-bold tracking-tight">
-      How I work
-    </h2>
+{
+  /* Asymmetric split: narrative + boundary callout left, process rail with
+    oversized amber numerals right — the page's one numbered sequence (it IS
+    a sequence). Elevated band breaks the base-bg rhythm. */
+}
+<Section aria-labelledby="how-i-work-heading" class="border-border-subtle bg-bg-elev-1 border-y">
+  <Container width="wide">
+    <div class="lg:grid lg:grid-cols-12 lg:gap-16">
+      <div class="lg:col-span-5">
+        <h2
+          id="how-i-work-heading"
+          class="text-text-primary text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl"
+        >
+          How I work
+        </h2>
 
-    <p class="text-text-secondary mt-8 text-pretty">{narrative}</p>
-    <p class="text-text-secondary mt-4 text-pretty">{boundary}</p>
+        <p class="text-text-secondary mt-8 text-pretty">{narrative}</p>
 
-    <ol role="list" class="mt-12 grid gap-8 sm:grid-cols-3 sm:gap-6">
-      {
-        steps.map((step, index) => (
-          <li class="border-border-subtle border-t pt-4">
-            <h3 class="text-text-primary text-sm font-semibold">
-              <span class="text-text-muted mr-2 font-mono text-xs font-normal" aria-hidden="true">
+        <div class="border-border-default bg-bg-base mt-6 rounded-lg border p-6">
+          <Icon name="terminal" class="text-accent size-5" />
+          <p class="text-text-secondary mt-3 text-sm text-pretty">{boundary}</p>
+        </div>
+
+        <p class="text-text-muted mt-8 text-sm text-pretty">
+          The process itself is public. Linear tickets written as executable specs drive AI agents
+          through worktree, TDD, and PR, with an adversarial AI review on every pull request. I gate
+          every merge. See <Link
+            href="https://github.com/kristijan-kresic-hvar/linear-pipeline-kit"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="font-mono text-xs">linear-pipeline-kit</Link
+          > and <Link
+            href="https://github.com/kristijan-kresic-hvar/ai-review-kit"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="font-mono text-xs">ai-review-kit</Link
+          >.
+        </p>
+      </div>
+
+      <ol role="list" class="mt-12 lg:col-span-7 lg:mt-0">
+        {
+          steps.map((step, index) => (
+            <li class="border-border-default grid grid-cols-[minmax(4.5rem,auto)_1fr] items-start gap-6 border-t py-8 first:border-t-0 first:pt-0 sm:grid-cols-[minmax(7rem,auto)_1fr] sm:py-10 lg:first:pt-2">
+              <span
+                aria-hidden="true"
+                class="text-accent text-5xl leading-none font-bold tracking-tighter sm:text-7xl"
+              >
                 {String(index + 1).padStart(2, '0')}
               </span>
-              {step.label}
-            </h3>
-            <p class="text-text-secondary mt-2 text-sm text-pretty" data-step-line>
-              {step.line}
-            </p>
-          </li>
-        ))
-      }
-    </ol>
-
-    <p class="text-text-muted mt-12 text-sm text-pretty">
-      The process itself is public. Linear tickets written as executable specs drive AI agents
-      through worktree, TDD, and PR, with an adversarial AI review on every pull request. I gate
-      every merge. See <Link
-        href="https://github.com/kristijan-kresic-hvar/linear-pipeline-kit"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="font-mono text-xs">linear-pipeline-kit</Link
-      > and <Link
-        href="https://github.com/kristijan-kresic-hvar/ai-review-kit"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="font-mono text-xs">ai-review-kit</Link
-      >.
-    </p>
+              <div>
+                <h3 class="text-text-primary flex items-center gap-2.5 text-lg font-semibold sm:text-xl">
+                  <Icon name={step.icon} class="text-text-secondary size-5" />
+                  {step.label}
+                </h3>
+                <p class="text-text-secondary mt-2 text-pretty" data-step-line>
+                  {step.line}
+                </p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
   </Container>
 </Section>

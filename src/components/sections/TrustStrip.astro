@@ -7,16 +7,19 @@ const companies = ['Agilno', 'amondi GmbH', 'Reroot'];
 ---
 
 {
-  /* Quiet band, not a full section — mirrors Footer.astro's meta-line register.
-    The py overrides need the important modifier to beat Section's own py-*
-    (same specificity, later in the generated CSS). */
+  /* Quiet band, not a full section — still reads in <2s. Split composition:
+    facts + wordmarks left, endorsement right of a hairline (Instrument
+    pattern), oversized amber quote glyph as the band's single accent. The py
+    overrides need the important modifier to beat Section's own py-*. */
 }
 <Section
   aria-label="Experience and endorsements"
   class="border-border-subtle bg-bg-base border-y py-10! sm:py-12! lg:py-16!"
 >
   <Container width="wide">
-    <div class="flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
+    <div
+      class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,26rem)] lg:items-center lg:gap-12"
+    >
       <div class="flex flex-col gap-5">
         {/* Separator dots ride with the preceding item so a wrapped line never opens with one. */}
         <p
@@ -30,7 +33,7 @@ const companies = ['Agilno', 'amondi GmbH', 'Reroot'];
         </p>
         <ul
           role="list"
-          class="text-text-muted flex flex-wrap items-baseline gap-x-10 gap-y-3 font-mono text-sm font-medium tracking-wide sm:text-base"
+          class="text-text-secondary flex flex-wrap items-baseline gap-x-10 gap-y-3 text-base font-semibold tracking-wide sm:text-lg"
         >
           {companies.map((name) => <li>{name}</li>)}
         </ul>
@@ -42,9 +45,11 @@ const companies = ['Agilno', 'amondi GmbH', 'Reroot'];
           <span>Web Dev + PHP Backend (2016–2018)</span>
         </p>
       </div>
+      <div aria-hidden="true" class="bg-border-default hidden w-px self-stretch lg:block"></div>
       <figure class="lg:max-w-md lg:shrink-0">
-        <blockquote class="text-text-secondary text-base leading-normal text-pretty">
-          <p>&ldquo;Great to build with, sharp, and always on top of the details.&rdquo;</p>
+        <div aria-hidden="true" class="text-accent text-5xl leading-none font-bold">&ldquo;</div>
+        <blockquote class="text-text-primary mt-2 text-base leading-normal text-pretty sm:text-lg">
+          <p>Great to build with, sharp, and always on top of the details.</p>
         </blockquote>
         <figcaption class="text-text-muted mt-3 font-mono text-xs">
           &mdash; Frane Žunić, Full Stack Developer

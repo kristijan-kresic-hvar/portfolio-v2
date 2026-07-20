@@ -41,6 +41,23 @@ describe('workSchema', () => {
     ).toThrow();
   });
 
+  it('parses the cover composition fields', () => {
+    const parsed = workSchema.parse({
+      title: 'Acme redesign',
+      summary: 'Rebuilt the marketing site.',
+      role: 'Lead engineer',
+      stack: ['Astro'],
+      year: 2026,
+      cover: 'acme-dashboard.webp',
+      coverPeek: 'acme-detail.webp',
+      coverAlt: 'Acme dashboard overview',
+    });
+
+    expect(parsed.cover).toBe('acme-dashboard.webp');
+    expect(parsed.coverPeek).toBe('acme-detail.webp');
+    expect(parsed.coverAlt).toBe('Acme dashboard overview');
+  });
+
   it('rejects frontmatter missing a required title', () => {
     expect(() =>
       workSchema.parse({
