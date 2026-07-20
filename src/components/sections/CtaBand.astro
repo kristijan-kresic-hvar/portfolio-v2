@@ -1,4 +1,6 @@
 ---
+import type { IconName } from '@/components/icons/Icon.astro';
+import Icon from '@/components/icons/Icon.astro';
 import Button from '@/components/primitives/Button.astro';
 import Card from '@/components/primitives/Card.astro';
 import Container from '@/components/primitives/Container.astro';
@@ -8,44 +10,54 @@ import Section from '@/components/primitives/Section.astro';
 // The ?intent= params are load-bearing: Phase 7's /contact reads them to prefill the
 // form's intent path — don't strip or rename them before that lands.
 // Availability copy is dated on purpose; KKD-12 (pre-launch copy sweep) owns updating it.
-const paths = [
+const paths: { heading: string; sub: string; cta: string; href: string; icon: IconName }[] = [
   {
     heading: 'Hiring a senior developer?',
     sub: 'Open to full-stack roles. 4 years professional. Available from August 2026.',
     cta: 'Talk about a role',
     href: '/contact?intent=hire',
+    icon: 'briefcase',
   },
   {
     heading: 'Have a project that needs shipping?',
     sub: 'I scope, build, and ship modern web products end-to-end.',
     cta: 'Start a project',
     href: '/contact?intent=project',
+    icon: 'send',
   },
 ];
 ---
 
 <Section
   aria-labelledby="cta-band-heading"
-  class="border-border-subtle bg-bg-elev-1 relative border-t"
+  class="border-border-subtle relative overflow-hidden border-t lg:py-32!"
 >
-  {/* Amber band edge — the accent marks the page's decision point, not decoration. */}
+  {/* Amber band edge + glow field — the accent marks the page's decision point. */}
   <div
     class="via-accent absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent to-transparent"
     aria-hidden="true"
   >
   </div>
-  <Container width="wide">
+  <div
+    aria-hidden="true"
+    class="absolute top-0 left-1/2 h-80 w-[min(90vw,48rem)] -translate-x-1/2 -translate-y-1/3 bg-[radial-gradient(closest-side,var(--color-accent-glow),transparent)]"
+  >
+  </div>
+  <Container width="wide" class="relative">
     <h2
       id="cta-band-heading"
-      class="text-text-primary text-3xl font-bold tracking-tight text-balance md:text-4xl lg:text-5xl"
+      class="text-text-primary text-3xl font-bold tracking-tight text-balance sm:text-4xl md:text-5xl lg:text-6xl"
     >
       Two ways to work with me.
     </h2>
-    <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-12 lg:gap-6">
+    <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-14 lg:gap-6">
       {
         paths.map((path) => (
-          <Card class="flex flex-col items-start sm:p-8 lg:p-10">
-            <h3 class="text-text-primary text-xl font-semibold text-balance">{path.heading}</h3>
+          <Card elevated class="flex flex-col items-start sm:p-8 lg:p-10">
+            <h3 class="text-text-primary flex items-center gap-3 text-xl font-semibold text-balance">
+              <Icon name={path.icon} class="text-accent size-5 shrink-0" />
+              {path.heading}
+            </h3>
             <p class="text-text-secondary mt-3 mb-8 text-pretty">{path.sub}</p>
             <Button href={path.href} size="lg" class="group mt-auto">
               {path.cta}
