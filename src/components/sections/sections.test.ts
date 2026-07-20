@@ -1,6 +1,9 @@
+import { readFileSync } from 'node:fs';
+
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { beforeAll, describe, expect, it } from 'vitest';
 
+import CtaBand from '@/components/sections/CtaBand.astro';
 import FeaturedWork from '@/components/sections/FeaturedWork.astro';
 import Hero from '@/components/sections/Hero.astro';
 import HowIWork from '@/components/sections/HowIWork.astro';
@@ -17,6 +20,7 @@ let emptyFeaturedWorkHtml: string;
 let whatIDoHtml: string;
 let techStackHtml: string;
 let howIWorkHtml: string;
+let ctaBandHtml: string;
 
 // Mirrors the stub MDX entries in src/content/work/ — getCollection() resolves
 // empty under vitest, so the render tests inject entries via the test seam.
@@ -79,6 +83,7 @@ beforeAll(async () => {
   whatIDoHtml = await container.renderToString(WhatIDo);
   techStackHtml = await container.renderToString(TechStack);
   howIWorkHtml = await container.renderToString(HowIWork);
+  ctaBandHtml = await container.renderToString(CtaBand);
 });
 
 describe('Hero', () => {
@@ -272,6 +277,36 @@ describe('HowIWork', () => {
   it('ships zero client JS and no raw hex', () => {
     expect(howIWorkHtml).not.toContain('<script');
     expect(howIWorkHtml).not.toMatch(/#[0-9a-fA-F]{6}/);
+  });
+});
+
+describe('CtaBand', () => {
+  it('renders both split paths with the exact intent-param hrefs', () => {
+    // The ?intent= params are load-bearing for Phase 7's contact prefill.
+    expect(ctaBandHtml).toContain('href="/contact?intent=hire"');
+    expect(ctaBandHtml).toContain('href="/contact?intent=project"');
+  });
+
+  it('renders the locked card copy with the availability phrasing intact', () => {
+    expect(ctaBandHtml).toContain('Hiring a senior developer?');
+    expect(ctaBandHtml).toContain(
+      'Open to full-stack roles. 4 years professional. Available from August 2026.',
+    );
+    expect(ctaBandHtml).toContain('Have a project that needs shipping?');
+    expect(ctaBandHtml).toContain('I scope, build, and ship modern web products end-to-end.');
+    expect(ctaBandHtml).toContain('Talk about a role');
+    expect(ctaBandHtml).toContain('Start a project');
+  });
+
+  it('is mounted as the last section in index.astro, directly before the footer', () => {
+    // Footer renders inside RootLayout after the slot, so last-in-slot = last before footer.
+    const indexSource = readFileSync(new URL('../../pages/index.astro', import.meta.url), 'utf-8');
+    expect(indexSource).toMatch(/<CtaBand \/>\s*<\/RootLayout>/);
+  });
+
+  it('ships zero client JS and no raw hex', () => {
+    expect(ctaBandHtml).not.toContain('<script');
+    expect(ctaBandHtml).not.toMatch(/#[0-9a-fA-F]{6}/);
   });
 });
 
