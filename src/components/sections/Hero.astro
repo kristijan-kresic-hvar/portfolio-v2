@@ -16,27 +16,131 @@ import Section from '@/components/primitives/Section.astro';
     (same specificity, later in the generated CSS); the grid's min-h owns the
     full-viewport height at lg instead */
 }
-<Section class="relative isolate overflow-x-clip lg:py-0!">
+<Section class="hero-section relative isolate overflow-x-clip lg:py-0!">
   <div class="hero-field absolute inset-0 -z-10" aria-hidden="true"></div>
+  {
+    /* Constellation backdrop (KKD-34, pattern adapted from designwithintent.ai):
+      an irregular star-map scatter — short connecting hairlines at varied
+      angles between genuinely nearby nodes, deliberately NO axis-aligned
+      strokes (the blueprint rules/ticks died in review: "weird straight
+      vertical lines"). DESKTOP ONLY (user decision 2026-07-20): below lg the
+      svg is display:none — no static fallback field on mobile/tablet, and
+      therefore nothing that could ever crowd the stacked layouts. Geometry
+      is authored against the split layout's measured empty zones and never
+      intersects the copy or portrait boxes at any width ≥1024 (overlap
+      audit). Node radii stay in px so dots never balloon. At rest the field
+      is near-hidden; a fine pointer reveals it locally via the --mx/--my
+      mask (script at the bottom of this file). */
+  }
+  <svg
+    class="hero-fx pointer-events-none absolute inset-0 -z-10 hidden h-full w-full lg:block"
+    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {
+      /* Schematic mark vocabulary (KKD-34 refinement round): the field mixes
+        filled dots, hollow rings, plus ticks and tiny diamonds so it reads as
+        a hand-plotted star chart, not a dot grid. EVERY mark is a <use>
+        against these defs (all authored centered on 0,0), positioned via
+        CSS translate percents — the uniform mark model is what lets the
+        script re-deal shapes between positions per load (an href+class
+        swap, no element surgery), and translate positioning is what keeps
+        the pop's scale centered (see the .hero-fx use rule below). The
+        authored mix is the no-JS default. */
+    }
+    <defs>
+      <circle id="fx-def-dot" r="1.5"></circle>
+      <circle id="fx-def-dot-l" r="2"></circle>
+      <circle id="fx-def-ring" r="2.75"></circle>
+      <path id="fx-def-plus" d="M-3 0H3M0 -3V3"></path>
+      <path id="fx-def-plus-s" d="M-2.2 0H2.2M0 -2.2V2.2"></path>
+      <path id="fx-def-diamond" d="M0 -3L2.6 0L0 3L-2.6 0Z"></path>
+      <path id="fx-def-diamond-s" d="M0 -2.2L1.9 0L0 2.2L-1.9 0Z"></path>
+    </defs>
+    <g class="fx-desk">
+      {
+        /* desktop split view: zigzag clusters across the top band + bottom
+        zigzag left of the portrait. The former right-edge diagonal, column
+        seam marks and drift arc were cut 2026-07-20: all three intersected
+        the portrait/content boxes at one or more widths (overlap audit),
+        and the field may never overlap content — empty beats overlap. */
+      }
+      {
+        /* Desk geometry is grouped into .fx-cluster <g>s — the reveal script
+          wakes a WHOLE cluster (one class toggle) when the cursor nears any
+          of its endpoints; CSS does the rest. */
+      }
+      <g class="fx-cluster">
+        <line class="fx-line" x1="7%" y1="14%" x2="11%" y2="6.5%"></line>
+        <line class="fx-line" x1="11%" y1="6.5%" x2="16%" y2="11%"></line>
+        <line class="fx-line" x1="16%" y1="11%" x2="21%" y2="5.5%"></line>
+        <line class="fx-line" x1="21%" y1="5.5%" x2="27%" y2="15.5%"></line>
+        <use class="fx-node" href="#fx-def-dot-l" style={{ translate: '7% 14%' }}></use>
+        <use class="fx-plus" href="#fx-def-plus-s" style={{ translate: '11% 6.5%' }}></use>
+        <use class="fx-ring" href="#fx-def-ring" style={{ translate: '16% 11%' }}></use>
+        <use class="fx-node" href="#fx-def-dot" style={{ translate: '21% 5.5%' }}></use>
+        <use class="fx-node fx-amber" href="#fx-def-dot-l" style={{ translate: '27% 15.5%' }}></use>
+      </g>
+      <g class="fx-cluster">
+        <line class="fx-line" x1="38%" y1="7%" x2="44%" y2="12.5%"></line>
+        <line class="fx-line" x1="44%" y1="12.5%" x2="50%" y2="5.5%"></line>
+        <use class="fx-node" href="#fx-def-dot" style={{ translate: '38% 7%' }}></use>
+        <use class="fx-diamond" href="#fx-def-diamond" style={{ translate: '44% 12.5%' }}></use>
+        <use class="fx-node" href="#fx-def-dot" style={{ translate: '50% 5.5%' }}></use>
+      </g>
+      <g class="fx-cluster">
+        <line class="fx-line" x1="58%" y1="15%" x2="63%" y2="9.5%"></line>
+        <line class="fx-line" x1="63%" y1="9.5%" x2="68%" y2="4.5%"></line>
+        <use class="fx-ring" href="#fx-def-ring" style={{ translate: '58% 15%' }}></use>
+        <use class="fx-node fx-amber" href="#fx-def-dot-l" style={{ translate: '63% 9.5%' }}></use>
+        <use class="fx-node" href="#fx-def-dot-l" style={{ translate: '68% 4.5%' }}></use>
+      </g>
+      <g class="fx-cluster">
+        <line class="fx-line" x1="74%" y1="12%" x2="81%" y2="7%"></line>
+        <line class="fx-line" x1="81%" y1="7%" x2="88%" y2="15.5%"></line>
+        <line class="fx-line" x1="88%" y1="15.5%" x2="93%" y2="5%"></line>
+        <use class="fx-node" href="#fx-def-dot" style={{ translate: '74% 12%' }}></use>
+        <use class="fx-plus" href="#fx-def-plus" style={{ translate: '81% 7%' }}></use>
+        <use class="fx-node" href="#fx-def-dot" style={{ translate: '88% 15.5%' }}></use>
+        <use class="fx-diamond" href="#fx-def-diamond-s" style={{ translate: '93% 5%' }}></use>
+      </g>
+      <g class="fx-cluster">
+        <line class="fx-line" x1="7%" y1="86%" x2="13%" y2="92.5%"></line>
+        <line class="fx-line" x1="13%" y1="92.5%" x2="20%" y2="87.5%"></line>
+        <line class="fx-line" x1="20%" y1="87.5%" x2="28%" y2="93.5%"></line>
+        <line class="fx-line" x1="28%" y1="93.5%" x2="36%" y2="89%"></line>
+        <use class="fx-node" href="#fx-def-dot" style={{ translate: '7% 86%' }}></use>
+        <use class="fx-node fx-amber" href="#fx-def-dot-l" style={{ translate: '13% 92.5%' }}></use>
+        <use class="fx-ring" href="#fx-def-ring" style={{ translate: '20% 87.5%' }}></use>
+        <use class="fx-node" href="#fx-def-dot" style={{ translate: '28% 93.5%' }}></use>
+        <use class="fx-diamond" href="#fx-def-diamond" style={{ translate: '36% 89%' }}></use>
+      </g>
+    </g>
+  </svg>
   <Container width="wide">
     <div
       class="grid items-center gap-12 lg:min-h-[calc(100svh-64px)] lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:content-center lg:gap-16 xl:grid-cols-[minmax(0,1fr)_minmax(0,520px)] xl:gap-12"
     >
       <div>
         {
-          /* xl type is sized by wrap math, not a display cap: the text column is
-            664px (1232 container inner − 48 gap − 520 image col); at 60px/-0.04em
-            Geist bold, "Full-stack developer for" = 653px — so the headline
-            breaks once into the balanced 2-line block "Full-stack developer for"
-            / "modern web products." (measured in-browser). NOTE the split
-            "Full-stack developer" / "for modern web products." is impossible in
-            pure CSS: line 2 (741px @64px) is WIDER than line 1 + "for" (697px),
-            and the locked-copy test forbids a <br> inside the h1. Mobile slope
-            is sized so "Full-stack developer" holds one line at 375px in Geist
-            (signed-off 3-line wrap; ≤33.4px measured) */
+          /* Type is sized by wrap math per band, not display caps. xl: the text
+            column is 664px (1232 container inner − 48 gap − 520 image col); at
+            60px/-0.04em Geist bold, "Full-stack developer for" = 653px — so the
+            headline breaks once into the balanced 2-line block "Full-stack
+            developer for" / "modern web products." (measured in-browser). NOTE
+            the split "Full-stack developer" / "for modern web products." is
+            impossible in pure CSS: line 2 (741px @64px) is WIDER than line 1 +
+            "for" (697px), and the locked-copy test forbids a <br> inside the
+            h1. lg band (1024-1279): the 7fr column runs 532-681px, so the
+            clamp(44px,4.5vw,58px) slope keeps the same 2-line balanced break
+            across the whole band — the previous 14ch cap + sm slope produced a
+            4-line tower at ~1024 (user-flagged 2026-07-21; same failure class
+            as the KKD-23 ≥1440 tower). Mobile slope is sized so "Full-stack
+            developer" holds one line at 375px in Geist (signed-off 3-line
+            wrap; ≤33.4px measured) */
         }
         <h1
-          class="text-[clamp(28px,8.7vw,40px)] leading-tight font-bold tracking-tight text-balance sm:text-[clamp(40px,3vw+28px,72px)] lg:max-w-[14ch] lg:tracking-tighter xl:max-w-none xl:text-[60px]"
+          class="text-[clamp(28px,8.7vw,40px)] leading-tight font-bold tracking-tight text-balance sm:text-[clamp(40px,3vw+28px,72px)] lg:text-[clamp(44px,4.5vw,58px)] lg:tracking-tighter xl:text-[60px]"
         >
           Full-stack developer for modern web products.
         </h1>
@@ -101,12 +205,30 @@ import Section from '@/components/primitives/Section.astro';
      a void). Below lg the layout stacks with the portrait last, so the lobes
      sit bottom-center behind it; at lg+ the mass moves low-right under the
      split-view portrait. Static — no reduced-motion concern. */
+  /* Dimmed 2026-07-21 (user + review): the elev-3/elev-2 lobes lifted the
+     backdrop ~11% over base behind the head — a readable, nameable shape,
+     i.e. exactly the halo read that killed the KKD-23 glow treatments. The
+     field now peaks at elev-1 (~4% lift) with color-mixed sub-steps below
+     it: felt as body, not seen as light. Portrait presence comes from its
+     own edge contrast. */
   .hero-field {
     background:
-      radial-gradient(34% 16% at 50% 88%, var(--color-bg-elev-3), transparent 72%),
-      radial-gradient(52% 26% at 42% 82%, var(--color-bg-elev-2), transparent 76%),
-      radial-gradient(60% 30% at 58% 92%, var(--color-bg-elev-2), transparent 76%),
-      radial-gradient(95% 45% at 50% 88%, var(--color-bg-elev-1), transparent 85%);
+      radial-gradient(34% 16% at 50% 88%, var(--color-bg-elev-1), transparent 72%),
+      radial-gradient(
+        52% 26% at 42% 82%,
+        color-mix(in oklab, var(--color-bg-elev-1) 55%, var(--color-bg-base)),
+        transparent 76%
+      ),
+      radial-gradient(
+        60% 30% at 58% 92%,
+        color-mix(in oklab, var(--color-bg-elev-1) 55%, var(--color-bg-base)),
+        transparent 76%
+      ),
+      radial-gradient(
+        95% 45% at 50% 88%,
+        color-mix(in oklab, var(--color-bg-elev-1) 40%, var(--color-bg-base)),
+        transparent 85%
+      );
   }
 
   @media (min-width: 1024px) {
@@ -115,11 +237,219 @@ import Section from '@/components/primitives/Section.astro';
          a spotlight, offset lobes read as an organic form. Mass sits low-right
          because the portrait is bottom-anchored onto it. */
       background:
-        radial-gradient(24% 30% at 73% 66%, var(--color-bg-elev-3), transparent 72%),
-        radial-gradient(32% 42% at 84% 44%, var(--color-bg-elev-3), transparent 74%),
-        radial-gradient(52% 64% at 65% 72%, var(--color-bg-elev-2), transparent 76%),
-        radial-gradient(58% 72% at 84% 36%, var(--color-bg-elev-2), transparent 76%),
-        radial-gradient(95% 120% at 72% 60%, var(--color-bg-elev-1), transparent 85%);
+        radial-gradient(24% 30% at 73% 66%, var(--color-bg-elev-1), transparent 72%),
+        radial-gradient(32% 42% at 84% 44%, var(--color-bg-elev-1), transparent 74%),
+        radial-gradient(
+          52% 64% at 65% 72%,
+          color-mix(in oklab, var(--color-bg-elev-1) 55%, var(--color-bg-base)),
+          transparent 76%
+        ),
+        radial-gradient(
+          58% 72% at 84% 36%,
+          color-mix(in oklab, var(--color-bg-elev-1) 55%, var(--color-bg-base)),
+          transparent 76%
+        ),
+        radial-gradient(
+          95% 120% at 72% 60%,
+          color-mix(in oklab, var(--color-bg-elev-1) 40%, var(--color-bg-base)),
+          transparent 85%
+        );
+    }
+  }
+
+  /* ── Constellation backdrop ─────────────────────────────────────────────
+     Texture, not decoration: everything sits in border tokens at low opacity;
+     the FEW amber nodes stay far under the 5% accent viewport cap so the
+     primary CTA remains the chroma peak. */
+  .fx-line {
+    stroke: var(--color-border-default);
+    stroke-width: 1;
+    opacity: 0.55;
+  }
+
+  .fx-node {
+    fill: var(--color-border-strong);
+    opacity: 0.6;
+  }
+
+  /* Schematic marks share the dots' ink discipline: same token, same 1px
+     stroke weight as the hairlines, same rest opacity. */
+  .fx-ring {
+    fill: none;
+    stroke: var(--color-border-strong);
+    stroke-width: 1;
+    opacity: 0.6;
+  }
+
+  .fx-plus {
+    fill: none;
+    stroke: var(--color-border-strong);
+    stroke-width: 1;
+    opacity: 0.6;
+  }
+
+  .fx-diamond {
+    fill: var(--color-border-strong);
+    opacity: 0.6;
+  }
+
+  .fx-amber {
+    fill: var(--color-accent);
+    opacity: 0.45;
+  }
+
+  /* Reveal model — DESKTOP ONLY (fine pointer AND ≥1024px; the script gates
+     on the same pair and bails before adding listeners elsewhere). Below lg
+     the svg itself is display:none (hidden lg:block on the markup) — no
+     field at all, no mask, no script work.
+     Desktop: the whole field sits under a radial mask whose floor (0.08
+     alpha) keeps it near-hidden at rest; the script grows --fx-r to 300px
+     while the pointer is inside the hero, revealing the field around
+     --mx/--my. Registered via @property so the radius TRANSITIONS — the
+     reveal blooms in at the cursor and collapses on exit instead of popping.
+     No JS → --fx-r stays 0 → the floor is all you see. Only mask
+     position/size change per frame: no layout, no reflow. */
+  .hero-fx {
+    opacity: 0.35;
+  }
+
+  @property --fx-r {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 0px;
+  }
+
+  @media (pointer: fine) and (min-width: 1024px) {
+    .hero-fx {
+      opacity: 1;
+      -webkit-mask-image: radial-gradient(
+        var(--fx-r, 0px) circle at var(--mx, 50%) var(--my, 50%),
+        rgb(0 0 0) 0%,
+        rgb(0 0 0 / 0.55) 55%,
+        rgb(0 0 0 / 0.08) 100%
+      );
+      mask-image: radial-gradient(
+        var(--fx-r, 0px) circle at var(--mx, 50%) var(--my, 50%),
+        rgb(0 0 0) 0%,
+        rgb(0 0 0 / 0.55) 55%,
+        rgb(0 0 0 / 0.08) 100%
+      );
+    }
+  }
+
+  @media (min-width: 1920px) {
+    /* ultra-wide: the percent spread thins the field, so marks grow a hair
+       to keep presence. r on a <use> is a no-op, so the bump targets the
+       shared circle DEFS (geometry property; older engines fall back to the
+       attribute radii — purely cosmetic). */
+    #fx-def-dot {
+      r: 2px;
+    }
+
+    #fx-def-dot-l {
+      r: 2.5px;
+    }
+
+    #fx-def-ring {
+      r: 3.25px;
+    }
+  }
+
+  /* Cluster wake — replaces the dash-draw mechanic (cut 2026-07-20: read
+     weird + per-line dashoffset transitions were the perf-heavy part).
+     While the desktop script is active (.fx-js), cluster hairlines rest
+     fully transparent; when the cursor nears a cluster the script stamps
+     .is-lit on the GROUP and the lines simply crossfade in — the playful
+     beat is the marks' micro pop (scale about their own center, one
+     compositor transform, ~250ms bounce). Opacity/transform only, no
+     per-frame attribute writes. */
+  :global(.hero-section.fx-js) .fx-desk .fx-cluster .fx-line {
+    opacity: 0;
+  }
+
+  :global(.hero-section.fx-js) .fx-desk .fx-cluster.is-lit .fx-line {
+    opacity: 0.8;
+  }
+
+  /* Mark placement/pop geometry — the load-bearing subtlety (bug fix
+     2026-07-20: "dots move out of place after CTA hover"): Chrome computes
+     a <use>'s fill-box WITHOUT its placement offset, so a scale pop with
+     transform-box: fill-box re-originated at the SVG corner and TRANSLATED
+     the mark across the canvas. Instead: marks are positioned via CSS
+     translate (percents resolve against the view-box), the defs are
+     authored centered on (0,0), and origin 0 0 makes the pop's scale apply
+     in local coords BEFORE the translate (spec order: T·R·S) — pops grow
+     in place, never move. */
+  .hero-fx use {
+    transform-box: view-box;
+    transform-origin: 0 0;
+  }
+
+  /* Ambient motion + transitions, gated on user preference (global.css also
+     hard-kills animation under reduce). The amber twinkle is JS-randomized
+     (WAAPI in the script below, self-gated on the same preference — no fixed
+     CSS loop, so no two visits shimmer alike). The positional reveal mask is
+     NOT in here — it isn't motion, it's position. */
+  @media (prefers-reduced-motion: no-preference) {
+    /* The bloom-in lives on the section: custom-property transitions animate
+       on the element whose value changes (the script writes --fx-r inline
+       here); the mask lookup downstream sees the interpolated radius. */
+    :global(.hero-section) {
+      transition: --fx-r var(--duration-slow) var(--ease-standard);
+    }
+
+    /* CTA payoff bloom gets a longer beat: the wake wave sweeping the whole
+       field from the CTA reads deliberate, not twitchy. Collapse (class
+       removed) falls back to the 500ms spotlight timing. */
+    :global(.hero-section.cta-lit) {
+      transition-duration: var(--duration-deliberate);
+    }
+
+    /* Intro breath exhale: the settle leg dissolves over 3s with a long
+       ease-out tail instead of riding the 500ms spotlight transition (which
+       read as switching off, not breathing out — user flag 2026-07-20). The
+       script adds this class only for the collapse leg and strips it on
+       pointer/CTA takeover, so interaction never inherits the lag. */
+    :global(.hero-section.breathing-out) {
+      transition-duration: 3s;
+      transition-timing-function: var(--ease-out);
+    }
+
+    :global(.hero-section.fx-js) .fx-desk .fx-cluster .fx-line {
+      transition: opacity var(--duration-normal) var(--ease-standard);
+    }
+
+    /* The playful beat: marks pop about their own centers when their cluster
+       wakes (picked by eye over a whole-cluster elastic settle — which slid
+       rest-visible geometry — and an opacity ripple, which was imperceptible
+       at these mark sizes). Tiny nth-child stagger keeps the pops from firing
+       in mechanical unison. Bounce token intentional: the user asked for
+       "slightly playful" and --ease-bounce is the system's overshoot ease. */
+    :global(.hero-section.fx-js)
+      .fx-desk
+      .fx-cluster.is-lit
+      :is(.fx-node, .fx-ring, .fx-plus, .fx-diamond) {
+      animation: fx-pop 250ms var(--ease-bounce);
+    }
+
+    :global(.hero-section.fx-js)
+      .fx-desk
+      .fx-cluster.is-lit
+      :is(.fx-node, .fx-ring, .fx-plus, .fx-diamond):nth-child(2n) {
+      animation-delay: 45ms;
+    }
+
+    :global(.hero-section.fx-js)
+      .fx-desk
+      .fx-cluster.is-lit
+      :is(.fx-node, .fx-ring, .fx-plus, .fx-diamond):nth-child(3n) {
+      animation-delay: 90ms;
+    }
+  }
+
+  @keyframes fx-pop {
+    50% {
+      scale: 1.25;
     }
   }
 
@@ -169,3 +499,299 @@ import Section from '@/components/primitives/Section.astro';
      treatment never landed visually. DESIGN.md motion rule 8 (glow fades in one
      beat after copy) is deferred with it — revisit in the Phase 8 motion pass. */
 </style>
+
+{
+  /* Cursor-proximity reveal (progressive enhancement per root CLAUDE.md
+    Interactivity rules — script policy PR #61). Desktop only: bails before
+    adding any listener unless the pointer is fine AND the viewport is ≥1024px
+    (same gate as the reveal CSS). Tracks the pointer into --mx/--my with a
+    light rAF ease so the spotlight trails the cursor, toggles --fx-r (the
+    mask radius, transitioned in CSS) on enter/leave, and stamps .is-lit on
+    each desk CLUSTER whose any endpoint sits inside the reveal radius — CSS
+    owns the wake animation. Endpoint math is precomputed percentages × the
+    hero box: no per-frame DOM reads beyond one rect on pointer events, and
+    per-frame writes are capped at the two mask vars + one class toggle per
+    cluster (no attribute writes, no layout). Under reduced motion the ease
+    is skipped (direct positional write — position isn't motion; the wake
+    animation is off via the CSS guard). Also re-deals the mark SHAPES and
+    re-draws WHICH junction dots are amber on every load (href/class swaps
+    only — geometry never moves), flares each amber once as it enters the
+    light, wakes the ENTIRE field while the primary CTA is hovered or
+    keyboard-focused (conversion payoff), and breathes the field visible
+    once shortly after load (discoverability). Without JS the near-hidden
+    static field stands complete, with the authored default mix. */
+}
+<script is:inline>
+  (() => {
+    const hero = document.querySelector('.hero-section');
+    const desktop =
+      matchMedia('(pointer: fine)').matches && matchMedia('(min-width: 1024px)').matches;
+    if (!hero || !desktop) return;
+    hero.classList.add('fx-js');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+    const R = 300;
+    // Shape shuffle, per page load (user request 2026-07-20 — "shapes are
+    // always the same"): every mark keeps its position, but WHICH shape it
+    // renders (dot / ring / plus / diamond) is re-dealt at init — a
+    // Fisher-Yates over the marks' href+class pairs, so the shape multiset
+    // is preserved and no element is created or destroyed. The authored mix
+    // is the no-JS default.
+    const marks = Array.from(hero.querySelectorAll('.fx-desk use'));
+    for (const m of marks) m.classList.remove('fx-amber');
+    const deal = marks.map((m) => [m.getAttribute('href'), m.getAttribute('class')]);
+    for (let i = deal.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = deal[i];
+      deal[i] = deal[j];
+      deal[j] = t;
+    }
+    marks.forEach((m, i) => {
+      m.setAttribute('href', deal[i][0]);
+      m.setAttribute('class', deal[i][1]);
+    });
+    // Amber reshuffle, per page load: positions never move, but WHICH dots
+    // carry the accent is re-drawn on every load — first pick random, then
+    // greedy farthest-point so the set is spread-guaranteed, never
+    // clustered. Pool rule: amber lives ONLY on connection points (dots
+    // that terminate at least one hairline; the seed pick prefers true
+    // junctions with 2+). Non-dot marks stay neutral always. The 3 ambers
+    // authored in the SVG are the no-JS default; both shuffles are
+    // class/href-only (tokens), never geometry.
+    // Marks carry their position in the inline translate style ("7% 14%").
+    const pos = (el) => el.style.translate.split(/\s+/).map((v) => parseFloat(v) / 100);
+    const ends = [];
+    for (const l of hero.querySelectorAll('.fx-desk .fx-line')) {
+      ends.push(l.getAttribute('x1') + l.getAttribute('y1'));
+      ends.push(l.getAttribute('x2') + l.getAttribute('y2'));
+    }
+    const deg = (el) => {
+      const k = el.style.translate.replace(/\s+/g, '');
+      return ends.filter((e) => e === k).length;
+    };
+    const dots = marks.filter((d) => d.classList.contains('fx-node') && deg(d) > 0);
+    if (dots.length > 6) {
+      const count = 4 + Math.floor(Math.random() * 3);
+      const hubs = dots.filter((d) => deg(d) > 1);
+      const seedPool = hubs.length ? hubs : dots;
+      const chosen = [seedPool[Math.floor(Math.random() * seedPool.length)]];
+      while (chosen.length < count) {
+        let best = null;
+        let bestD = -1;
+        for (const d of dots) {
+          if (chosen.includes(d)) continue;
+          const dp = pos(d);
+          const dist = Math.min(
+            ...chosen.map((c) => {
+              const cp = pos(c);
+              return Math.hypot(dp[0] - cp[0], dp[1] - cp[1]);
+            }),
+          );
+          if (dist > bestD) {
+            bestD = dist;
+            best = d;
+          }
+        }
+        chosen.push(best);
+      }
+      for (const d of dots) d.classList.toggle('fx-amber', chosen.includes(d));
+    }
+    const ambers = Array.from(hero.querySelectorAll('.fx-desk .fx-amber'), (el) => {
+      const p = pos(el);
+      return { el, lit: false, x: p[0], y: p[1] };
+    });
+    const sparkle = (el) =>
+      el.animate(
+        { opacity: [0.45, 1, 0.45] },
+        { duration: 1400 + Math.random() * 1200, easing: 'ease-in-out' },
+      );
+    const clusters = Array.from(hero.querySelectorAll('.fx-desk .fx-cluster'), (el) => ({
+      el,
+      lit: false,
+      pts: Array.from(el.querySelectorAll('.fx-line')).flatMap((l) => [
+        [parseFloat(l.getAttribute('x1')) / 100, parseFloat(l.getAttribute('y1')) / 100],
+        [parseFloat(l.getAttribute('x2')) / 100, parseFloat(l.getAttribute('y2')) / 100],
+      ]),
+    }));
+    let w = 0;
+    let h = 0;
+    const measure = () => {
+      const r = hero.getBoundingClientRect();
+      w = r.width;
+      h = r.height;
+    };
+    measure();
+    addEventListener('resize', measure, { passive: true });
+    let tx = 0;
+    let ty = 0;
+    let x = 0;
+    let y = 0;
+    let raf = 0;
+    let ctaWake = false;
+    const frame = () => {
+      const k = reduce.matches ? 1 : 0.22;
+      x += (tx - x) * k;
+      y += (ty - y) * k;
+      hero.style.setProperty('--mx', x.toFixed(1) + 'px');
+      hero.style.setProperty('--my', y.toFixed(1) + 'px');
+      // While the CTA holds the whole field lit, proximity logic stands down.
+      if (!ctaWake) {
+        for (const c of clusters) {
+          const lit = c.pts.some((p) => Math.hypot(p[0] * w - x, p[1] * h - y) < R);
+          if (lit !== c.lit) {
+            c.lit = lit;
+            c.el.classList.toggle('is-lit', lit);
+          }
+        }
+        // Sparkle is part of the reveal moment: each amber flares once as it
+        // crosses INTO the light (per-amber edge detection — 4-6 hypots).
+        if (!reduce.matches) {
+          for (const a of ambers) {
+            const lit = Math.hypot(a.x * w - x, a.y * h - y) < R;
+            if (lit && !a.lit) sparkle(a.el);
+            a.lit = lit;
+          }
+        }
+      }
+      raf = Math.abs(tx - x) > 0.5 || Math.abs(ty - y) > 0.5 ? requestAnimationFrame(frame) : 0;
+    };
+    const track = (e) => {
+      const r = hero.getBoundingClientRect();
+      tx = e.clientX - r.left;
+      ty = e.clientY - r.top;
+    };
+    let inside = false;
+    let breathing = false;
+    hero.addEventListener('pointerenter', (e) => {
+      inside = true;
+      breathing = false;
+      // Takeover cancels a mid-exhale breath instantly — without this the
+      // spotlight would inherit the 3s dissolve.
+      hero.classList.remove('breathing-out');
+      track(e);
+      x = tx;
+      y = ty;
+      hero.style.setProperty('--fx-r', R + 'px');
+      frame();
+    });
+    hero.addEventListener(
+      'pointermove',
+      (e) => {
+        track(e);
+        if (!raf) raf = requestAnimationFrame(frame);
+      },
+      { passive: true },
+    );
+    const rest = () => {
+      // A trailing frame from pointermove would recompute `lit` from the last
+      // inside coords and re-add .is-lit after this handler cleared it.
+      cancelAnimationFrame(raf);
+      raf = 0;
+      hero.style.setProperty('--fx-r', '0px');
+      for (const c of clusters) {
+        c.lit = false;
+        c.el.classList.remove('is-lit');
+      }
+      // Fresh reveal, fresh sparkle: re-arm the ambers' entry edge.
+      for (const a of ambers) a.lit = false;
+    };
+    hero.addEventListener('pointerleave', () => {
+      inside = false;
+      if (!ctaWake) rest();
+    });
+    // CTA payoff: hovering OR keyboard-focusing the primary CTA wakes the
+    // WHOLE system — the mask blooms out until it covers the field (200vmax
+    // radius, same transitioned custom property as the spotlight), every
+    // cluster lights, and the ambers flare in a staggered wave. "About to
+    // start a project" = the whole constellation comes online. Focus parity
+    // is deliberate: keyboard users get the exact same flourish. Cost: one
+    // class, one var write, the same is-lit toggles — nothing new per
+    // frame. Under reduced motion the global transition kill makes the lit
+    // state instant and the sparkle wave is skipped.
+    const cta = hero.querySelector('a[href="/contact?intent=project"]');
+    if (cta) {
+      let hov = false;
+      let foc = false;
+      const sync = () => {
+        const on = hov || foc;
+        if (on === ctaWake) return;
+        ctaWake = on;
+        breathing = false;
+        hero.classList.remove('breathing-out');
+        hero.classList.toggle('cta-lit', on);
+        if (on) {
+          hero.style.setProperty('--fx-r', '200vmax');
+          for (const c of clusters) {
+            c.lit = true;
+            c.el.classList.add('is-lit');
+          }
+          if (!reduce.matches) {
+            ambers.forEach((a, i) => {
+              a.lit = true;
+              setTimeout(() => sparkle(a.el), 90 * i);
+            });
+          }
+        } else if (inside) {
+          hero.style.setProperty('--fx-r', R + 'px');
+        } else {
+          rest();
+        }
+      };
+      cta.addEventListener('pointerenter', () => {
+        hov = true;
+        sync();
+      });
+      cta.addEventListener('pointerleave', () => {
+        hov = false;
+        sync();
+      });
+      cta.addEventListener('focus', () => {
+        foc = true;
+        sync();
+      });
+      cta.addEventListener('blur', () => {
+        foc = false;
+        sync();
+      });
+    }
+    // Intro breath (discoverability): once per page view, shortly after
+    // load, the whole field breathes visible — the mask blooms from center
+    // (default --mx/--my is 50% 50%) over the normal 500ms, holds, then
+    // EXHALES: the collapse leg gets its own 3s ease-out transition via
+    // .breathing-out so the field dissolves instead of switching off. The
+    // class is stripped on pointer/CTA takeover (instant cancel, no
+    // inherited lag) and on a timer just past the transition's end.
+    // Skipped under reduced motion. Delayed so it never competes with the
+    // LCP paint.
+    if (!reduce.matches) {
+      setTimeout(() => {
+        if (ctaWake || inside) return;
+        breathing = true;
+        hero.style.setProperty('--fx-r', '200vmax');
+        setTimeout(() => {
+          if (!breathing) return;
+          breathing = false;
+          hero.classList.add('breathing-out');
+          hero.style.setProperty('--fx-r', '0px');
+          // ponytail: timer cleanup over transitionend — deterministic, and
+          // custom-property transition events are engine-flaky.
+          setTimeout(() => hero.classList.remove('breathing-out'), 3200);
+        }, 1200);
+      }, 600);
+    }
+    // Permanent AMBIENT twinkle on top of the entry sparkle (user decision
+    // 2026-07-20): every amber junction runs its OWN calm loop — a single
+    // soft flash, then a fresh random 3-9s wait, re-randomized after every
+    // cycle so no shared rhythm ever emerges and nothing blinks in sync.
+    // WAAPI runs on rAF and bypasses the global.css reduced-motion kill, so
+    // it self-gates (repo reduced-motion HARD RULE).
+    if (!reduce.matches) {
+      for (const a of ambers) {
+        const loop = () => {
+          sparkle(a.el);
+          setTimeout(loop, 3000 + Math.random() * 6000);
+        };
+        setTimeout(loop, 1000 + Math.random() * 6000);
+      }
+    }
+  })();
+</script>
