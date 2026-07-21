@@ -3,7 +3,13 @@ import Container from '@/components/primitives/Container.astro';
 import Section from '@/components/primitives/Section.astro';
 
 // Text wordmarks, not logo images — trademark decision 2026-07-17 (KKD-24).
-const companies = ['Agilno', 'amondi GmbH', 'Reroot'];
+// Reveal facts verbatim from the vault About timeline (content-outline.md) —
+// never invent; a wordmark without a vault-verified role/years ships no reveal.
+const companies = [
+  { name: 'Agilno', reveal: 'Frontend Web Developer · 2023–2026' },
+  { name: 'amondi GmbH', reveal: 'Frontend Web Developer · 2022' },
+  { name: 'Reroot', reveal: 'Web Developer · 2020–2021' },
+];
 ---
 
 {
@@ -33,9 +39,32 @@ const companies = ['Agilno', 'amondi GmbH', 'Reroot'];
         </p>
         <ul
           role="list"
-          class="text-text-secondary flex flex-wrap items-baseline gap-x-10 gap-y-3 text-base font-semibold tracking-wide sm:text-lg"
+          class="text-text-secondary relative flex flex-wrap items-baseline gap-x-10 gap-y-3 text-base font-semibold tracking-wide sm:text-lg"
         >
-          {companies.map((name) => <li>{name}</li>)}
+          {
+            /* Micro-life (KKD-36): hover/focus-visible lifts the name to text-primary,
+              draws a small amber baseline tick, and slides in the role · years reveal.
+              The reveal OVERLAYS (absolute + bg) instead of expanding — neighbors never
+              shift. Amber on interaction only; `motion-safe:` keeps reduced-motion
+              reveals instant. tabindex gives keyboard users the same reveal as hover. */
+          }
+          {
+            companies.map(({ name, reveal }) => (
+              <li
+                tabindex="0"
+                class="group focus-visible:outline-accent hover:text-text-primary focus-visible:text-text-primary cursor-default transition-colors duration-200 outline-none focus-visible:outline-1 focus-visible:outline-offset-4"
+              >
+                <span class="after:bg-accent relative after:absolute after:top-full after:left-0 after:mt-0.5 after:h-0.5 after:w-4 after:origin-left after:scale-x-0 after:content-[''] group-hover:after:scale-x-100 group-focus-visible:after:scale-x-100 motion-safe:after:transition-transform motion-safe:after:duration-200">
+                  {name}
+                </span>
+                {reveal && (
+                  <span class="wordmark-reveal bg-bg-base text-text-muted invisible absolute top-full left-0 z-10 mt-1 font-mono text-xs font-normal tracking-normal whitespace-nowrap opacity-0 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:visible group-focus-visible:translate-y-0 group-focus-visible:opacity-100 motion-safe:-translate-y-1 motion-safe:transition-[opacity,transform,visibility] motion-safe:duration-200">
+                    {reveal}
+                  </span>
+                )}
+              </li>
+            ))
+          }
         </ul>
         <p class="text-text-muted flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs">
           <span class="inline-flex items-center gap-x-2">

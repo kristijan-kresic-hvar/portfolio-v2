@@ -154,6 +154,23 @@ describe('TrustStrip', () => {
     expect(trustStripHtml).not.toContain('<script');
     expect(trustStripHtml).not.toMatch(/#[0-9a-fA-F]{6}/);
   });
+
+  // Vault-verified facts only (content-outline About timeline) — KKD-36.
+  it('carries a role · years reveal for each vault-verified wordmark', () => {
+    expect(trustStripHtml).toContain('Frontend Web Developer · 2023–2026');
+    expect(trustStripHtml).toContain('Frontend Web Developer · 2022');
+    expect(trustStripHtml).toContain('Web Developer · 2020–2021');
+  });
+
+  it('makes each wordmark keyboard-focusable so focus reveals match hover', () => {
+    expect(trustStripHtml.match(/tabindex="0"/g)).toHaveLength(3);
+  });
+
+  it('keeps reveals invisible at rest (no resting layout or amber change)', () => {
+    // Overlay reveals: absolute + invisible at rest, shown via group-hover/group-focus-visible.
+    expect(trustStripHtml.match(/wordmark-reveal/g)).toHaveLength(3);
+    expect(trustStripHtml).toMatch(/wordmark-reveal[^"]*invisible/);
+  });
 });
 
 describe('selectFeaturedWork', () => {
