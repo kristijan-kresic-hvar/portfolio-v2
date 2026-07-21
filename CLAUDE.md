@@ -14,7 +14,7 @@ a11y review is **manual** via `/impeccable audit` — there is no enforcement ho
 - TypeScript strict + `noUncheckedIndexedAccess`
 - Tailwind CSS v4 (`@theme {}` block in `src/styles/global.css`)
 - MDX via Astro Content Collections (`work` + `blog`)
-- **No client framework** — React dropped 2026-07-17 (nothing in the spec needs client state); zero JS by default
+- **No client framework** — React dropped 2026-07-17 (nothing in the spec needs client state); zero JS as starting point, plain `<script>` enhancements welcome when they earn their bytes (see Interactivity rules)
 - **Motion** (vanilla `motion` package — NOT `framer-motion`, that's the legacy name) in plain `<script>` tags + CSS scroll-driven animations; **native cross-document View Transitions** (CSS `@view-transition` in `global.css` — no `<ClientRouter />`); native scroll (Lenis dropped — smooth-scroll libs only earn their cost on choreographed scroll storytelling, which this site deliberately avoids)
 - **Astro Actions** for the contact form (`src/actions/index.ts`, `accept: 'form'` + Zod) — not a hand-rolled `/api/contact` endpoint
 - Geist + Geist Mono via `@fontsource-variable`
@@ -140,7 +140,8 @@ Branch naming: `<type>/<scope>-<short-slug>` (e.g. `feat/hero-with-headshot`, `c
 
 ## Interactivity rules (no client framework)
 
-- Default: zero JS. Interactivity is progressive enhancement in plain `<script>` tags.
+- **Scripts are a legitimate tool, not a fear (policy update KK 2026-07-20 — supersedes the hard "zero client JS" posture).** Plain `<script>` tags are welcome whenever a designed effect or interaction needs them — cursor-driven reveals, hover choreography, form UX. Lighthouse 100 mobile (KKD-14) is the governor, not a JS ban: a script earns its place by serving the design/conversion intent and staying inside the perf budget. Zero JS remains the _starting point_ (don't add scripts to sections that don't need them), never a ticket AC — **ticket authors: stop writing "zero client JS" as an acceptance criterion**; write "scripts earn their bytes; Lighthouse budget holds" instead. First sanctioned example: the hero constellation cursor-reveal (KKD-34, PR #60).
+- Interactivity is progressive enhancement in plain `<script>` tags — the page must be complete and functional with JS disabled.
 - Animation: vanilla `motion` (`animate`, `inView`) or CSS scroll-driven animations — never re-add `framer-motion`/React for it.
 - **Conversion-first motion budget:** reveals ≤400ms, opacity + small translate only, trigger once, never gate content (hero copy readable immediately, no scroll hijacking).
 - **Motion psychology playbook** — DESIGN.md § "Motion psychology" governs WHAT animates and why: one moving element per resting viewport (CTA-first), stagger-to-CTA reading order, single-fire arrival emphasis, ≥500ms labor illusion on form submit, no loops / fake urgency / attention-jacking. Consult it before animating anything.
