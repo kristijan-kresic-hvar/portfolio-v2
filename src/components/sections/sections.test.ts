@@ -164,12 +164,13 @@ describe('TrustStrip', () => {
 
   it('makes each wordmark keyboard-focusable so focus reveals match hover', () => {
     expect(trustStripHtml.match(/tabindex="0"/g)).toHaveLength(3);
+    expect(trustStripHtml.match(/aria-describedby="wordmark-reveal-/g)).toHaveLength(3);
   });
 
   it('keeps reveals invisible at rest (no resting layout or amber change)', () => {
     // Overlay reveals: absolute + invisible at rest, shown via group-hover/group-focus-visible.
-    expect(trustStripHtml.match(/wordmark-reveal/g)).toHaveLength(3);
-    expect(trustStripHtml).toMatch(/wordmark-reveal[^"]*invisible/);
+    expect(trustStripHtml.match(/class="wordmark-reveal/g)).toHaveLength(3);
+    expect(trustStripHtml).toMatch(/class="wordmark-reveal[^"]*invisible/);
   });
 });
 
