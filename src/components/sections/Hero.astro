@@ -123,19 +123,24 @@ import Section from '@/components/primitives/Section.astro';
     >
       <div>
         {
-          /* xl type is sized by wrap math, not a display cap: the text column is
-            664px (1232 container inner − 48 gap − 520 image col); at 60px/-0.04em
-            Geist bold, "Full-stack developer for" = 653px — so the headline
-            breaks once into the balanced 2-line block "Full-stack developer for"
-            / "modern web products." (measured in-browser). NOTE the split
-            "Full-stack developer" / "for modern web products." is impossible in
-            pure CSS: line 2 (741px @64px) is WIDER than line 1 + "for" (697px),
-            and the locked-copy test forbids a <br> inside the h1. Mobile slope
-            is sized so "Full-stack developer" holds one line at 375px in Geist
-            (signed-off 3-line wrap; ≤33.4px measured) */
+          /* Type is sized by wrap math per band, not display caps. xl: the text
+            column is 664px (1232 container inner − 48 gap − 520 image col); at
+            60px/-0.04em Geist bold, "Full-stack developer for" = 653px — so the
+            headline breaks once into the balanced 2-line block "Full-stack
+            developer for" / "modern web products." (measured in-browser). NOTE
+            the split "Full-stack developer" / "for modern web products." is
+            impossible in pure CSS: line 2 (741px @64px) is WIDER than line 1 +
+            "for" (697px), and the locked-copy test forbids a <br> inside the
+            h1. lg band (1024-1279): the 7fr column runs 532-681px, so the
+            clamp(44px,4.5vw,58px) slope keeps the same 2-line balanced break
+            across the whole band — the previous 14ch cap + sm slope produced a
+            4-line tower at ~1024 (user-flagged 2026-07-21; same failure class
+            as the KKD-23 ≥1440 tower). Mobile slope is sized so "Full-stack
+            developer" holds one line at 375px in Geist (signed-off 3-line
+            wrap; ≤33.4px measured) */
         }
         <h1
-          class="text-[clamp(28px,8.7vw,40px)] leading-tight font-bold tracking-tight text-balance sm:text-[clamp(40px,3vw+28px,72px)] lg:max-w-[14ch] lg:tracking-tighter xl:max-w-none xl:text-[60px]"
+          class="text-[clamp(28px,8.7vw,40px)] leading-tight font-bold tracking-tight text-balance sm:text-[clamp(40px,3vw+28px,72px)] lg:text-[clamp(44px,4.5vw,58px)] lg:tracking-tighter xl:text-[60px]"
         >
           Full-stack developer for modern web products.
         </h1>
@@ -200,12 +205,30 @@ import Section from '@/components/primitives/Section.astro';
      a void). Below lg the layout stacks with the portrait last, so the lobes
      sit bottom-center behind it; at lg+ the mass moves low-right under the
      split-view portrait. Static — no reduced-motion concern. */
+  /* Dimmed 2026-07-21 (user + review): the elev-3/elev-2 lobes lifted the
+     backdrop ~11% over base behind the head — a readable, nameable shape,
+     i.e. exactly the halo read that killed the KKD-23 glow treatments. The
+     field now peaks at elev-1 (~4% lift) with color-mixed sub-steps below
+     it: felt as body, not seen as light. Portrait presence comes from its
+     own edge contrast. */
   .hero-field {
     background:
-      radial-gradient(34% 16% at 50% 88%, var(--color-bg-elev-3), transparent 72%),
-      radial-gradient(52% 26% at 42% 82%, var(--color-bg-elev-2), transparent 76%),
-      radial-gradient(60% 30% at 58% 92%, var(--color-bg-elev-2), transparent 76%),
-      radial-gradient(95% 45% at 50% 88%, var(--color-bg-elev-1), transparent 85%);
+      radial-gradient(34% 16% at 50% 88%, var(--color-bg-elev-1), transparent 72%),
+      radial-gradient(
+        52% 26% at 42% 82%,
+        color-mix(in oklab, var(--color-bg-elev-1) 55%, var(--color-bg-base)),
+        transparent 76%
+      ),
+      radial-gradient(
+        60% 30% at 58% 92%,
+        color-mix(in oklab, var(--color-bg-elev-1) 55%, var(--color-bg-base)),
+        transparent 76%
+      ),
+      radial-gradient(
+        95% 45% at 50% 88%,
+        color-mix(in oklab, var(--color-bg-elev-1) 40%, var(--color-bg-base)),
+        transparent 85%
+      );
   }
 
   @media (min-width: 1024px) {
@@ -214,11 +237,23 @@ import Section from '@/components/primitives/Section.astro';
          a spotlight, offset lobes read as an organic form. Mass sits low-right
          because the portrait is bottom-anchored onto it. */
       background:
-        radial-gradient(24% 30% at 73% 66%, var(--color-bg-elev-3), transparent 72%),
-        radial-gradient(32% 42% at 84% 44%, var(--color-bg-elev-3), transparent 74%),
-        radial-gradient(52% 64% at 65% 72%, var(--color-bg-elev-2), transparent 76%),
-        radial-gradient(58% 72% at 84% 36%, var(--color-bg-elev-2), transparent 76%),
-        radial-gradient(95% 120% at 72% 60%, var(--color-bg-elev-1), transparent 85%);
+        radial-gradient(24% 30% at 73% 66%, var(--color-bg-elev-1), transparent 72%),
+        radial-gradient(32% 42% at 84% 44%, var(--color-bg-elev-1), transparent 74%),
+        radial-gradient(
+          52% 64% at 65% 72%,
+          color-mix(in oklab, var(--color-bg-elev-1) 55%, var(--color-bg-base)),
+          transparent 76%
+        ),
+        radial-gradient(
+          58% 72% at 84% 36%,
+          color-mix(in oklab, var(--color-bg-elev-1) 55%, var(--color-bg-base)),
+          transparent 76%
+        ),
+        radial-gradient(
+          95% 120% at 72% 60%,
+          color-mix(in oklab, var(--color-bg-elev-1) 40%, var(--color-bg-base)),
+          transparent 85%
+        );
     }
   }
 

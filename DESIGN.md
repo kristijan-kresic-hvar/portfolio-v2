@@ -331,7 +331,7 @@ Tailwind v4 exposes these natively via the `--breakpoint-*` namespace; the defau
 
 ### All-viewport rule (added 2026-07-19 after the KKD-23 hero rework)
 
-Every section must look GOOD — not merely unbroken — at **375, 768, 1280, 1440, 1920 and 2560**. Sign-off requires an actual screenshot at each width, looked at, before the build is called done. A 1280-tuned layout that floats in a larger void is the failure this rule exists to prevent. Distilled from the hero's failure modes:
+Every section must look GOOD — not merely unbroken — at **375, 768, 1024, 1280, 1440, 1920 and 2560**. (1024 added 2026-07-21: the hero wrapped into a 4-line tower at ~1024, caught by the user — in-between bands are where towers hide.) Sign-off requires an actual screenshot at each width, looked at, before the build is called done. A 1280-tuned layout that floats in a larger void is the failure this rule exists to prevent. Tower-class failures additionally require a continuous SWEEP through the breakpoint seams (≤10px steps, assert headline line-count), not just the locked widths — the failure lives between the spot-checks. Distilled from the hero's failure modes:
 
 1. **Type fills its measure.** Size headlines by wrap math per breakpoint tier (measure the real line widths in-browser, in the production font); a display-size cap that wraps into a narrow ragged tower at wide viewports is wrong even if it "fits". Prototype fonts lie — re-measure after the real font loads (Inter-sized wrap math broke in Geist).
 2. **Focal imagery scales as viewport share, not fixed px.** A 460px portrait that reads right at 1280 is a lost thumbnail at 2560; target a proportional share (hero portrait: ~35–45% of viewport width at wide tiers) with srcset tiers to match.
