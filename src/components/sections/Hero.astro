@@ -370,6 +370,16 @@ import Section from '@/components/primitives/Section.astro';
       transition-duration: var(--duration-deliberate);
     }
 
+    /* Intro breath exhale: the settle leg dissolves over 3s with a long
+       ease-out tail instead of riding the 500ms spotlight transition (which
+       read as switching off, not breathing out — user flag 2026-07-20). The
+       script adds this class only for the collapse leg and strips it on
+       pointer/CTA takeover, so interaction never inherits the lag. */
+    :global(.hero-section.breathing-out) {
+      transition-duration: 3s;
+      transition-timing-function: var(--ease-out);
+    }
+
     :global(.hero-section.fx-js) .fx-desk .fx-cluster .fx-line {
       transition: opacity var(--duration-normal) var(--ease-standard);
     }
@@ -619,6 +629,9 @@ import Section from '@/components/primitives/Section.astro';
     hero.addEventListener('pointerenter', (e) => {
       inside = true;
       breathing = false;
+      // Takeover cancels a mid-exhale breath instantly — without this the
+      // spotlight would inherit the 3s dissolve.
+      hero.classList.remove('breathing-out');
       track(e);
       x = tx;
       y = ty;
@@ -668,6 +681,7 @@ import Section from '@/components/primitives/Section.astro';
         if (on === ctaWake) return;
         ctaWake = on;
         breathing = false;
+        hero.classList.remove('breathing-out');
         hero.classList.toggle('cta-lit', on);
         if (on) {
           hero.style.setProperty('--fx-r', '200vmax');
@@ -706,18 +720,26 @@ import Section from '@/components/primitives/Section.astro';
     }
     // Intro breath (discoverability): once per page view, shortly after
     // load, the whole field breathes visible — the mask blooms from center
-    // (default --mx/--my is 50% 50%) and settles back to near-hidden.
-    // Skipped under reduced motion, and it stands down instantly the moment
-    // the pointer or the CTA takes over. Delayed so it never competes with
-    // the LCP paint.
+    // (default --mx/--my is 50% 50%) over the normal 500ms, holds, then
+    // EXHALES: the collapse leg gets its own 3s ease-out transition via
+    // .breathing-out so the field dissolves instead of switching off. The
+    // class is stripped on pointer/CTA takeover (instant cancel, no
+    // inherited lag) and on a timer just past the transition's end.
+    // Skipped under reduced motion. Delayed so it never competes with the
+    // LCP paint.
     if (!reduce.matches) {
       setTimeout(() => {
         if (ctaWake || inside) return;
         breathing = true;
         hero.style.setProperty('--fx-r', '200vmax');
         setTimeout(() => {
-          if (breathing) hero.style.setProperty('--fx-r', '0px');
+          if (!breathing) return;
           breathing = false;
+          hero.classList.add('breathing-out');
+          hero.style.setProperty('--fx-r', '0px');
+          // ponytail: timer cleanup over transitionend — deterministic, and
+          // custom-property transition events are engine-flaky.
+          setTimeout(() => hero.classList.remove('breathing-out'), 3200);
         }, 1200);
       }, 600);
     }
