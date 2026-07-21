@@ -156,21 +156,14 @@ describe('TrustStrip', () => {
   });
 
   // Vault-verified facts only (content-outline About timeline) — KKD-36.
-  it('carries a role · years reveal for each vault-verified wordmark', () => {
+  it('renders an always-visible role · years line per vault-verified wordmark', () => {
     expect(trustStripHtml).toContain('Frontend Web Developer · 2023–2026');
     expect(trustStripHtml).toContain('Frontend Web Developer · 2022');
     expect(trustStripHtml).toContain('Web Developer · 2020–2021');
-  });
-
-  it('makes each wordmark keyboard-focusable so focus reveals match hover', () => {
-    expect(trustStripHtml.match(/tabindex="0"/g)).toHaveLength(3);
-    expect(trustStripHtml.match(/aria-describedby="wordmark-reveal-/g)).toHaveLength(3);
-  });
-
-  it('keeps reveals invisible at rest (no resting layout or amber change)', () => {
-    // Overlay reveals: absolute + invisible at rest, shown via group-hover/group-focus-visible.
-    expect(trustStripHtml.match(/class="wordmark-reveal/g)).toHaveLength(3);
-    expect(trustStripHtml).toMatch(/class="wordmark-reveal[^"]*invisible/);
+    expect(trustStripHtml.match(/class="wordmark-meta/g)).toHaveLength(3);
+    // In flow and visible at rest — no hidden-until-hover machinery.
+    expect(trustStripHtml).not.toMatch(/wordmark-meta[^"]*(invisible|opacity-0|absolute)/);
+    expect(trustStripHtml).not.toContain('tabindex');
   });
 });
 

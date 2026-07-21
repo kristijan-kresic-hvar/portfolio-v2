@@ -3,12 +3,12 @@ import Container from '@/components/primitives/Container.astro';
 import Section from '@/components/primitives/Section.astro';
 
 // Text wordmarks, not logo images — trademark decision 2026-07-17 (KKD-24).
-// Reveal facts verbatim from the vault About timeline (content-outline.md) —
-// never invent; a wordmark without a vault-verified role/years ships no reveal.
+// Meta facts verbatim from the vault About timeline (content-outline.md) —
+// never invent; a wordmark without a vault-verified role/years ships without meta.
 const companies = [
-  { name: 'Agilno', id: 'wordmark-reveal-agilno', reveal: 'Frontend Web Developer · 2023–2026' },
-  { name: 'amondi GmbH', id: 'wordmark-reveal-amondi', reveal: 'Frontend Web Developer · 2022' },
-  { name: 'Reroot', id: 'wordmark-reveal-reroot', reveal: 'Web Developer · 2020–2021' },
+  { name: 'Agilno', meta: 'Frontend Web Developer · 2023–2026' },
+  { name: 'amondi GmbH', meta: 'Frontend Web Developer · 2022' },
+  { name: 'Reroot', meta: 'Web Developer · 2020–2021' },
 ];
 ---
 
@@ -42,28 +42,21 @@ const companies = [
           class="text-text-secondary flex flex-wrap items-baseline gap-x-10 gap-y-3 text-base font-semibold tracking-wide sm:text-lg"
         >
           {
-            /* Micro-life (KKD-36): hover/focus-visible lifts the name to text-primary,
-              draws a small amber baseline tick, and slides in the role · years reveal.
-              The reveal OVERLAYS (absolute + bg) instead of expanding — neighbors never
-              shift. Amber on interaction only; `motion-safe:` keeps reduced-motion
-              reveals instant. tabindex gives keyboard users the same reveal as hover. */
+            /* Micro-life (KKD-36, rescoped in review): each wordmark is a mini column —
+              name over an always-visible role · years line (hidden-until-hover reveals
+              were undiscoverable and dead on touch; KK call 2026-07-21). Hover lifts the
+              name to text-primary and draws a small amber baseline tick — decoration
+              only, no gated content, so no tabindex. Amber on interaction only. */
           }
           {
-            companies.map(({ name, id, reveal }) => (
-              <li
-                tabindex="0"
-                aria-describedby={reveal ? id : undefined}
-                class="group focus-visible:outline-accent hover:text-text-primary focus-visible:text-text-primary relative cursor-default transition-colors duration-200 outline-none focus-visible:outline-1 focus-visible:outline-offset-4"
-              >
-                <span class="after:bg-accent relative after:absolute after:top-full after:left-0 after:mt-0.5 after:h-0.5 after:w-4 after:origin-left after:scale-x-0 after:content-[''] group-hover:after:scale-x-100 group-focus-visible:after:scale-x-100 motion-safe:after:transition-transform motion-safe:after:duration-200">
+            companies.map(({ name, meta }) => (
+              <li class="group hover:text-text-primary cursor-default transition-colors duration-200">
+                <span class="after:bg-accent relative after:absolute after:top-full after:left-0 after:mt-0.5 after:h-0.5 after:w-4 after:origin-left after:scale-x-0 after:content-[''] group-hover:after:scale-x-100 motion-safe:after:transition-transform motion-safe:after:duration-200">
                   {name}
                 </span>
-                {reveal && (
-                  <span
-                    id={id}
-                    class="wordmark-reveal bg-bg-base text-text-muted invisible absolute top-full left-0 z-10 mt-1 font-mono text-xs font-normal tracking-normal whitespace-nowrap opacity-0 group-last:right-0 group-last:left-auto group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:visible group-focus-visible:translate-y-0 group-focus-visible:opacity-100 motion-safe:-translate-y-1 motion-safe:transition-[opacity,transform,visibility] motion-safe:duration-200"
-                  >
-                    {reveal}
+                {meta && (
+                  <span class="wordmark-meta text-text-muted mt-1.5 block font-mono text-xs font-normal tracking-normal">
+                    {meta}
                   </span>
                 )}
               </li>
