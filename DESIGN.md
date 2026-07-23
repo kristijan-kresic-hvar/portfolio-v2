@@ -15,7 +15,8 @@ Dark only. Single amber accent. Geist + Geist Mono.
 - `--radius-*` — border radii
 - `--shadow-*` — shadows / elevation
 - `--leading-*` / `--tracking-*` — line-height / letter-spacing
-- `--ease-*` / `--duration-*` — motion easings / durations
+- `--ease-*` — motion easings
+- `--duration-*` — motion durations. **Not a utility namespace** — raw custom properties, referenced as `duration-(--duration-fast)`. See § Motion → Durations.
 
 **Values are reconciled to the vault `design-system.md` spec** (`01 - Projects/portfolio-v2/design-system.md`) — the richer 4-step bg / 5-step text / 3-border / code / accent-subtle+accent-text scale — plus the Phase 2 **color-sweep** refinements: `--color-text-muted` = `#8E8E8E`; `--color-accent-subtle` = `rgba(245,158,11,0.13)`. Locked brand decisions carry over unchanged: dark-only, single amber `#F59E0B` (hover `#FBBF24`, active `#D97706`), Geist + Geist Mono.
 
@@ -259,15 +260,19 @@ Shadows use the `--shadow-*` namespace (`--shadow-card` → `shadow-card`). Drop
 
 ### Durations
 
-Durations use the `--duration-*` namespace.
+Durations use the `--duration-*` namespace. Unlike `--ease-*`, this is a **raw custom-property namespace, not a Tailwind utility namespace** — on Tailwind 4.3.0 `duration-fast` generates nothing (the namespace behind the `duration-*` utility is `--transition-duration-*`). Reference the tokens with v4's custom-property syntax; that is the sanctioned canonical form here:
 
-| Token                   | Value | Use                                       |
-| ----------------------- | ----- | ----------------------------------------- |
-| `--duration-instant`    | 100ms | —                                         |
-| `--duration-fast`       | 200ms | Hover state transitions                   |
-| `--duration-normal`     | 300ms | Standard UI                               |
-| `--duration-slow`       | 500ms | Card reveal, prominent micro-interactions |
-| `--duration-deliberate` | 800ms | Hero reveal, page transitions             |
+```html
+<a class="ease-standard transition-colors duration-(--duration-fast)">…</a>
+```
+
+| Token                   | Value | Utility                            | Use                                       |
+| ----------------------- | ----- | ---------------------------------- | ----------------------------------------- |
+| `--duration-instant`    | 100ms | `duration-(--duration-instant)`    | —                                         |
+| `--duration-fast`       | 200ms | `duration-(--duration-fast)`       | Hover state transitions                   |
+| `--duration-normal`     | 300ms | `duration-(--duration-normal)`     | Standard UI                               |
+| `--duration-slow`       | 500ms | `duration-(--duration-slow)`       | Card reveal, prominent micro-interactions |
+| `--duration-deliberate` | 800ms | `duration-(--duration-deliberate)` | Hero reveal, page transitions             |
 
 ### Easings
 
@@ -431,7 +436,9 @@ Structural advantage: static Astro, zero-JS default, self-hosted fonts — the s
 
 ## Implementation notes
 
-Tokens live in `src/styles/global.css` inside the `@theme {}` block. Tailwind v4 generates utility classes automatically from the reserved namespaces above (e.g. `--color-accent` → `bg-accent` / `text-accent`; `--spacing-4` → `p-4`; `--radius-md` → `rounded-md`). Raw names outside these namespaces generate no utilities — that is why KKD-5 locked the `--color-*` / `--text-*` / `--font-*` / `--spacing-*` / `--radius-*` / `--shadow-*` / `--leading-*` / `--tracking-*` / `--ease-*` / `--duration-*` convention.
+Tokens live in `src/styles/global.css` inside the `@theme {}` block. Tailwind v4 generates utility classes automatically from the reserved namespaces above (e.g. `--color-accent` → `bg-accent` / `text-accent`; `--spacing-4` → `p-4`; `--radius-md` → `rounded-md`; `--ease-out` → `ease-out`). Raw names outside these namespaces generate no utilities — that is why KKD-5 locked the `--color-*` / `--text-*` / `--font-*` / `--spacing-*` / `--radius-*` / `--shadow-*` / `--leading-*` / `--tracking-*` / `--ease-*` convention.
+
+**`--duration-*` is the deliberate exception** (verified on Tailwind 4.3.0, KKD-16): it is a raw custom-property namespace and auto-generates nothing — `duration-fast` is dead. Tailwind's duration utility reads `--transition-duration-*` instead. We keep the `--duration-*` token names and reference them with the custom-property syntax `duration-(--duration-fast)`, which every primitive and section already ships; renaming the tokens to `--transition-duration-*` would churn all of them for utility-name cosmetics alone.
 
 Source-of-truth files:
 
