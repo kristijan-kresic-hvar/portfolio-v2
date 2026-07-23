@@ -39,7 +39,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write  # write: dismiss stale approvals on new commits (else read would do)
+  pull-requests: write # write: dismiss stale approvals on new commits (else read would do)
   issues: read
   statuses: write
 
