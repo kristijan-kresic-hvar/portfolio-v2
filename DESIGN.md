@@ -6,7 +6,7 @@ Dark only. Single amber accent. Geist + Geist Mono.
 
 ## Canonical token convention (LOCKED — KKD-5)
 
-**Tailwind v4 `@theme` namespaces are the source of truth.** Every token below uses a reserved Tailwind v4 namespace, because Tailwind v4 only auto-generates utility classes from these namespaces — raw names (`--bg-base`, `--space-4`, `--accent`) generate nothing:
+**Tailwind v4 `@theme` namespaces are the source of truth.** Every token below uses a reserved Tailwind v4 namespace — most of them auto-generate utility classes, and raw names (`--bg-base`, `--space-4`, `--accent`) generate nothing. `--duration-*` is the one exception, noted below:
 
 - `--color-*` — all colors (backgrounds, text, borders, accent, semantic, code)
 - `--text-*` — font sizes
