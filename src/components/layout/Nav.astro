@@ -32,12 +32,16 @@ const isActive = (href: string) => pathname === href || pathname.startsWith(`${h
         <span class="sm:hidden"><BrandMark /></span>
       </a>
       {
+        /* py-3 buys the 44px tap target; -my-1/-mx-2 hand the added padding back, so the link's
+      margin box — and the band around it — stay the size they were. Same idiom as Footer. */
+      }
+      {
         routes.map(({ href, label }) => (
           <a
             href={href}
             aria-current={isActive(href) ? 'page' : undefined}
             class:list={[
-              'ease-standard py-2 text-sm font-medium transition-colors duration-(--duration-fast)',
+              'ease-standard -mx-2 -my-1 px-2 py-3 text-sm font-medium transition-colors duration-(--duration-fast)',
               isActive(href)
                 ? 'text-text-primary decoration-accent underline decoration-2 underline-offset-[6px]'
                 : 'text-text-secondary hover:text-text-primary',
