@@ -78,6 +78,19 @@ describe('Nav', () => {
     expect(html).not.toContain('aria-current');
   });
 
+  it('gives route links a 44px tap target without growing the nav band', async () => {
+    const html = await renderNavAt('/');
+    const routeLinks = html.match(/<a[^>]*href="\/(work|about)"[^>]*>/g) ?? [];
+    expect(routeLinks).toHaveLength(2);
+    for (const link of routeLinks) {
+      // py-3 + text-sm's 20px line box = 44px; -my-1/-mx-2 cancel the added padding
+      expect(link).toMatch(/\bpy-3\b/);
+      expect(link).toMatch(/-my-1\b/);
+      expect(link).toMatch(/\bpx-2\b/);
+      expect(link).toMatch(/-mx-2\b/);
+    }
+  });
+
   it('ships zero JS — no entrance animation to gate on reduced motion', async () => {
     const html = await renderNavAt('/');
     expect(html).not.toContain('<script');
