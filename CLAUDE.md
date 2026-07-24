@@ -2,7 +2,7 @@
 
 Engineering conventions for AI coding agents working in this repo. Mirror of the source-of-truth spec in the Obsidian vault at `01 - Projects/portfolio-v2/dev-conventions.md`.
 
-Private repo. Every change is deliberate.
+Public repo (flipped 2026-07-24). The commit history + two-reviewer PR pipeline are part of the portfolio — every change is deliberate and publicly visible.
 
 ## Accessibility (Phase 2+ — UI file edits)
 
