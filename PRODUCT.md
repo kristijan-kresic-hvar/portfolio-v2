@@ -69,7 +69,7 @@ Look at instead: rauno.me · paco.me · brittanychiang.com · leerob.io · emilk
 4. **Trust strip before featured work.** Hierarchy: company logos + experience line directly under the hero, _before_ the work cards. Proof > narrative.
 5. **Contact is first-class.** Sticky-nav accent button is always visible. Contact form is a real form (not a `mailto:` link). Two intent paths (hire / project) drive the email subject line for triage.
 6. **Real headshot, intentionally treated.** HeadshotPro portrait integrated on hero — small/medium, treated (duotone / cutout / scroll-reveal — final treatment decided after photo arrives). Differentiator: across 16 reference portfolios, real-headshot-on-hero is genuinely rare.
-7. **The repo is part of the case study.** Commit history + code structure + this very file are visible artifacts of craft. Private repo, but Phase 5 ships a meta case study (`/work/portfolio-v2`) that describes the build openly.
+7. **The repo is part of the case study.** Commit history + code structure + this very file are visible artifacts of craft. Public repo (flipped 2026-07-24) — Phase 5 ships a meta case study (`/work/portfolio-v2`) that links the source + two-reviewer PR history directly.
 8. **Lean MVP fast.** Phases 1-7 minimal in ~2 weeks; polish (Phases 8-11) over the following weeks. Don't perfect a section before the next is sketched.
 9. **A/B-test critical headlines and CTAs.** Not v1, but the architecture supports it via the `ab-testing` skill once traffic justifies.
 
