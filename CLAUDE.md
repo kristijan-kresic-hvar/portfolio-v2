@@ -220,9 +220,13 @@ Before touching components, layouts, sections, motion, or a11y: invoke `/impecca
 
 **Design bar (LOCKED 2026-07-20):** `DESIGN.md` § "Design register & elevation bar" governs every craft/shape pass and every UI ticket — bolder direction by default, one signature moment per section, amber presence at every scroll depth, imagery on proof surfaces. **AC-compliant-but-flat is not done.** Read that section before any page/section craft; ticket authors include its design-ambition criterion in every UI ticket's AC. (Born from the Phase-4 "templated" verdict — six compliant sections shipped flat; KKD-30 fixed the landing, this rule prevents the regression in Phases 5+.)
 
-### Effort routing (Fable 5) — taste work runs at xhigh via the `design-taste` subagent
+### Effort routing — model-conditional
 
-Sessions run at `high` effort by default. Taste-judged work — anything the phase marker or the mapping below tags as `/impeccable shape`, `craft`, `polish`, `animate`, `typeset`, the Mobbin reference pass, or persuasive copy (hero, CTAs, case-study prose) — MUST be delegated to the **`design-taste`** subagent (`.claude/agents/design-taste.md`, `effort: xhigh`) instead of being done inline. Spec'd build work (assembly, plumbing, config, checklist tasks) stays inline at session effort. Per-phase defaults live as `⚡ effort:` markers on the phase headings in the Obsidian project note.
+**On Opus 5 (current default): no per-task effort tiering and no `design-taste` delegation — every task, taste-judged work included, runs inline in the main session.** It already reasons deeply enough that splitting taste work into a subagent buys nothing. The `⚡ effort:` markers on the phase headings in the Obsidian project note are **Fable-5 inputs**; ignore them on Opus 5. (`ultracode` is an orchestration mode, not an effort tier, and its multi-agent Workflow fan-out is a per-task opt-in only the user can give — this file neither grants nor requests it.)
+
+**On Fable 5 only:** sessions run at `high` effort by default, so taste-judged work — anything the phase marker or the mapping below tags as `/impeccable shape`, `craft`, `polish`, `animate`, `typeset`, the Mobbin reference pass, or persuasive copy (hero, CTAs, case-study prose) — MUST be delegated to the **`design-taste`** subagent (`.claude/agents/design-taste.md`, `effort: xhigh`) instead of being done inline. Spec'd build work (assembly, plumbing, config, checklist tasks) stays inline at session effort.
+
+(Corrected 2026-07-25, KK: the xhigh-via-`design-taste` rule was always a Fable-5 workaround for a `high`-default session. It never applied to Opus 5.)
 
 ### Reference pass (Mobbin) — before design, never after
 
