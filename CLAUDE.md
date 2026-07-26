@@ -222,7 +222,7 @@ Before touching components, layouts, sections, motion, or a11y: invoke `/impecca
 
 ### Effort routing — model-conditional
 
-**On Opus 5 (current default): run `ultracode` effort for ALL implementation work.** No per-task tiering, and no `design-taste` delegation — the session already reasons deeply enough that splitting taste work into a subagent buys nothing. The `⚡ effort:` markers on the phase headings in the Obsidian project note are **Fable-5 inputs**; ignore them on Opus 5.
+**On Opus 5 (current default): no per-task effort tiering and no `design-taste` delegation — every task, taste-judged work included, runs inline in the main session.** It already reasons deeply enough that splitting taste work into a subagent buys nothing. The `⚡ effort:` markers on the phase headings in the Obsidian project note are **Fable-5 inputs**; ignore them on Opus 5. (`ultracode` is an orchestration mode, not an effort tier, and its multi-agent Workflow fan-out is a per-task opt-in only the user can give — this file neither grants nor requests it.)
 
 **On Fable 5 only:** sessions run at `high` effort by default, so taste-judged work — anything the phase marker or the mapping below tags as `/impeccable shape`, `craft`, `polish`, `animate`, `typeset`, the Mobbin reference pass, or persuasive copy (hero, CTAs, case-study prose) — MUST be delegated to the **`design-taste`** subagent (`.claude/agents/design-taste.md`, `effort: xhigh`) instead of being done inline. Spec'd build work (assembly, plumbing, config, checklist tasks) stays inline at session effort.
 
