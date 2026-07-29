@@ -45,7 +45,6 @@ const entries = selectFeaturedWork(Astro.props.entries ?? (await getCollection('
         <ul role="list" class="mt-10 grid gap-6 lg:mt-12 lg:grid-cols-2">
           {entries.map((entry, index) => (
             <li class:list={[index === 0 && 'lg:col-span-2']}>
-              {/* ponytail: cards stay unlinked until the detail route lands (KKD-22, Phase 5) */}
               <CaseCard entry={entry} wide={index === 0} />
             </li>
           ))}

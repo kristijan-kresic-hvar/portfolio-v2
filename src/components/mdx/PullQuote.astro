@@ -1,0 +1,15 @@
+---
+interface Props {
+  /** The line beneath the quote; the quote itself is the default slot. */
+  attribution: string;
+}
+
+const { attribution } = Astro.props;
+---
+
+<figure class="my-8">
+  <blockquote class="text-text-secondary text-lg">
+    <slot />
+  </blockquote>
+  <figcaption class="text-text-muted mt-3 font-mono text-sm">{attribution}</figcaption>
+</figure>

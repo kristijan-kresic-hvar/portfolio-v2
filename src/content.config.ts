@@ -11,6 +11,7 @@ export const workSchema = z.object({
   outcome: z.string().optional(),
   constraint: z.string().optional(),
   retrospective: z.string().optional(),
+  cta: z.string().optional(),
   cover: z.string().optional(),
   coverPeek: z.string().optional(),
   coverAlt: z.string().optional(),

@@ -26,7 +26,7 @@ const meta = [role, ...stack, String(year)].join(' · ');
 
 <article
   class:list={[
-    'group border-border-subtle bg-bg-elev-1 ease-standard hover:border-border-default hover:shadow-card-hover relative h-full overflow-hidden rounded-xl border transition duration-(--duration-fast)',
+    'group border-border-subtle bg-bg-elev-1 ease-standard hover:border-border-default hover:shadow-card-hover has-[a:focus-visible]:border-border-default has-[a:focus-visible]:shadow-card-hover relative h-full overflow-hidden rounded-xl border transition duration-(--duration-fast)',
     wide ? 'flex flex-col lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]' : 'flex flex-col',
   ]}
 >
@@ -37,7 +37,18 @@ const meta = [role, ...stack, String(year)].join(' · ');
         wide ? 'text-2xl lg:text-3xl' : 'text-xl sm:text-2xl',
       ]}
     >
-      {title}
+      {
+        /* Stretched link: the anchor names the card for screen readers, its ::after
+        makes the whole card the tap target. z-10 lifts that overlay above the cover
+        composition — positioned and later in the DOM, so it would otherwise leave
+        only the text half clickable. */
+      }
+      <a
+        href={`/work/${entry.id}`}
+        class="after:absolute after:inset-0 after:z-10 after:content-['']"
+      >
+        {title}
+      </a>
     </h3>
     {
       outcome && (
