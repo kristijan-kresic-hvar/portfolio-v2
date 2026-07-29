@@ -2,14 +2,14 @@
 
 High-level overview of how the portfolio is wired together. Read this if you want to understand the project beyond a tour of the repo. Engineering conventions live in [`CLAUDE.md`](./CLAUDE.md); design tokens in [`src/styles/global.css`](./src/styles/global.css).
 
-> **Status — documents the intended end-state, not `main` today.** Most of `src/` is currently scaffolded (`.gitkeep` placeholders); real files so far: `RootLayout.astro`, `index.astro`, `global.css`, `content.config.ts` (+ its test), `env.d.ts`, and `lib/motion/springs.ts`. Remaining routes, `lib/` modules, server endpoints, layouts beyond `RootLayout`, and content land in Phases 2+. Treat the paths below as the target structure.
+> **Status — documents the intended end-state, not `main` today.** Phases 2–4 have shipped: the six primitives (`Button`, `Card`, `Chip`, `Container`, `Link`, `Section`), the layout chrome (`Nav`, `Footer`, `PageHeader`, `BrandMark`), the seven landing sections, `CaseCard`, `Icon.astro`, all three layouts (`RootLayout`, `BlogLayout`, `WorkLayout`), `global.css` + `prose.css`, the `/work` and `/blog` listing pages, and three MDX case studies. Phase 5 has started: KKD-38 landed `/work/[id]` and the five MDX components (`Screenshot`, `RejectedPath`, `ConstraintLedger`, `Callout`, `PullQuote` — semantics and prop contracts only, deliberately plain; the craft pass is KKD-47), and `/cv` redirects to the committed PDF. Not built yet: `actions/`, `lib/brief|email|seo/`, `pages/api/` — the blog detail routes, `/about`, `/contact`, the OG generator and the Brief pipeline land in Phases 5+. Treat the paths below as the target structure. (Inventory captured at `81738ae`, 2026-07-29.)
 
 ## Route map
 
 ```
 /                      Landing — conversion-ordered funnel
 /work                  Index of case studies
-/work/[slug]           Individual case study (MDX content collection)
+/work/[id]             Individual case study (MDX content collection — the glob loader's param is `id`)
 /blog                  Index of blog posts
 /blog/[slug]           Individual post (MDX content collection)
 /blog/tag/[tag]        Posts filtered by tag (indexable for topical SEO)
@@ -30,20 +30,20 @@ The Brief pipeline has no route — it runs as a **scheduled GitHub Action** (`.
 
 ```
 src/pages/index.astro
-  ├─ <RootLayout>
-  │   ├─ Geist fonts (self-hosted via @fontsource-variable)
-  │   └─ Native cross-document view transitions (CSS @view-transition in global.css — zero JS)
-  └─ Sections
-      ├─ <Hero />                   (above-the-fold + headshot)
-      ├─ <TrustStrip />              (years + past companies)
-      ├─ <FeaturedWork />            (3 case study cards)
-      ├─ <Capabilities />            (what I do)
-      ├─ <Workflow />                (how I work — AI-augmented manifesto)
-      ├─ <StackChips />              (recruiter-searchable terms)
-      ├─ <FeaturedWriting />         (3 latest Briefs)
-      ├─ <CTABand />                 (split: Hire / Project)
-      └─ <Footer />
+  └─ <RootLayout>                    (Nav + <main> + Footer chrome)
+      ├─ Geist fonts (self-hosted via @fontsource-variable)
+      ├─ Native cross-document view transitions (CSS @view-transition in global.css — zero JS)
+      └─ Sections
+          ├─ <Hero />                (above-the-fold + headshot)
+          ├─ <TrustStrip />          (years + past companies)
+          ├─ <FeaturedWork />        (featured case study cards)
+          ├─ <WhatIDo />             (capabilities)
+          ├─ <TechStack />           (recruiter-searchable terms)
+          ├─ <HowIWork />            (AI-augmented manifesto)
+          └─ <CtaBand />             (split: Hire / Project)
 ```
+
+A `<FeaturedWriting />` section (3 latest Briefs) belongs to the target landing above, but was never built — the blog was cut from launch 2026-07-17 and lands in Phase 6.
 
 All sections are static Astro components. Motion is progressive enhancement via the vanilla `motion` package (`animate` / `inView`) in plain `<script>` tags, or CSS scroll-driven animations — **no client framework ships**. Reveals are fast (≤400ms), animate content in without gating it, and respect `prefers-reduced-motion`.
 
@@ -53,11 +53,11 @@ Defined in [`src/content.config.ts`](./src/content.config.ts) using Zod schemas 
 
 ```
 src/content/
-├── work/              # MDX case studies
-│   ├── agrivi.mdx
-│   ├── robinson-restaurant.mdx
-│   └── portfolio-v2.mdx (meta case study — this repo)
-└── blog/              # MDX posts (briefs + deep-dives)
+├── work/              # MDX case studies — on main: naitur, biocirv, vetster
+│   ├── naitur.mdx
+│   ├── biocirv.mdx
+│   └── vetster.mdx    # oncallable.mdx + portfolio-v2.mdx (meta study) land in Phase 5
+└── blog/              # MDX posts (briefs + deep-dives) — empty until Phase 6
     ├── brief-2026-06.mdx
     └── ...
 ```

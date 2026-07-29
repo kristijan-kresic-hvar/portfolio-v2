@@ -1,6 +1,8 @@
 # Site Layout Brief — portfolio-v2 (KKD-17, Phase 3)
 
-Produced by `/impeccable shape "site layout brief"`. Sets the structural register for the whole site: nav, footer, content shells, container widths, section rhythm. Consumed by the Nav/Footer/PageShell `craft` passes. Every value below is a DESIGN.md token — no new tokens invented.
+Produced by `/impeccable shape "site layout brief"`. Sets the structural register for the whole site: nav, footer, content shells, container widths, section rhythm. Consumed by the Nav/Footer/RootLayout `craft` passes. Every value below is a DESIGN.md token — no new tokens invented.
+
+> **Naming note (2026-07-25):** this brief was written pre-build and called the page shell `PageShell`. No such component was ever created — it shipped as `RootLayout.astro` (Nav + `<main>` + Footer) plus `PageHeader.astro` (page title block). The names below have been updated to the shipped ones; the structural spec itself is unchanged.
 
 ## 1. Feature summary
 
@@ -24,7 +26,7 @@ From any scroll position on any page, reach Contact in one click. The sticky nav
 
 ## 4. Scope
 
-Production-ready structural spec; breadth is site chrome + shells (Nav, Footer, PageShell), not page sections. Interactivity: shipped-quality, zero-JS chrome. This brief is the shape artifact for KKD-17's Nav build and the Phase 3 Footer/PageShell work that follows.
+Production-ready structural spec; breadth is site chrome + shells (Nav, Footer, RootLayout), not page sections. Interactivity: shipped-quality, zero-JS chrome. This brief is the shape artifact for KKD-17's Nav build and the Phase 3 Footer/RootLayout work that follows.
 
 ## 5. Layout strategy
 
@@ -47,9 +49,9 @@ Production-ready structural spec; breadth is site chrome + shells (Nav, Footer, 
 - Contents, single `max-w-wide` row (stacking on mobile): wordmark + one-line positioning echo (`--color-text-muted`, `--text-sm`) left; inline link echo `Work · Blog · About · Contact` (ghost links) right; below, a meta line in Geist Mono `--text-xs` `--color-text-muted`: `© <year> Kristijan Krešić · Hvar, Croatia (CET) · GitHub · LinkedIn`.
 - **No accent in the footer** except link hover. The CTA band (a page section, not chrome) sits directly above it and owns the peak-end accent moment — the footer's job is to be the quiet after it.
 
-### Content shells (PageShell)
+### Content shells (RootLayout)
 
-- `PageShell` = Nav + `<main>` + Footer. `<body>` is `min-h-dvh` flex column, `<main>` is `flex-1` — short pages (Contact, 404) pin the footer to the viewport bottom.
+- `RootLayout` = Nav + `<main>` + Footer. `<body>` is `min-h-dvh` flex column, `<main>` is `flex-1` — short pages (Contact, 404) pin the footer to the viewport bottom.
 - Width variants via the existing `Container` primitive (`px-6` gutters, 24px):
   - `content` (`--container-content`, 1200px) — default page content.
   - `reading` (`--container-reading`, 680px) — blog + case-study body.
