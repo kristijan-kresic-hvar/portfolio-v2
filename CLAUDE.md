@@ -33,7 +33,7 @@ a11y review is **manual** via `/impeccable audit` — there is no enforcement ho
 
 ## Folder structure
 
-Target structure. Phases 2–4 have landed (primitives, layout chrome, landing sections, both content layouts, the two listing pages); `actions/`, `lib/brief/`, `lib/email/`, `lib/seo/`, `components/mdx/` and the remaining routes are still `.gitkeep` scaffolding — ARCHITECTURE.md's status line has the current inventory.
+Target structure. Phases 2–4 have landed (primitives, layout chrome, landing sections, both content layouts, the two listing pages), plus Phase 5's `components/mdx/` set and the `/work/[id]` detail route; `actions/`, `lib/brief/`, `lib/email/`, `lib/seo/` and the remaining routes are not built yet — ARCHITECTURE.md's status line has the current inventory.
 
 ```
 src/
@@ -43,7 +43,7 @@ src/
 │   ├── primitives/      # Button, Card, Chip, Link, Section, Container
 │   ├── layout/          # Nav, Footer, PageHeader, BrandMark
 │   ├── sections/        # Hero, TrustStrip, FeaturedWork, CTABand (landing)
-│   └── mdx/             # MDX-only components (Callout, Image, Video, Code)
+│   └── mdx/             # MDX-only components (Screenshot, RejectedPath, ConstraintLedger, Callout, PullQuote)
 ├── content/
 │   ├── blog/            # MDX briefs + deep-dives
 │   └── work/            # MDX case studies
