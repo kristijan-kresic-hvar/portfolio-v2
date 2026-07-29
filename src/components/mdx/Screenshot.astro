@@ -1,0 +1,108 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Picture } from 'astro:assets';
+
+interface Props {
+  /** Bare filename in src/assets/work/ (.webp only) or an absolute https:// URL. */
+  src: string;
+  /** Required and non-empty — this image carries information. Decorative frames go through `peek`. */
+  alt: string;
+  /** ≤2 lines, states what the screen does. */
+  caption: string;
+  /** Renders a plain `FIG 0n —` index ahead of the caption. */
+  fig?: number;
+  variant?: 'hero' | 'body';
+  width?: number;
+  widths?: number[];
+  sizes?: string;
+  ratio?: number;
+  /** Marks the figure for KKD-47's wide treatment; sets a data attribute and nothing else. */
+  breakout?: boolean;
+  /** Hero only: decorative second frame, rendered alt="" + aria-hidden. */
+  peek?: string;
+}
+
+const { src, alt, caption, fig, variant = 'body', ratio = 16 / 10, breakout, peek } = Astro.props;
+
+const hero = variant === 'hero';
+const width = Astro.props.width ?? (hero ? 1280 : 960);
+const widths = Astro.props.widths ?? (hero ? [640, 960, 1280, 1600] : [640, 960, 1280]);
+const sizes =
+  Astro.props.sizes ??
+  (hero ? '(min-width: 1280px) 1280px, 100vw' : '(min-width: 768px) 680px, 100vw');
+const height = Math.round(width / ratio);
+
+// ponytail: both guards throw at build rather than dropping the figure silently —
+// a missing screenshot on a case study is a content bug, not a render branch.
+if (alt.trim() === '') {
+  throw new Error(
+    `<Screenshot src="${src}"> needs a non-empty alt. Decorative frames belong on the \`peek\` prop.`,
+  );
+}
+
+// Only .webp is globbed (same recipe as CaseCard) — a .png/.jpg harvest asset
+// would resolve undefined, so convert on ingest.
+const assets = import.meta.glob<{ default: ImageMetadata }>('/src/assets/work/*.webp', {
+  eager: true,
+});
+const remote = src.startsWith('http');
+const image = remote ? undefined : assets[`/src/assets/work/${src}`]?.default;
+const peekImage = peek ? assets[`/src/assets/work/${peek}`]?.default : undefined;
+
+if (!remote && !image) {
+  throw new Error(`<Screenshot src="${src}"> found no /src/assets/work/${src} — .webp only.`);
+}
+---
+
+<figure class="my-8" data-breakout={breakout ? '' : undefined}>
+  <div class="border-border-subtle bg-bg-elev-1 relative overflow-hidden rounded-lg border">
+    {
+      peekImage && (
+        <div class="border-border-subtle absolute top-8 left-4 w-[45%] overflow-hidden rounded-md border opacity-80">
+          <Picture
+            src={peekImage}
+            formats={['avif']}
+            fallbackFormat="webp"
+            width={640}
+            widths={[400, 640]}
+            sizes="45vw"
+            loading="lazy"
+            alt=""
+            aria-hidden="true"
+            class="h-auto w-full"
+          />
+        </div>
+      )
+    }
+    {
+      image ? (
+        <Picture
+          src={image}
+          formats={['avif']}
+          fallbackFormat="webp"
+          width={width}
+          widths={widths}
+          sizes={sizes}
+          loading={hero ? 'eager' : 'lazy'}
+          fetchpriority={hero ? 'high' : undefined}
+          alt={alt}
+          class="h-auto w-full"
+        />
+      ) : (
+        <img
+          src={src}
+          width={width}
+          height={height}
+          loading={hero ? 'eager' : 'lazy'}
+          fetchpriority={hero ? 'high' : undefined}
+          alt={alt}
+          class="h-auto w-full"
+        />
+      )
+    }
+  </div>
+  <figcaption class="text-text-muted mt-3 text-sm">
+    {fig !== undefined && <span class="font-mono">FIG {String(fig).padStart(2, '0')} — </span>}
+    {caption}
+  </figcaption>
+</figure>

@@ -1,0 +1,167 @@
+---
+/*
+ * /work/[id] — renders the frontmatter chrome and the MDX body, nothing more.
+ * Custom components are NOT auto-injected: every .mdx file imports what it uses
+ * at the top of its own body, so there is no components={{…}} map to keep in
+ * sync across five studies.
+ *
+ *   import Screenshot from '@/components/mdx/Screenshot.astro';
+ *   import ConstraintLedger from '@/components/mdx/ConstraintLedger.astro';
+ *
+ * The param is `id`, not `slug` — the work collection uses the glob loader.
+ */
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+import { getCollection, render } from 'astro:content';
+
+import Screenshot from '@/components/mdx/Screenshot.astro';
+import Chip from '@/components/primitives/Chip.astro';
+import WorkLayout from '@/layouts/WorkLayout.astro';
+
+export const getStaticPaths = (async () => {
+  const entries = (await getCollection('work', ({ data }) => !data.draft)).sort(
+    (a, b) => (a.data.order ?? Number.MAX_SAFE_INTEGER) - (b.data.order ?? Number.MAX_SAFE_INTEGER),
+  );
+
+  // prev/next come from this same ordering — no wrap-around, so the first entry
+  // has no prev and the last has no next.
+  return entries.map((entry, index) => ({
+    params: { id: entry.id },
+    props: { entry, prev: entries[index - 1], next: entries[index + 1] },
+  }));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { entry, prev, next } = Astro.props as Props;
+const { title, summary, role, stack, year, outcome, cta, cover, coverPeek, coverAlt, links } =
+  entry.data;
+
+const { Content } = await render(entry);
+
+// ponytail: 5-entry literal, not a schema field — no enum, no round-trip test.
+const CTA_INTENT: Record<string, 'hire' | 'project'> = {
+  naitur: 'hire',
+  biocirv: 'hire',
+  vetster: 'hire',
+  oncallable: 'project',
+  'portfolio-v2': 'project',
+};
+const intent = CTA_INTENT[entry.id] ?? 'project';
+
+// KKD-40 replaces this with the real harvest asset.
+const heroSrc =
+  cover ?? `https://placehold.co/2400x1500/141416/f59e0b?text=${encodeURIComponent(title)}`;
+
+const tapTarget = 'inline-flex min-h-11 items-center -mx-2 px-2';
+---
+
+<WorkLayout {title} description={summary}>
+  <div slot="meta" class="mt-8">
+    <dl class="border-border-subtle border-t">
+      <div class="border-border-subtle grid gap-1 border-b py-3 sm:grid-cols-[8rem_1fr] sm:gap-6">
+        <dt class="text-text-muted font-mono text-sm">Role</dt>
+        <dd class="text-text-secondary">{role}</dd>
+      </div>
+      <div class="border-border-subtle grid gap-2 border-b py-3 sm:grid-cols-[8rem_1fr] sm:gap-6">
+        <dt class="text-text-muted font-mono text-sm">Stack</dt>
+        <dd class="flex flex-wrap gap-2">
+          {stack.slice(0, 4).map((tech) => <Chip>{tech}</Chip>)}
+        </dd>
+      </div>
+      <div class="border-border-subtle grid gap-1 border-b py-3 sm:grid-cols-[8rem_1fr] sm:gap-6">
+        <dt class="text-text-muted font-mono text-sm">Year</dt>
+        <dd class="text-text-secondary">{year}</dd>
+      </div>
+      {
+        outcome && (
+          <div class="border-border-subtle grid gap-1 border-b py-3 sm:grid-cols-[8rem_1fr] sm:gap-6">
+            <dt class="text-text-muted font-mono text-sm">Outcome</dt>
+            {/* The outcome line — plain text, no metric split (KKD-47 anchors it). */}
+            <dd class="text-accent-text">{outcome}</dd>
+          </div>
+        )
+      }
+    </dl>
+    {
+      (links.live || links.repo) && (
+        <p class="mt-4 flex flex-wrap items-center gap-x-6">
+          {links.live && (
+            <a
+              href={links.live}
+              target="_blank"
+              rel="noopener noreferrer"
+              class:list={[
+                tapTarget,
+                'text-accent hover:text-accent-hover ease-standard text-sm underline underline-offset-4 transition-colors duration-(--duration-fast)',
+              ]}
+            >
+              Live site ↗
+            </a>
+          )}
+          {links.repo && (
+            <a
+              href={links.repo}
+              target="_blank"
+              rel="noopener noreferrer"
+              class:list={[
+                tapTarget,
+                'text-accent hover:text-accent-hover ease-standard text-sm underline underline-offset-4 transition-colors duration-(--duration-fast)',
+              ]}
+            >
+              Code ↗
+            </a>
+          )}
+        </p>
+      )
+    }
+  </div>
+
+  <Screenshot
+    slot="wide"
+    src={heroSrc}
+    alt={coverAlt ?? `${title} — product screenshot`}
+    caption={coverAlt ?? summary}
+    variant="hero"
+    peek={coverPeek}
+  />
+
+  <Content />
+
+  <div class="border-border-subtle mt-16 border-t pt-8">
+    <p>
+      <a
+        href={`/contact?intent=${intent}`}
+        class:list={[
+          tapTarget,
+          'text-accent hover:text-accent-hover ease-standard font-medium underline underline-offset-4 transition-colors duration-(--duration-fast)',
+        ]}
+      >
+        {cta ?? "Need similar work? Let's talk."}
+      </a>
+    </p>
+    {
+      (prev || next) && (
+        <nav aria-label="Case studies" class="mt-8 flex flex-wrap justify-between gap-x-6 gap-y-2">
+          {prev ? (
+            <a
+              href={`/work/${prev.id}`}
+              class:list={[tapTarget, 'text-text-secondary hover:text-text-primary text-sm']}
+            >
+              ← {prev.data.title}
+            </a>
+          ) : (
+            <span />
+          )}
+          {next && (
+            <a
+              href={`/work/${next.id}`}
+              class:list={[tapTarget, 'text-text-secondary hover:text-text-primary text-sm']}
+            >
+              {next.data.title} →
+            </a>
+          )}
+        </nav>
+      )
+    }
+  </div>
+</WorkLayout>

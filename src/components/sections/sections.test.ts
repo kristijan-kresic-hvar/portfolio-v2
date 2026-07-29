@@ -218,9 +218,11 @@ describe('FeaturedWork', () => {
     expect(featuredWorkHtml).toContain('2026');
   });
 
-  it('links only to the work index, never to detail routes', () => {
+  it('links every card to its own detail route, alongside the index link', () => {
     expect(featuredWorkHtml).toContain('href="/work"');
-    expect(featuredWorkHtml).not.toMatch(/href="\/work\/./);
+    for (const entry of workEntries) {
+      expect(featuredWorkHtml).toContain(`href="/work/${entry.id}"`);
+    }
   });
 
   it('renders a lazy layered cover composition per card from real harvest picks', () => {

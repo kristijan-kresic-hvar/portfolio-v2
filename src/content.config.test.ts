@@ -58,6 +58,32 @@ describe('workSchema', () => {
     expect(parsed.coverAlt).toBe('Acme dashboard overview');
   });
 
+  it('parses the case-study template fields and leaves them optional', () => {
+    const base = {
+      title: 'Acme redesign',
+      summary: 'Rebuilt the marketing site.',
+      role: 'Lead engineer',
+      stack: ['Astro'],
+      year: 2026,
+    };
+
+    const parsed = workSchema.parse({
+      ...base,
+      constraint: 'No CMS · 6-week window',
+      retrospective: 'I would cut the second nav tier sooner.',
+      cta: 'Need similar work?',
+    });
+
+    expect(parsed.constraint).toBe('No CMS · 6-week window');
+    expect(parsed.retrospective).toBe('I would cut the second nav tier sooner.');
+    expect(parsed.cta).toBe('Need similar work?');
+
+    const bare = workSchema.parse(base);
+    expect(bare.constraint).toBeUndefined();
+    expect(bare.retrospective).toBeUndefined();
+    expect(bare.cta).toBeUndefined();
+  });
+
   it('rejects frontmatter missing a required title', () => {
     expect(() =>
       workSchema.parse({
