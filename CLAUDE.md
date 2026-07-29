@@ -33,7 +33,7 @@ a11y review is **manual** via `/impeccable audit` — there is no enforcement ho
 
 ## Folder structure
 
-Target structure — most of it is `.gitkeep` scaffolding until Phases 2+ land (same status caveat as ARCHITECTURE.md).
+Target structure. Phases 2–4 have landed (primitives, layout chrome, landing sections, both content layouts, the two listing pages); `actions/`, `lib/brief/`, `lib/email/`, `lib/seo/`, `components/mdx/` and the remaining routes are still `.gitkeep` scaffolding — ARCHITECTURE.md's status line has the current inventory.
 
 ```
 src/
@@ -41,7 +41,7 @@ src/
 │   └── index.ts         # Astro Actions (contact form: Zod + Resend)
 ├── components/
 │   ├── primitives/      # Button, Card, Chip, Link, Section, Container
-│   ├── layout/          # Nav, Footer, PageShell
+│   ├── layout/          # Nav, Footer, PageHeader, BrandMark
 │   ├── sections/        # Hero, TrustStrip, FeaturedWork, CTABand (landing)
 │   └── mdx/             # MDX-only components (Callout, Image, Video, Code)
 ├── content/
@@ -245,9 +245,9 @@ Primitives (Phase 2) skip this — they're token application. Mobbin is a delibe
 | Phase | Task                                                                      | Primary skill(s)                                                                                                                                                                                                                     |
 | ----- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 2     | Design tokens + primitives (Button, Card, Chip, Link, Section, Container) | `/impeccable document` once to verify DESIGN.md, then ONE batched `/impeccable craft` pass over the primitive set (per-primitive ceremony dropped 2026-07-17 — tokens are locked; quality gate moves to page-level `polish`/`audit`) |
-| 3     | Layouts (Nav, Footer, PageShell)                                          | `/impeccable shape` brief, then `/impeccable craft`                                                                                                                                                                                  |
+| 3     | Layouts (Nav, Footer, RootLayout)                                         | `/impeccable shape` brief, then `/impeccable craft`                                                                                                                                                                                  |
 | 4     | Landing sections (Hero, TrustStrip, FeaturedWork, etc.)                   | `/impeccable craft` per section, `/impeccable polish` over the full page                                                                                                                                                             |
-| 5     | Case study template + 3 real studies                                      | `/impeccable craft` template, `/impeccable polish` per filled study; screenshot optimization by hand (WebP, sizing, lazy-load — the old `image` skill is gone)                                                                       |
+| 5     | Case study template + 5 real studies                                      | `/impeccable craft` template, `/impeccable polish` per filled study; screenshot optimization by hand (WebP, sizing, lazy-load — the old `image` skill is gone)                                                                       |
 | 6     | Blog templates (Brief + Deep-dive)                                        | `/impeccable craft` for templates, `/impeccable typeset` for prose tuning                                                                                                                                                            |
 | 7     | About + Contact pages                                                     | `/impeccable craft` per page, `/impeccable harden` on the contact form, `playwright-cli` for browser QA                                                                                                                              |
 | 8     | Motion polish                                                             | `/impeccable animate` page-by-page, `/impeccable polish` for hover micro-interactions                                                                                                                                                |
