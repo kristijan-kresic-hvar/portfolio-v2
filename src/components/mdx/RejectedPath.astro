@@ -1,0 +1,22 @@
+---
+interface Props {
+  considered: string;
+  chose: string;
+  because: string;
+}
+
+const { considered, chose, because } = Astro.props;
+---
+
+{/* The locked "we considered X but chose Y because…" shape, split across two blocks. */}
+<div class="border-border-subtle my-8 grid gap-6 border-y py-6 sm:grid-cols-2">
+  <div>
+    <h3 class="text-text-secondary font-mono text-sm">Considered</h3>
+    <p class="text-text-body mt-2">{considered}</p>
+  </div>
+  <div>
+    <h3 class="text-text-secondary font-mono text-sm">Chose</h3>
+    <p class="text-text-body mt-2">{chose}</p>
+    <p class="text-text-body mt-2">{because}</p>
+  </div>
+</div>

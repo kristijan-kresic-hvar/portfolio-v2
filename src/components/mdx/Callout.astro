@@ -1,0 +1,16 @@
+---
+interface Props {
+  /** Optional so `<Callout text={frontmatter.retrospective}>` vanishes when the field is absent. */
+  text?: string;
+}
+
+const { text } = Astro.props;
+---
+
+{
+  text && (
+    <div class="border-border-default bg-bg-elev-1 my-8 rounded-lg border p-6">
+      <p class="text-text-body">{text}</p>
+    </div>
+  )
+}

@@ -1,0 +1,32 @@
+---
+interface Props {
+  items?: string[];
+  /** One string holding several items, joined with the CaseCard meta separator (" · "). */
+  summary?: string;
+}
+
+const { items, summary } = Astro.props;
+
+const rows =
+  items ??
+  summary
+    ?.split(' · ')
+    .map((row) => row.trim())
+    .filter(Boolean) ??
+  [];
+
+// Studies with more rows than a single string can carry pass <li> children instead.
+const slotted = Astro.slots.has('default');
+---
+
+{
+  (rows.length > 0 || slotted) && (
+    /* list-none!/ps-0!: prose.css is unlayered, so plain utilities lose to `.prose ol`. */
+    <ol class="border-border-subtle my-8 list-none! border-t ps-0!">
+      {rows.map((row) => (
+        <li class="border-border-subtle text-text-body border-b py-3">{row}</li>
+      ))}
+      <slot />
+    </ol>
+  )
+}
