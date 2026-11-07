@@ -8,7 +8,7 @@ Source of my personal site, kept public as a working sample of how I set up and 
 
 - **Project setup from scratch**: Astro 6, TypeScript strict with `noUncheckedIndexedAccess`, Tailwind CSS v4 design tokens in a single `@theme` block, MDX content collections with Zod schemas.
 - **Quality gates that actually run**: Vitest unit tests, ESLint + Prettier on pre-commit (lefthook), Conventional Commits enforced by commitlint with a scope whitelist, CI on every PR (`typecheck` + `lint` + `test` + `build`).
-- **Two-reviewer PR pipeline**: every PR gets an automated code review plus a merge gate that stays red until the review is clean on the current head. See `.github/workflows/`.
+- **Two-reviewer PR pipeline**: every PR gets a Claude Code review and a Codex review, plus a merge gate that stays red until the review is clean on the current head. See `.github/workflows/`.
 - **Documented decisions**: [`ARCHITECTURE.md`](./ARCHITECTURE.md) (routes, data flow, design system), [`DESIGN.md`](./DESIGN.md) (tokens, motion rules, accessibility target of 100), [`CLAUDE.md`](./CLAUDE.md) (conventions for AI coding agents working in the repo).
 - **AI-augmented workflow, human-owned output**: I use Claude Code and Cursor for scaffolding and research drafts. Architecture, security decisions and every merged line are reviewed by me.
 

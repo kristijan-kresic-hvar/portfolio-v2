@@ -38,7 +38,7 @@ VARIANTS = {
         "skills": [
             ("Frontend", "React, Next.js (App Router), TypeScript, JavaScript, Vue.js, Tailwind CSS, HTML5, CSS3, TanStack Query, React Hook Form, Zod, Recharts, Astro"),
             ("Mobile", "React Native, BLE / Bluetooth Low Energy integrations"),
-            ("Backend", "Node.js, PHP / Laravel, REST API integration (Django REST, Laravel), PostgreSQL, MySQL"),
+            ("Backend", "PHP / Laravel, REST API integration (Django REST, Laravel, Node backends), PostgreSQL, MySQL"),
             ("Testing &amp; tooling", "Vitest, Playwright (agent-driven browser QA), CI/CD (GitHub Actions, Bitbucket Pipelines), ESLint, Prettier, Git, Vercel, Sanity CMS, WordPress, Figma, Claude Code, Cursor"),
         ],
     },
@@ -47,9 +47,9 @@ VARIANTS = {
         "title": "Kristijan Krešić — Software Engineer (React / Next.js / TypeScript / Laravel)",
         "headline": "Software Engineer · React / Next.js / TypeScript · Laravel",
         "summary": (
-            "Frontend-led full-stack engineer with 4+ years of professional experience (building for the web since 2016). "
+            "Frontend-led full-stack engineer with 4+ years of professional experience. "
             "Shipped production frontends on six North American web and mobile products across insurance, HIPAA healthcare, "
-            "telehealth and IoT, working remote and async. Owns the frontend end-to-end (React, Next.js, TypeScript) and works across the stack when the team needs it: "
+            "telehealth and IoT. Owns the frontend end-to-end (React, Next.js, TypeScript) and works across the stack when the team needs it: "
             "Laravel controllers and migrations, REST integration over Django and Node backends, CMS and payments."
         ),
         "skills": [
@@ -97,14 +97,14 @@ PROJECTS = [
         "hook": 'pet-telehealth marketplace, Toronto (<a href="https://vetster.com">vetster.com</a>)',
         "dates": "Jul 2024 – Apr 2025",
         "bullets": [
-            "Shipped Vue.js frontend features on a 24/7 video-consultation platform with 100k+ app users.",
+            "Shipped Vue.js features (vet onboarding, profile and account-settings screens) on a 24/7 video-consultation platform with 100k+ app users.",
             "Backend: Laravel controllers and database migrations for user and vet profile data (profile fields, onboarding, account settings).",
         ],
         "stack": "Laravel · PHP · Vue.js · PostgreSQL",
     },
     {
         "name": "Naitur",
-        "hook": 'first digital platform for licensed psilocybin therapy clinics (US, HIPAA — <a href="https://naitur.ai">naitur.ai</a>)',
+        "hook": 'platform for licensed psilocybin therapy clinics (US, HIPAA — <a href="https://naitur.ai">naitur.ai</a>)',
         "dates": "Aug 2023 – Jul 2024",
         "bullets": [
             "Shipped the responsive frontend for a US-regulated platform (100+ facilitators and 15+ clinics onboarded in its first week).",
@@ -125,7 +125,7 @@ PROJECTS = [
 
 EARLY = [
     ('<strong>amondi GmbH</strong> (Zagreb, hybrid) · Frontend React Developer: CMS-driven React apps (car-catcher.de, <a href="https://buildmycareer.de">buildmycareer.de</a>)', "2022"),
-    ('<strong>Reroot</strong> (remote, contract) · Web Developer: full redesign of Agrivi, a top-3 farm-management platform globally (<a href="https://www.agrivi.com">agrivi.com</a> · WordPress, PHP, multilingual)', "2020 – 2021"),
+    ('<strong>Reroot</strong> (remote, contract) · Web Developer: full redesign of Agrivi, a farm-management SaaS (<a href="https://www.agrivi.com">agrivi.com</a> · WordPress, PHP, multilingual)', "2020 – 2021"),
     ('<strong>Robinson Restaurant</strong> (Hvar · <a href="https://robinson-hvar.com">robinson-hvar.com</a>) · Freelance full-stack: custom WordPress theme from scratch (PHP); the owner reported inquiries up about 200% after launch', "2019 – 2021"),
 ]
 
@@ -164,7 +164,7 @@ def build(v):
 <header>
   <h1>Kristijan Krešić<span class="dot">.</span></h1>
   <p class="headline">{v['headline']}</p>
-  <p class="contact">Hvar, Croatia (CET) {SEP} Remote, EU or US-East overlap {SEP} Hybrid in Split (open to relocating to Zagreb) {SEP} EU citizen, no visa needed {SEP} Croatian, English</p>
+  <p class="contact">Hvar, Croatia (CET) {SEP} Remote, EU or US-East overlap {SEP} Hybrid in Split (open to relocating to Zagreb) {SEP} EU citizen, no visa needed</p>
   <p class="contact"><a href="mailto:kristijan.kresic.dev@gmail.com">kristijan.kresic.dev@gmail.com</a> {SEP} <a href="https://github.com/kristijan-kresic-hvar">github.com/kristijan-kresic-hvar</a> {SEP} <a href="https://www.linkedin.com/in/kkwebdev/">linkedin.com/in/kkwebdev</a></p>
 </header>
 
