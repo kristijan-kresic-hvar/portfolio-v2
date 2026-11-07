@@ -1,10 +1,26 @@
 """Build cv/frontend.html and cv/fullstack.html from one content model. Usage: python3 cv/build.py cv  (then cv/render.sh)."""
+import re
 import sys
 from pathlib import Path
 
-OUT = Path(sys.argv[1])
+OUT = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parent
 import re as _re
-STYLE = _re.sub(r"@font-face \{.*?\}\n", "", (OUT / "style.html").read_text(), flags=_re.S).replace("</style>", "  :root{--sans:'Liberation Sans',Arial,sans-serif;--mono:'Liberation Mono',monospace} body{font-size:10.4px;line-height:1.36} .stack{font-size:8.5px} .row .dates{font-size:9px} h2{font-size:9.5px} section{margin-top:7px} h2{margin-bottom:5px} @page{margin:6mm 12mm 6mm} ul{list-style:disc outside;padding-left:13px} li{position:static;padding-left:0} li::before{content:none} li::marker{color:var(--amber-text)} .row{display:table;width:100%} .row>h3,.row>.what{display:table-cell;vertical-align:baseline} .row .dates{display:table-cell;text-align:right;padding-left:12px;vertical-align:baseline;width:1%}\n</style>")
+CSS_OVERRIDE = """
+  :root{--sans:'Liberation Sans',Arial,sans-serif;--mono:'Liberation Mono',monospace}
+  body{font-size:10.4px;line-height:1.36}
+  .stack{font-size:8.5px} .row .dates{font-size:9px} h2{font-size:9.5px}
+  section{margin-top:7px} h2{margin-bottom:5px}
+  @page{margin:6mm 12mm 6mm}
+  ul{list-style:disc outside;padding-left:13px} li{position:static;padding-left:0}
+  li::before{content:none} li::marker{color:var(--amber-text)}
+  .row{display:table;width:100%} .row>h3,.row>.what{display:table-cell;vertical-align:baseline}
+  .row .dates{display:table-cell;text-align:right;padding-left:12px;vertical-align:baseline;width:1%}
+"""
+# Drop the @font-face blocks: the PDF embeds static TrueType fonts (Chrome embeds variable woff2 as Type 3,
+# which some ATS parsers mishandle).
+STYLE = re.sub(r"@font-face \{.*?\}\n", "", (OUT / "style.html").read_text(), flags=re.S).replace(
+    "</style>", CSS_OVERRIDE + "</style>"
+)
 
 SEP = '<span class="sep" aria-hidden="true">·</span>'
 
@@ -37,7 +53,7 @@ VARIANTS = {
             "Laravel controllers and migrations, REST integration over Django and Node backends, CMS and payments."
         ),
         "skills": [
-                        ("Frontend", "React, Next.js (App Router), TypeScript, JavaScript, Vue.js, Tailwind CSS, HTML5, CSS3, TanStack Query, React Hook Form, Zod, Recharts, Astro"),
+            ("Frontend", "React, Next.js (App Router), TypeScript, JavaScript, Vue.js, Tailwind CSS, HTML5, CSS3, TanStack Query, React Hook Form, Zod, Recharts, Astro"),
             ("Backend", "Laravel / PHP (controllers, migrations), WordPress theme development (PHP), REST API integration (Django REST, Laravel, Node backends), PostgreSQL, MySQL, PayPal API, Sanity CMS"),
             ("Mobile", "React Native, BLE / Bluetooth Low Energy integrations"),
             ("Testing &amp; tooling", "Vitest, Playwright (agent-driven browser QA), CI/CD (GitHub Actions, Bitbucket Pipelines), ESLint, Prettier, Git, Vercel, WordPress, Figma, Claude Code, Cursor"),

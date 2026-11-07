@@ -11,7 +11,7 @@ export default defineConfig({
   adapter: vercel(),
   redirects: {
     // speakable CV URL — the PDF is rendered by cv/render.sh into public/cv/
-    '/cv': '/cv/kristijan-kresic-cv.pdf',
+    '/cv': '/cv/kristijan-kresic-cv-frontend.pdf',
   },
   integrations: [mdx(), sitemap()],
   vite: {
