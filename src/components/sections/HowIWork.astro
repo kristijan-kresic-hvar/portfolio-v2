@@ -2,7 +2,6 @@
 import type { IconName } from '@/components/icons/Icon.astro';
 import Icon from '@/components/icons/Icon.astro';
 import Container from '@/components/primitives/Container.astro';
-import Link from '@/components/primitives/Link.astro';
 import Section from '@/components/primitives/Section.astro';
 
 // Step lines are capped at 12 words (research L-4) — enforced by sections.test.ts
@@ -54,22 +53,6 @@ const boundary =
           <Icon name="terminal" class="text-accent size-5" />
           <p class="text-text-secondary mt-3 text-sm text-pretty">{boundary}</p>
         </div>
-
-        <p class="text-text-muted mt-8 text-sm text-pretty">
-          The process itself is public. Linear tickets written as executable specs drive AI agents
-          through worktree, TDD, and PR, with an adversarial AI review on every pull request. I gate
-          every merge. See <Link
-            href="https://github.com/kristijan-kresic-hvar/linear-pipeline-kit"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="font-mono text-xs">linear-pipeline-kit</Link
-          > and <Link
-            href="https://github.com/kristijan-kresic-hvar/ai-review-kit"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="font-mono text-xs">ai-review-kit</Link
-          >.
-        </p>
       </div>
 
       <ol role="list" class="mt-12 lg:col-span-7 lg:mt-0">

@@ -1,6 +1,6 @@
 ---
 name: pr-review-loop
-description: Autonomous review-fix loop for ai-review-kit repos — triages AI review findings, applies verified fixes, replies/resolves threads, re-triggers reviewers, sweeps your open PRs. Use when review findings land on a PR, or when asked to "run the review loop on PR <N>" or "babysit my PRs".
+description: Autonomous review-fix loop for AI-reviewed repos — triages AI review findings, applies verified fixes, replies/resolves threads, re-triggers reviewers, sweeps your open PRs. Use when review findings land on a PR, or when asked to "run the review loop on PR <N>" or "babysit my PRs".
 ---
 
 # PR Review Loop (shim)
