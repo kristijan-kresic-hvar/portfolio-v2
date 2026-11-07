@@ -169,7 +169,7 @@ def build(v):
   <h1>Kristijan Krešić<span class="dot" aria-hidden="true"></span></h1>
   <p class="headline">{v['headline']}</p>
   <p class="contact">Hvar, Croatia (CET) {SEP} Available now {SEP} Remote (EU / US-East overlap) {SEP} Hybrid in Split, or relocate for Zagreb {SEP} EU citizen, no visa needed</p>
-  <p class="contact"><a href="mailto:kristijan.kresic.dev@gmail.com">kristijan.kresic.dev@gmail.com</a> {SEP} <a href="https://github.com/kristijan-kresic-hvar">github.com/kristijan-kresic-hvar</a> {SEP} <a href="https://www.linkedin.com/in/kkwebdev/">linkedin.com/in/kkwebdev</a></p>
+  <p class="contact"><a href="mailto:kristijan.kresic.dev@gmail.com">kristijan.kresic.dev@gmail.com</a> {SEP} <a href="tel:+385919027183">+385 91 9027 183</a> {SEP} <a href="https://github.com/kristijan-kresic-hvar">github.com/kristijan-kresic-hvar</a> {SEP} <a href="https://www.linkedin.com/in/kkwebdev/">linkedin.com/in/kkwebdev</a></p>
 </header>
 
 <section aria-labelledby="summary">
