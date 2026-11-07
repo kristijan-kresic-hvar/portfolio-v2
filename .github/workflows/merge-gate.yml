@@ -1,7 +1,7 @@
 # merge-gate — stamps a commit status (context: "merge-gate") on the PR head, green ONLY
 # when every APPLICABLE AI reviewer is clean on the CURRENT head. A leg applies when its
 # reviewer is configured OR has activity on the PR (normative signal map: the
-# ai-review-kit playbook — .github/ai-review-loop.md, step 5):
+# review-loop playbook — .github/ai-review-loop.md, step 5):
 #   - Claude: a review by claude[bot], state APPROVED, on the head SHA. Waived (with a
 #     note) only when the PR touches code-review.yml itself AND every changed file is a
 #     workflow file — the review action self-skips only code-review.yml edits; other

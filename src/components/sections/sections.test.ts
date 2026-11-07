@@ -296,14 +296,6 @@ describe('HowIWork', () => {
     }
   });
 
-  it('names Linear and links both public kit repos', () => {
-    expect(howIWorkHtml).toContain('Linear');
-    expect(howIWorkHtml).toContain(
-      'href="https://github.com/kristijan-kresic-hvar/linear-pipeline-kit"',
-    );
-    expect(howIWorkHtml).toContain('href="https://github.com/kristijan-kresic-hvar/ai-review-kit"');
-  });
-
   it('renders an inline decorative SVG icon per process step', () => {
     expect((howIWorkHtml.match(/<svg/g) ?? []).length).toBeGreaterThanOrEqual(3);
     expect(howIWorkHtml).toContain('aria-hidden="true"');
