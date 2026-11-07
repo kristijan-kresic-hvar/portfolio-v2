@@ -15,6 +15,8 @@ CSS_OVERRIDE = """
   li::before{content:none} li::marker{color:var(--amber-text)}
   .row{display:table;width:100%} .row>h3,.row>.what{display:table-cell;vertical-align:baseline}
   .row .dates{display:table-cell;text-align:right;padding-left:12px;vertical-align:baseline;width:1%}
+  .stack{color:#52525b}
+  h1 .dot{display:inline-block;width:.17em;height:.17em;border-radius:50%;background:#d97706;margin-left:.06em;vertical-align:baseline}
 """
 # Drop the @font-face blocks: the PDF embeds static TrueType fonts (Chrome embeds variable woff2 as Type 3,
 # which some ATS parsers mishandle).
@@ -30,16 +32,17 @@ VARIANTS = {
         "title": "Kristijan Krešić — Frontend Engineer (React / Next.js / TypeScript)",
         "headline": "Frontend Engineer · React / Next.js / TypeScript",
         "summary": (
-            "Frontend engineer with 4+ years of professional experience (building for the web since 2016). "
-            "Shipped production frontends on six North American web and mobile products across insurance, HIPAA healthcare, "
-            "telehealth and IoT. Owns the frontend end-to-end: architecture, data layer, component system, forms and delivery, "
-            "working remote and async with distributed product teams."
+            "Frontend engineer, 4+ years professional (building for the web since 2016). Shipped six production React / Next.js / "
+            "TypeScript and React Native products for North American clients in insurance, HIPAA healthcare, telehealth and IoT, "
+            "most recently a public data portal on Next.js 16 / React 19 and a BLE mobile app. Owns the frontend end-to-end: "
+            "architecture, data layer, component system, forms, accessibility, performance and delivery, remote and async with distributed teams."
         ),
         "skills": [
-            ("Frontend", "React, Next.js (App Router), TypeScript, JavaScript, Vue.js, Tailwind CSS, HTML5, CSS3, TanStack Query, React Hook Form, Zod, Recharts, Astro"),
+            ("Frontend", "React, Next.js (App Router, SSR/SSG), TypeScript, JavaScript, Vue.js, Tailwind CSS, HTML5, CSS3, TanStack Query, React Hook Form, Zod, Recharts, Astro"),
             ("Mobile", "React Native, BLE / Bluetooth Low Energy integrations"),
-            ("Backend", "PHP / Laravel, REST API integration (Django REST, Laravel, Node backends), PostgreSQL, MySQL"),
-            ("Testing &amp; tooling", "Vitest, Playwright (agent-driven browser QA), CI/CD (GitHub Actions, Bitbucket Pipelines), ESLint, Prettier, Git, Vercel, Sanity CMS, WordPress, Figma, Claude Code, Cursor"),
+            ("Backend", "PHP / Laravel, REST API integration (Django REST, Laravel, Node.js backends), PostgreSQL, MySQL"),
+            ("Testing &amp; quality", "Vitest, Playwright (browser QA), accessibility (semantic HTML, keyboard navigation, Lighthouse a11y audits), web performance (Lighthouse, Core Web Vitals), CI/CD (GitHub Actions, Bitbucket Pipelines), ESLint, Prettier"),
+            ("Tooling &amp; languages", "Git, Vercel, Sanity CMS, WordPress, Figma, Claude Code, Cursor · English (fluent), Croatian (native)"),
         ],
     },
     "fullstack": {
@@ -47,16 +50,17 @@ VARIANTS = {
         "title": "Kristijan Krešić — Software Engineer (React / Next.js / TypeScript / Laravel)",
         "headline": "Software Engineer · React / Next.js / TypeScript · Laravel",
         "summary": (
-            "Frontend-led full-stack engineer with 4+ years of professional experience. "
-            "Shipped production frontends on six North American web and mobile products across insurance, HIPAA healthcare, "
-            "telehealth and IoT. Owns the frontend end-to-end (React, Next.js, TypeScript) and works across the stack when the team needs it: "
-            "Laravel controllers and migrations, REST integration over Django and Node backends, CMS and payments."
+            "Frontend-led full-stack engineer, 4+ years professional (building for the web since 2016). Shipped six production React / "
+            "Next.js / TypeScript and React Native products for North American clients in insurance, HIPAA healthcare, telehealth and IoT, "
+            "most recently a public data portal on Next.js 16 / React 19 and a BLE mobile app. Owns the frontend end-to-end and works across "
+            "the stack when the team needs it: Laravel controllers and migrations, REST integration over Django and Node.js backends, CMS and payments."
         ),
         "skills": [
-            ("Frontend", "React, Next.js (App Router), TypeScript, JavaScript, Vue.js, Tailwind CSS, HTML5, CSS3, TanStack Query, React Hook Form, Zod, Recharts, Astro"),
-            ("Backend", "Laravel / PHP (controllers, migrations), WordPress theme development (PHP), REST API integration (Django REST, Laravel, Node backends), PostgreSQL, MySQL, PayPal API, Sanity CMS"),
+            ("Frontend", "React, Next.js (App Router, SSR/SSG), TypeScript, JavaScript, Vue.js, Tailwind CSS, HTML5, CSS3, TanStack Query, React Hook Form, Zod, Recharts, Astro"),
+            ("Backend", "Laravel / PHP (controllers, migrations), WordPress theme development (PHP), REST API integration (Django REST, Laravel, Node.js backends), PostgreSQL, MySQL, PayPal API, Sanity CMS"),
             ("Mobile", "React Native, BLE / Bluetooth Low Energy integrations"),
-            ("Testing &amp; tooling", "Vitest, Playwright (agent-driven browser QA), CI/CD (GitHub Actions, Bitbucket Pipelines), ESLint, Prettier, Git, Vercel, WordPress, Figma, Claude Code, Cursor"),
+            ("Testing &amp; quality", "Vitest, Playwright (browser QA), accessibility (semantic HTML, keyboard navigation, Lighthouse a11y audits), web performance (Lighthouse, Core Web Vitals), CI/CD (GitHub Actions, Bitbucket Pipelines), ESLint, Prettier"),
+            ("Tooling &amp; languages", "Git, Vercel, WordPress, Figma, Claude Code, Cursor · English (fluent), Croatian (native)"),
         ],
     },
 }
@@ -67,7 +71,7 @@ PROJECTS = [
         "hook": 'public biomass-discovery platform (<a href="https://biocirv.beamcircular.org">biocirv.beamcircular.org</a>)',
         "dates": "Feb 2026 – Jul 2026",
         "bullets": [
-            "Built the public discovery UI from scratch, responsive and keyboard-accessible: search with autocomplete, faceted filters, interactive maps, biomass profiles and Recharts dashboards over a Django REST API.",
+            "Built the public discovery UI from scratch, responsive and accessible (semantic HTML, keyboard navigation): search with autocomplete, faceted filters, interactive maps, biomass profiles and Recharts dashboards over a Django REST API.",
             "Designed the data layer (TanStack Query + URL-synced filter state) so every search is a shareable link and results stay cached across navigation.",
             "Owned the frontend foundation two other developers built on, and reviewed their pull requests: component system, typed forms (React Hook Form + Zod), Figma-to-code workflow, commit conventions and QA handoff.",
         ],
@@ -85,7 +89,7 @@ PROJECTS = [
     },
     {
         "name": "Suello",
-        "hook": 'BLE-connected smart-planter app, Toronto IoT startup (<a href="https://www.linkedin.com/company/suello/">LinkedIn</a>)',
+        "hook": 'BLE-connected smart-planter app, Toronto IoT startup (<a href="https://www.linkedin.com/company/suello/">suello on LinkedIn</a>)',
         "dates": "Apr 2025 – Nov 2025",
         "bullets": [
             "Built the companion mobile app from scratch in React Native: BLE pairing and device-communication layer, authentication, and the onboarding flow with custom animations.",
@@ -124,9 +128,9 @@ PROJECTS = [
 ]
 
 EARLY = [
-    ('<strong>amondi GmbH</strong> (Zagreb, hybrid) · Frontend React Developer: CMS-driven React apps (car-catcher.de, <a href="https://buildmycareer.de">buildmycareer.de</a>)', "2022"),
-    ('<strong>Reroot</strong> (remote, contract) · Web Developer: full redesign of Agrivi, a farm-management SaaS (<a href="https://www.agrivi.com">agrivi.com</a> · WordPress, PHP, multilingual)', "2020 – 2021"),
-    ('<strong>Robinson Restaurant</strong> (Hvar · <a href="https://robinson-hvar.com">robinson-hvar.com</a>) · Freelance full-stack: custom WordPress theme from scratch (PHP); the owner reported inquiries up about 200% after launch', "2019 – 2021"),
+    ('<strong>amondi GmbH</strong> (Zagreb, hybrid) · Frontend Web Developer: CMS-driven React apps (car-catcher.de, <a href="https://buildmycareer.de">buildmycareer.de</a>)', "Apr 2022 – Nov 2022"),
+    ('<strong>Reroot</strong> (remote, contract) · Web Developer: full redesign of the Agrivi marketing site, a farm-management SaaS (<a href="https://www.agrivi.com">agrivi.com</a> · WordPress, PHP, multilingual)', "Jul 2020 – Mar 2021"),
+    ('<strong>Robinson Restaurant</strong> (Hvar · <a href="https://robinson-hvar.com">robinson-hvar.com</a>) · Freelance web developer: custom WordPress theme from scratch (PHP); the owner reported inquiries up about 200% after launch', "2019 – 2021"),
 ]
 
 
@@ -162,9 +166,9 @@ def build(v):
 <body>
 
 <header>
-  <h1>Kristijan Krešić<span class="dot">.</span></h1>
+  <h1>Kristijan Krešić<span class="dot" aria-hidden="true"></span></h1>
   <p class="headline">{v['headline']}</p>
-  <p class="contact">Hvar, Croatia (CET) {SEP} Remote, EU or US-East overlap {SEP} Hybrid in Split or Zagreb {SEP} EU citizen, no visa needed</p>
+  <p class="contact">Hvar, Croatia (CET) {SEP} Available now {SEP} Remote (EU / US-East overlap) {SEP} Hybrid in Split, or relocate for Zagreb {SEP} EU citizen, no visa needed</p>
   <p class="contact"><a href="mailto:kristijan.kresic.dev@gmail.com">kristijan.kresic.dev@gmail.com</a> {SEP} <a href="https://github.com/kristijan-kresic-hvar">github.com/kristijan-kresic-hvar</a> {SEP} <a href="https://www.linkedin.com/in/kkwebdev/">linkedin.com/in/kkwebdev</a></p>
 </header>
 
@@ -181,7 +185,7 @@ def build(v):
       <h3 class="role-title">Frontend Developer — Agilno</h3>
       <span class="dates">Jan 2023 – Aug 2026</span>
     </div>
-    <p class="role-desc">Product agency; embedded in 6 North-American client teams · remote</p>
+    <p class="role-desc">Product agency; embedded in six North American client teams · remote</p>
 {projects}
   </div>
 </section>
@@ -199,8 +203,8 @@ def build(v):
 
 <section aria-labelledby="education">
   <h2 id="education">Education</h2>
-  <div class="edu row"><span class="what"><strong>Algebra University (Sveučilište Algebra), Zagreb</strong> · Certificate programme: PHP &amp; MySQL Backend Development</span><span class="dates">2017 – 2018</span></div>
-  <div class="edu row"><span class="what"><strong>Algebra University (Sveučilište Algebra), Zagreb</strong> · Certificate programme: Frontend Development &amp; Graphic Design</span><span class="dates">2016 – 2017</span></div>
+  <div class="edu row"><span class="what"><strong>Algebra Bernays University (Sveučilište Algebra), Zagreb</strong> · Certificate programme: PHP &amp; MySQL Backend Development</span><span class="dates">2017 – 2018</span></div>
+  <div class="edu row"><span class="what"><strong>Algebra Bernays University (Sveučilište Algebra), Zagreb</strong> · Certificate programme: Frontend Development &amp; Graphic Design</span><span class="dates">2016 – 2017</span></div>
 </section>
 
 </body>
